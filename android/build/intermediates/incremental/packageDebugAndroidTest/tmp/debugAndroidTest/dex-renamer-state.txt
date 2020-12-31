@@ -1,0 +1,4 @@
+#Wed Dec 30 17:58:14 CST 2020
+base.0=D\:\\Users\\Administrator\\Repository\\github\\react-native-ttlock\\android\\build\\intermediates\\transforms\\dexMerger\\androidTest\\debug\\0
+path.0=classes.dex
+renamed.0=classes.dex

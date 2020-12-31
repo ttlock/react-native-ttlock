@@ -19,10 +19,6 @@ export interface ScanWifiModal {
     wifi: string;
     rssi: number;
 }
-export interface InitLockParam {
-    lockMac: string;
-    lockVersion: string;
-}
 export interface InitGatewayParam {
     gatewayName: string;
     wifi: string;
