@@ -159,7 +159,7 @@ class Ttlock {
 
   /**
    * Initialize lock
-   * @param object {lock:"ea:09:e2:99:33", lockVersion:"{\"protocolType\":5,\"protocolVersion\":3,\"scene\":2,\"groupId\":1,\"orgId\":1}"}
+   * @param object {lockMac:"ea:09:e2:99:33", lockVersion:"{\"protocolType\":5,\"protocolVersion\":3,\"scene\":2,\"groupId\":1,\"orgId\":1}"}
    * @param success 
    * @param fail 
    */
