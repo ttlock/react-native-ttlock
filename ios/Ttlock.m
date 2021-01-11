@@ -12,7 +12,7 @@
 #define EVENT_SCAN_WIFI @"EventScanWifi"
 
 
-static bool isAddListenBluetoothState = false;
+//static bool isAddListenBluetoothState = false;
 
 
 @implementation Ttlock
@@ -28,9 +28,9 @@ RCT_EXPORT_MODULE()
     if (self = [super init]) {
         __weak Ttlock *weakSelf = self;
         [TTLock setupBluetooth:^(TTBluetoothState state) {
-            if (isAddListenBluetoothState) {
-                [weakSelf sendEventWithName:EVENT_BLUETOOTH_STATE body:@(state)];
-            }
+//            if (isAddListenBluetoothState) {
+//                [weakSelf sendEventWithName:EVENT_BLUETOOTH_STATE body:@(state)];
+//            }
         }];
     }
     return self;
@@ -42,7 +42,7 @@ RCT_EXPORT_MODULE()
       EVENT_SCAN_LOCK,
       EVENT_ADD_CARD_PROGRESS,
       EVENT_ADD_FINGERPRINT_PROGRESS,
-      EVENT_BLUETOOTH_STATE,
+//      EVENT_BLUETOOTH_STATE,
       EVENT_SCAN_GATEWAY,
       EVENT_SCAN_WIFI];
 }
@@ -50,9 +50,16 @@ RCT_EXPORT_MODULE()
 - (void)addListener:(NSString *)eventName
 {
     [super addListener:eventName];
-    if ([eventName isEqualToString:EVENT_BLUETOOTH_STATE]) {
-        isAddListenBluetoothState = true;
-    }
+//    if ([eventName isEqualToString:EVENT_BLUETOOTH_STATE]) {
+//        isAddListenBluetoothState = true;
+//    }
+}
+
+RCT_EXPORT_METHOD(getBluetoothState:(RCTResponseSenderBlock)callbackBlock)
+{
+    TTBluetoothState bluetoothState = [TTLock bluetoothState];
+    [Ttlock response:@(bluetoothState) success:callbackBlock];
+    
 }
 
 #pragma mark - Lock

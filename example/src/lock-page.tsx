@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { FlatList, StyleSheet, Text, TouchableHighlight } from 'react-native';
-import { Ttlock } from 'react-native-ttlock';
+import { Ttlock, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState } from 'react-native-ttlock';
 import * as Toast from './toast-page';
 
 const optionsData = [
@@ -55,12 +55,12 @@ const optionClick = (option: string, lockData: string) => {
   
   Toast.showToastLoad("load...");
 
-  // Ttlock.supportFunction(Ttlock.lockFunction.passageMode,lockData,(isSupport: boolean)=>{
-  //   console.log("isSupportPassageMode",isSupport)
-  // })
+  Ttlock.supportFunction(LockFunction.PassageMode,lockData,(isSupport: boolean)=>{
+    console.log("isSupportPassageMode:",isSupport)
+  })
 
   if (option === "Unlock/Lock") {
-    Ttlock.controlLock(Ttlock.controlEnum.unlock, lockData, (lockTime: number, electricQuantity: number, uniqueId: number) => {
+    Ttlock.controlLock(LockControlType.Unlock, lockData, (lockTime: number, electricQuantity: number, uniqueId: number) => {
       let text = "lockTime:" + lockTime + "\n" + "electricQuantity:" + electricQuantity + "\n" + "uniqueId:" + uniqueId;
       successCallback(text);
     }, failedCallback)
@@ -80,7 +80,7 @@ const optionClick = (option: string, lockData: string) => {
     }, failedCallback);
   }
   else if (option === "Get lock operate record") {
-    Ttlock.getLockOperateRecord(Ttlock.lockRecordEnum.latest, lockData, successCallback, failedCallback);
+    Ttlock.getLockOperateRecord(LockRecordType.Latest, lockData, successCallback, failedCallback);
   }
   else if (option === "Create custom passcode 1122") {
     // passcode valid one day
@@ -116,8 +116,8 @@ const optionClick = (option: string, lockData: string) => {
 
   else if (option === "Get lock switch state") {
 
-    Ttlock.getLockSwitchState(lockData, (state: number, description: string) => {
-      let text = "state:" + state + "\n" + "description:" + description;
+    Ttlock.getLockSwitchState(lockData, (state: LockState) => {
+      let text = "state:" + state;
       successCallback(text);
     }, failedCallback);
 
@@ -232,14 +232,14 @@ const optionClick = (option: string, lockData: string) => {
     }, failedCallback);
   }
   else if (option === "Get lock config") {
-    Ttlock.getLockConfig(Ttlock.lockConfigEnum.audio, lockData, (type: number, isOn: boolean) => {
+    Ttlock.getLockConfig(LockConfigType.Audio, lockData, (type: number, isOn: boolean) => {
       let text = "type:" + type + "\n" + "isOn:" + isOn;
       successCallback(text);
     }, failedCallback);
   }
   else if (option === "Set lock config") {
     let isOn = true;
-    Ttlock.setLockConfig(Ttlock.lockConfigEnum.audio, isOn, lockData, () => {
+    Ttlock.setLockConfig(LockConfigType.Audio, isOn, lockData, () => {
       let text = "config lock success";
       successCallback(text);
     }, failedCallback);
@@ -248,8 +248,8 @@ const optionClick = (option: string, lockData: string) => {
     //minutes  8:00 am ---   17:00 pm
     let startTime = 8 * 60;
     let endTime = 17 * 60;
-    // Ttlock.addPassageMode(Ttlock.lockPassageModeEnum.monthly, [1, 3, 9,28], startTime, endTime, lockData, successCallback, failedCallback);
-    Ttlock.addPassageMode(Ttlock.lockPassageModeEnum.weekly, [1, 2, 7], startTime, endTime, lockData, () => {
+
+    Ttlock.addPassageMode(LockPassageMode.Weekly, [1, 2, 7], startTime, endTime, lockData, () => {
       let text = "add passage mode success";
       successCallback(text);
     }, failedCallback);
