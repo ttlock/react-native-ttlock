@@ -13,5 +13,21 @@ public class TTLockFieldConstant {
     public static final String RSSI = "rssi";
     public static final String LOCK_SWITCH_STATE = "lockSwitchState";
 
-    public static final String LOCK_DATA = "lockData";
+
+    public static final String WEEK_DAY = "weekDay";
+    public static final String START_TIME = "startTime";
+    public static final String END_TIME = "endTime";
+
+//    public static final String LOCK_DATA = "lockData";
+
+//    public static final String ERROR_CODE = "errorCode";
+//    public static final String DESCRIPTION = "description";
+//    public static final String ERROR_DESCRIPTION = "errorDesc";
+
+//    public static final String STATE = "state";
+
+//    public static final String LOCK_TIME = "lockTime";
+//    public static final String UNIQUE_ID = "uniqueId";
+
+//    public static final String CONTROL = "control";
 }

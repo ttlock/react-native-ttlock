@@ -232,14 +232,14 @@ const optionClick = (option: string, lockData: string) => {
     }, failedCallback);
   }
   else if (option === "Get lock config") {
-    Ttlock.getLockConfig(Ttlock.lockConfigEnum.audio, lockData, (type: number, isOn: boolean) => {
+    Ttlock.getLockConfig(Ttlock.lockConfigEnum.freeze, lockData, (type: number, isOn: boolean) => {
       let text = "type:" + type + "\n" + "isOn:" + isOn;
       successCallback(text);
     }, failedCallback);
   }
   else if (option === "Set lock config") {
-    let isOn = true;
-    Ttlock.setLockConfig(Ttlock.lockConfigEnum.audio, isOn, lockData, () => {
+    let isOn = false;
+    Ttlock.setLockConfig(Ttlock.lockConfigEnum.freeze, isOn, lockData, () => {
       let text = "config lock success";
       successCallback(text);
     }, failedCallback);
@@ -249,7 +249,7 @@ const optionClick = (option: string, lockData: string) => {
     let startTime = 8 * 60;
     let endTime = 17 * 60;
     // Ttlock.addPassageMode(Ttlock.lockPassageModeEnum.monthly, [1, 3, 9,28], startTime, endTime, lockData, successCallback, failedCallback);
-    Ttlock.addPassageMode(Ttlock.lockPassageModeEnum.weekly, [1, 2, 7], startTime, endTime, lockData, () => {
+    Ttlock.addPassageMode(Ttlock.lockPassageModeEnum.weekly, [1, 2, 5, 7], startTime, endTime, lockData, () => {
       let text = "add passage mode success";
       successCallback(text);
     }, failedCallback);

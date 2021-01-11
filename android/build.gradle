@@ -33,15 +33,15 @@ android {
     targetSdkVersion getExtOrIntegerDefault('targetSdkVersion')
     versionCode 1
     versionName "1.0"
-    ndk {
-      // 设置支持的 SO 库构架
-      abiFilters 'armeabi', 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'//, 'mips', 'mips64'
-    }
+//    ndk {
+//      // 设置支持的 SO 库构架
+//      abiFilters 'armeabi', 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'//, 'mips', 'mips64'
+//    }
   }
 
-  packagingOptions {
-    exclude "lib/arm64-v8a/librealm-jni.so"
-  }
+//  packagingOptions {
+//    exclude "lib/arm64-v8a/librealm-jni.so"
+//  }
   
   buildTypes {
     release {
@@ -51,9 +51,21 @@ android {
   lintOptions {
     disable 'GradleCompatible'
   }
+  sourceSets {
+    main {
+      jniLibs.srcDirs = ['libs']
+    }
+  }
   compileOptions {
-    sourceCompatibility JavaVersion.VERSION_1_8
     targetCompatibility JavaVersion.VERSION_1_8
+    sourceCompatibility JavaVersion.VERSION_1_8
+  }
+
+  //添加本地仓库，并把libs目录作为仓库地址
+  repositories {
+    flatDir {
+      dirs 'libs'
+    }
   }
 }
 
@@ -61,7 +73,10 @@ repositories {
   mavenCentral()
   jcenter()
   google()
-
+//  flatDir {
+////    dirs 'libs'
+//    dirs "D:\\Users\\Administrator\\Repository\\github\\react-native-ttlock\\android\\libs"
+//  }
   def found = false
   def defaultDir = null
   def androidSourcesName = 'React Native sources'
@@ -131,8 +146,11 @@ repositories {
 def kotlin_version = getExtOrDefault('kotlinVersion')
 
 dependencies {
+  implementation fileTree(dir: 'libs', include: ['*.jar'])
   // noinspection GradleDynamicVersion
   api 'com.facebook.react:react-native:+'
 //  implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-  implementation 'com.tongtonglock:ttlock:3.1.0'
+//  implementation 'com.tongtonglock:ttlock:3.1.1'
+  implementation(name: 'ttlock-release', ext: 'aar')
+  implementation 'com.google.code.gson:gson:2.6.1'
 }
