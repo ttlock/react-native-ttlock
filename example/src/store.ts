@@ -62,14 +62,10 @@ class Store {
   }
 
   startScanWifi() {
-    this.wifiList = [];
     TtGateway.getNearbyWifi((list) => {
-      list.forEach(data => {
-        this.wifiList.push(data)
-      });
-      this.wifiList = this.wifiList.slice();
+      this.wifiList = list
     }, () => {
-
+      // finished
     }, null)
   }
 

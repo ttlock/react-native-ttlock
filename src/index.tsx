@@ -457,10 +457,10 @@ class Ttlock {
    * @param success 
    * @param fail 
    */
-  static getLockOperateRecord(type: LockRecordType, lockData: string, success: null | ((records: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
+  static getLockOperationRecord(type: LockRecordType, lockData: string, success: null | ((records: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttlockModule.getLockOperateRecord(type, lockData, success, fail);
+    ttlockModule.getLockOperationRecord(type, lockData, success, fail);
   }
 
   /**

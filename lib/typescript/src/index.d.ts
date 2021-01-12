@@ -219,7 +219,7 @@ declare class Ttlock {
      * @param success
      * @param fail
      */
-    static getLockOperateRecord(type: LockRecordType, lockData: string, success: null | ((records: string) => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static getLockOperationRecord(type: LockRecordType, lockData: string, success: null | ((records: string) => void), fail: null | ((errorCode: number, description: string) => void)): void;
     /**
      * Get the lock automatic locking periodic time
      * @param lockData

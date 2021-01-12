@@ -768,7 +768,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void getLockOperateRecord(int type, String lockData, Callback success, Callback fail) {
+    public void getLockOperationRecord(int type, String lockData, Callback success, Callback fail) {
         TTLockClient.getDefault().getOperationLog(type == 0 ? LogType.NEW : LogType.ALL, lockData, null, new GetOperationLogCallback() {
             @Override
             public void onGetLogSuccess(String log) {

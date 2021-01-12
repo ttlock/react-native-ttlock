@@ -80,7 +80,7 @@ const optionClick = (option: string, lockData: string) => {
     }, failedCallback);
   }
   else if (option === "Get lock operate record") {
-    Ttlock.getLockOperateRecord(LockRecordType.Latest, lockData, successCallback, failedCallback);
+    Ttlock.getLockOperationRecord(LockRecordType.Latest, lockData, successCallback, failedCallback);
   }
   else if (option === "Create custom passcode 1122") {
     // passcode valid one day
@@ -94,7 +94,7 @@ const optionClick = (option: string, lockData: string) => {
 
     // passcode valid one minute
     let startDate = new Date().getTime();
-    let endDate = startDate + 24 * 3600 * 1000;
+    let endDate = startDate + 1 * 60 * 1000;
     Ttlock.modifyPasscode("1122", "2233", startDate, endDate, lockData, () => {
       successCallback("modify passcode success");
     }, failedCallback);
@@ -165,7 +165,7 @@ const optionClick = (option: string, lockData: string) => {
     }, failedCallback);
   }
   else if (option === "Add fingerprint") {
-    // card valid one day
+    // fingerprint valid one day
     let startDate = new Date().getTime();
     let endDate = startDate + 24 * 3600 * 1000;
     Ttlock.addFingerprint(null, startDate, endDate, lockData, (currentCount: number, totalCount: number) => {
@@ -183,7 +183,7 @@ const optionClick = (option: string, lockData: string) => {
       return;
     }
 
-    // card valid one minute
+    // fingerprint valid one minute
     let startDate = new Date().getTime();
     let endDate = startDate + 1 * 60 * 1000;
     Ttlock.modifyFingerprintValidityPeriod(fingerprintNumber, null, startDate, endDate, lockData, () => {

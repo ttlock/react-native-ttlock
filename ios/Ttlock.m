@@ -146,7 +146,7 @@ RCT_EXPORT_METHOD(getLockTime:(NSString *)lockData success:(RCTResponseSenderBlo
     }];
 }
 
-RCT_EXPORT_METHOD(getLockOperateRecord:(int)type lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+RCT_EXPORT_METHOD(getLockOperationRecord:(int)type lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     TTOperateLogType logType = type + 1;
     [TTLock getOperationLogWithType:logType lockData:lockData success:^(NSString *operateRecord) {
