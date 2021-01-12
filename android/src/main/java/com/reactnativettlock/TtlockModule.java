@@ -73,6 +73,7 @@ import com.ttlock.bl.sdk.gateway.model.ConfigureGatewayInfo;
 import com.ttlock.bl.sdk.gateway.model.DeviceInfo;
 import com.ttlock.bl.sdk.gateway.model.GatewayError;
 import com.ttlock.bl.sdk.gateway.model.WiFi;
+import com.ttlock.bl.sdk.util.FeatureValueUtil;
 import com.ttlock.bl.sdk.util.LogUtil;
 
 import java.util.ArrayList;
@@ -88,6 +89,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
     private static HashMap<String, ExtendedBluetoothDevice> mCachedDevice = new HashMap<>();
     private String mac;
     private int totalCnt;
+    private boolean flag;
 
     public TtlockModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -214,17 +216,23 @@ public class TtlockModule extends ReactContextBaseJavaModule {
         //{ code: 0, description: "The bluetooth connect timeout" },
         //      { code: 1, description: "The bluetooth connect success" },
         //      { code: 2, description: "The bluetooth connect fail" }
+
+        //是否已经回调
+        flag = false;
         GatewayClient.getDefault().connectGateway(mac, new ConnectCallback() {
             @Override
             public void onConnectSuccess(ExtendedBluetoothDevice device) {
+                flag = true;
                 callback.invoke(1);
             }
 
             @Override
             public void onDisconnected() {
-                //Illegal callback invocation from native module. This callback type only permits a single invocation from native code.
                 try {//过滤掉断开连接的回调
-                    callback.invoke(0);
+                    if (!flag) {
+                        flag = true;
+                        callback.invoke(0);
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -913,10 +921,25 @@ public class TtlockModule extends ReactContextBaseJavaModule {
         });
     }
 
+    @ReactMethod
+    public void getBluetoothState(Callback callback) {
+        boolean enable = TTLockClient.getDefault().isBLEEnabled(getCurrentActivity());
+        //4-on, 5-off
+        callback.invoke(enable ? 4 : 5);
+    }
+
+    @ReactMethod
+    public void supportFunction(int function, String lockData, Callback callback) {
+        boolean support = FeatureValueUtil.isSupportFeature(lockData, function);
+        callback.invoke(support);
+    }
+
     private void lockErrorCallback(LockError lockError, Callback fail) {
         if (fail != null) {
             fail.invoke(TTLockErrorConverter.native2RN(lockError), lockError.getErrorMsg());
         }
     }
+
+
 
 }

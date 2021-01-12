@@ -1,10 +1,6 @@
 import type { ScanGatewayModal, ScanLockModal, InitGatewayParam, CardFingerprintCycleParam, ScanWifiModal, InitGatewayModal } from './types';
 declare class TtGateway {
     static defaultCallback: () => void;
-    static event: {
-        scanGateway: string;
-        scanWifi: string;
-    };
     /**
      * Scan for nearby gateways （Only newly powered gateways can be scanned）
      * @param callback  If there is a reenergized gateway nearby, the callback will be performed multiple times
@@ -20,7 +16,7 @@ declare class TtGateway {
      * @param success
      * @param fail
      */
-    static connect(mac: string, success: ((state: number, description: string) => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static connect(mac: string, success: ((state: ConnectState) => void), fail: null | ((state: ConnectState) => void)): void;
     /**
      * Read wifi near the gateway
      * @param progress
@@ -38,12 +34,6 @@ declare class TtGateway {
 }
 declare class Ttlock {
     static defaultCallback: () => void;
-    static event: {
-        scanLock: string;
-        addCardProgrress: string;
-        addFingerprintProgress: string;
-        bluetoothState: string;
-    };
     /**
      * Scan for nearby Bluetooth locks
      * @param callback  The Callback will be executed multiple times if there is a Bluetooth lock nearby
@@ -55,7 +45,7 @@ declare class Ttlock {
     static stopScan(): void;
     /**
      * Initialize lock
-     * @param object {lock:"ea:09:e2:99:33", lockVersion:"{\"protocolType\":5,\"protocolVersion\":3,\"scene\":2,\"groupId\":1,\"orgId\":1}"}
+     * @param object {lockMac:"ea:09:e2:99:33", lockVersion:"{\"protocolType\":5,\"protocolVersion\":3,\"scene\":2,\"groupId\":1,\"orgId\":1}"}
      * @param success
      * @param fail
      */
@@ -74,18 +64,14 @@ declare class Ttlock {
      * @param fail
      */
     static resetEkey(lockData: string, success: null | ((lockData: string) => void), fail: null | ((errorCode: number, description: string) => void)): void;
-    static controlEnum: Readonly<{
-        unlock: number;
-        lock: number;
-    }>;
     /**
      * Controle the lock Unlock or lock or other operations
-     * @param control  Ttlock.controlEnum.unlock or Ttlock.controlEnum.lock
+     * @param control  LockControlType
      * @param lockData string
      * @param success successful callback
      * @param fail failed callback
      */
-    static controlLock(control: number, lockData: string, success: null | ((lockTime: number, electricQuantity: number, uniqueId: number) => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static controlLock(control: LockControlType, lockData: string, success: null | ((lockTime: number, electricQuantity: number, uniqueId: number) => void), fail: null | ((errorCode: number, description: string) => void)): void;
     /**
      * Create a custom passcode.
      * @param passcode The password must be 4-9 digits
@@ -128,7 +114,7 @@ declare class Ttlock {
      * @param success
      * @param fail
      */
-    static getLockSwitchState(lockData: string, success: null | ((state: number, description: string) => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static getLockSwitchState(lockData: string, success: null | ((state: LockState) => void), fail: null | ((errorCode: number, description: string) => void)): void;
     /**
      * Add a card to unlock the lock
      * @param cycleList Periodic unlocking. You can set it to null if you don't need it
@@ -226,18 +212,14 @@ declare class Ttlock {
      * @param fail
      */
     static getLockTime(lockData: string, success: null | ((lockTimestamp: number) => void), fail: null | ((errorCode: number, description: string) => void)): void;
-    static lockRecordEnum: Readonly<{
-        latest: number;
-        all: number;
-    }>;
     /**
      * Read the operation record of the lock.
-     * @param type Ttlock.lockRecordEnum.latest or Ttlock.lockRecordEnum.all
+     * @param type LockRecordType
      * @param lockData
      * @param success
      * @param fail
      */
-    static getLockOperateRecord(type: number, lockData: string, success: null | ((records: string) => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static getLockOperateRecord(type: LockRecordType, lockData: string, success: null | ((records: string) => void), fail: null | ((errorCode: number, description: string) => void)): void;
     /**
      * Get the lock automatic locking periodic time
      * @param lockData
@@ -268,46 +250,36 @@ declare class Ttlock {
      * @param fail
      */
     static setLockRemoteUnlockSwitchState(isOn: boolean, lockData: string, success: null | ((lockData: string) => void), fail: null | ((errorCode: number, description: string) => void)): void;
-    static lockConfigEnum: Readonly<{
-        audio: number;
-        passcodeVisible: number;
-        freeze: number;
-        tamperAlert: number;
-        resetButton: number;
-        privacyLock: number;
-    }>;
     /**
      * Get config of the lock
-     * @param config Reference  Ttlock.lockConfigEnum
+     * @param config
      * @param lockData
      * @param success
      * @param fail
      */
-    static getLockConfig(config: number, lockData: string, success: null | ((type: number, isOn: boolean) => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static getLockConfig(config: LockConfigType, lockData: string, success: null | ((type: number, isOn: boolean) => void), fail: null | ((errorCode: number, description: string) => void)): void;
     /**
      * Set config of the lock
-     * @param config Reference  Ttlock.lockConfigEnum
+     * @param config
      * @param isOn
      * @param lockData
      * @param success
      * @param fail
      */
-    static setLockConfig(config: number, isOn: boolean, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
-    static lockPassageModeEnum: Readonly<{
-        weekly: number;
-        monthly: number;
-    }>;
+    static setLockConfig(config: LockConfigType, isOn: boolean, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
     /**
      * Set the lock always unlock.
-     * @param type Ttlock.lockPassageModeEnum.weekly or Ttlock.lockPassageModeEnum.monthly
-     * @param days type = Ttlock.lockPassageModeEnum.weekly then days should be 1~7 Monday ~ Sunday, [1,3,6]. type = Ttlock.lockPassageModeEnum.monthly then days should be 1~31, [1,7,29,31]
+     * @param mode LockPassageMode
+     * @param days
+     * type = LockPassageMode.Weekly then days should be 1~7 Monday ~ Sunday, [1,3,6]
+     * type = LockPassageMode.Monthly then days should be 1~31, [1,7,29,31]
      * @param startDate The valid time of the passage mode
      * @param endDate The invalid time of the passage mode
      * @param lockData
      * @param success
      * @param fail
      */
-    static addPassageMode(type: number, days: number[], startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static addPassageMode(mode: LockPassageMode, days: number[], startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
     /**
      * Clear all passage mode
      * @param lockData
@@ -319,44 +291,86 @@ declare class Ttlock {
      * Monitor phone's Bluetooth status
      * @param callback
      */
-    static addBluetoothStateListener(callback: (state: number, description: string) => void): void;
-    static deleteBluetoothStateListener(): void;
-    static lockFunction: Readonly<{
-        passcode: number;
-        icCard: number;
-        fingerprint: number;
-        wristband: number;
-        autoLock: number;
-        deletePasscode: number;
-        managePasscode: number;
-        locking: number;
-        passcodeVisible: number;
-        gatewayUnlock: number;
-        lockFreeze: number;
-        cyclePassword: number;
-        doorSensor: number;
-        remoteUnlockSwicth: number;
-        audioSwitch: number;
-        nbIot: number;
-        getAdminPasscode: number;
-        htelCard: number;
-        noClock: number;
-        noBroadcastInNormal: number;
-        passageMode: number;
-        turnOffAutoLock: number;
-        wirelessKeypad: number;
-        light: number;
-        hotelCardBlacklist: number;
-        identityCard: number;
-        tamperAlert: number;
-        resetButton: number;
-        privacyLock: number;
-        deadLock: number;
-        cyclicCardOrFingerprint: number;
-        fingerVein: number;
-        nbAwake: number;
-    }>;
-    static supportFunction(fuction: number, lockData: string, callback: (isSupport: boolean) => void): void;
+    /**
+     *
+     * @param callback
+     */
+    static getBluetoothState(callback: (state: BluetoothState) => void): void;
+    static supportFunction(fuction: LockFunction, lockData: string, callback: (isSupport: boolean) => void): void;
 }
-export { Ttlock, TtGateway };
+declare enum BluetoothState {
+    Unknow = 0,
+    Resetting = 1,
+    Unsupport = 2,
+    Unauthorized = 3,
+    On = 4,
+    Off = 5
+}
+declare enum LockFunction {
+    Passcode = 0,
+    IcCard = 1,
+    Fingerprint = 2,
+    Wristband = 3,
+    AutoLock = 4,
+    DeletePasscode = 5,
+    ManagePasscode = 7,
+    Locking = 8,
+    PasscodeVisible = 9,
+    GatewayUnlock = 10,
+    LockFreeze = 11,
+    CyclePassword = 12,
+    DoorSensor = 13,
+    RemoteUnlockSwicth = 14,
+    AudioSwitch = 15,
+    NbIot = 16,
+    GetAdminPasscode = 18,
+    HtelCard = 19,
+    NoClock = 20,
+    NoBroadcastInNormal = 21,
+    PassageMode = 22,
+    TurnOffAutoLock = 23,
+    WirelessKeypad = 24,
+    Light = 25,
+    HotelCardBlacklist = 26,
+    IdentityCard = 27,
+    TamperAlert = 28,
+    ResetButton = 29,
+    PrivacyLock = 30,
+    DeadLock = 32,
+    CyclicCardOrFingerprint = 34,
+    FingerVein = 37,
+    NbAwake = 39
+}
+declare enum LockRecordType {
+    Latest = 0,
+    All = 1
+}
+declare enum LockConfigType {
+    Audio = 0,
+    PasscodeVisible = 1,
+    Freeze = 2,
+    TamperAlert = 3,
+    ResetButton = 4,
+    PrivacyLock = 5
+}
+declare enum LockPassageMode {
+    Weekly = 0,
+    Monthly = 1
+}
+declare enum LockControlType {
+    Unlock = 0,
+    Lock = 1
+}
+declare enum LockState {
+    Locked = 0,
+    Unlock = 1,
+    Unknow = 2,
+    CarOnLock = 3
+}
+declare enum ConnectState {
+    Timeout = 0,
+    Success = 1,
+    Fail = 2
+}
+export { Ttlock, TtGateway, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState };
 export * from './types';

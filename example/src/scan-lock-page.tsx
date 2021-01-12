@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, FlatList, StyleSheet, Text, Button } from 'react-native';
-import { Ttlock, ScanLockModal } from 'react-native-ttlock';
+import { Ttlock, ScanLockModal, BluetoothState } from 'react-native-ttlock';
 import { observer } from 'mobx-react';
 import * as Toast from './toast-page';
 
@@ -35,6 +35,11 @@ const renderItem = (item: ScanLockModal, navigation: any) => {
 const ScanLockPage = (props: { navigation: any; route: any; }) => {
   const { navigation, route } = props;
   const { store } = route.params;
+
+  Ttlock.getBluetoothState((state: BluetoothState)=>{
+    console.log("蓝牙状态：", state);
+  });
+
   return (
     <FlatList
       data={store.lockList}

@@ -189,10 +189,9 @@ android {
 }
 
 repositories {
-    flatDir {
-    dirs "$rootDir/../../android/libs"
-//        dirs "D:\\Users\\Administrator\\Repository\\github\\react-native-ttlock\\android\\libs"
-    }
+//    flatDir {
+//        dirs "$rootDir/../../android/libs"
+//    }
 }
 
 dependencies {
