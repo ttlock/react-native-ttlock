@@ -40,6 +40,7 @@ class Store {
           let value2 = modal2.isInited ? 1 : 0;
           return value1 - value2;
         })
+        this.lockList = this.lockList.concat([]);
       }
     });
   }
