@@ -22,8 +22,38 @@ npm install react-native-ttlock
 
 
 #### Android
+1. AndroidManifest.xml configuration:   
+(1) Add 'xmlns:tools="http://schemas.android.com/tools"' to element   
+(2) Add 'tools:replace="android:label"' to element   
+(3) Additional permissions:  
+``` 
+<uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+<uses-permission android:name="android.permission.BLUETOOTH" />
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+``` 
+2. In order to get the permission request result in ttlock plugin, in MainActivity extends ReactActivity, you need override the onRequestPermissionsResult method and add below code:   
+(1) java code:
+``` 
+  @Override
+  public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    ReactInstanceManager mReactInstanceManager = getReactNativeHost().getReactInstanceManager();
 
-
+    TtlockModule ttlockModule = mReactInstanceManager.getCurrentReactContext().getNativeModule(TtlockModule.class);
+    ttlockModule.onRequestPermissionsResult(requestCode, permissions, grantResults);
+  }
+``` 
+3. When you release the apk, you need disable proguard in release builds.Config buildTypes in build.gradle like this:
+``` 
+repositories {
+    buildTypes {
+        release {
+            minifyEnabled false
+            shrinkResources false
+        }
+    }
+``` 
 ## Usage Lock
 
 ##### 1 Lock basic operation
