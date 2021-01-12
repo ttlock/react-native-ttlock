@@ -45,20 +45,13 @@ class TtGateway {
   /**
    * Connected to the gateway Only newly powered gateways can be connected）
    * @param mac 
-   * @param success 
-   * @param fail 
+   * @param callback 
    */
-  static connect(mac: string, success: ((state: ConnectState) => void), fail: null | ((state: ConnectState) => void)) {
-    success = success || this.defaultCallback;
-    fail = fail || this.defaultCallback;
+  static connect(mac: string, callback: ((state: ConnectState) => void)) {
+    callback = callback || this.defaultCallback;
     ttlockModule.connect(mac, (state: number) => {
-      if (state === 1) {
-        success(ConnectState.Success);
-      } else if (state === 0){
-        fail!(ConnectState.Timeout);
-      }else{
-        fail!(ConnectState.Fail);
-      }
+      let connectState = [ConnectState.Timeout,ConnectState.Success,ConnectState.Fail][state];
+      callback!(connectState);
     });
   }
 

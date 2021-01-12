@@ -13,10 +13,9 @@ declare class TtGateway {
     /**
      * Connected to the gateway Only newly powered gateways can be connected）
      * @param mac
-     * @param success
-     * @param fail
+     * @param callback
      */
-    static connect(mac: string, success: ((state: ConnectState) => void), fail: null | ((state: ConnectState) => void)): void;
+    static connect(mac: string, callback: ((state: ConnectState) => void)): void;
     /**
      * Read wifi near the gateway
      * @param progress

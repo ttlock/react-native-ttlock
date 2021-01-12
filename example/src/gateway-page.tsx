@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, TextInput, StyleSheet, Text, TouchableHighlight } from 'react-native';
 import { TtGateway } from 'react-native-ttlock';
-import type { InitGatewayParam } from 'react-native-ttlock';
+import type { InitGatewayParam, InitGatewayModal } from 'react-native-ttlock';
 import * as Toast from './toast-page';
 import config from './config'
 
