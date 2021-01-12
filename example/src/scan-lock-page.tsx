@@ -37,7 +37,7 @@ const ScanLockPage = (props: { navigation: any; route: any; }) => {
   const { store } = route.params;
 
   Ttlock.getBluetoothState((state: BluetoothState)=>{
-    console.log("蓝牙状态：", state);
+    console.log("BluetoothState：", state);
   });
 
   return (
