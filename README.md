@@ -19,7 +19,7 @@ const result = await Ttlock.multiply(3, 7);
 ```
 #### Android
 
-#1. AndroidManifest.xml configuration:
+1. AndroidManifest.xml configuration:
 (1) Add 'xmlns:tools="http://schemas.android.com/tools"' 
     to <manifest> element
 (2) Add 'tools:replace="android:label"' 
@@ -31,7 +31,7 @@ const result = await Ttlock.multiply(3, 7);
 <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 ```
-#2. In order to get the permission request result in ttlock plugin, in MainActivity extends ReactActivity, you need override the onRequestPermissionsResult method and 
+2. In order to get the permission request result in ttlock plugin, in MainActivity extends ReactActivity, you need override the onRequestPermissionsResult method and 
 add below code:
 (1) java code
 ```
@@ -44,7 +44,7 @@ add below code:
     ttlockModule.onRequestPermissionsResult(requestCode, permissions, grantResults);
   }
 ```
-#3.When you release the apk, you need disable proguard in release builds in build.gradle.like this:
+3.When you release the apk, you need disable proguard in release builds.Config buildTypes in build.gradle like this:
 
 ```
 repositories {
