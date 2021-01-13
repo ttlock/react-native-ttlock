@@ -465,7 +465,9 @@ class Ttlock {
   static getLockAutomaticLockingPeriodicTime(lockData: string, success: null | ((currentTime: number, maxTime: number, minTime: number) => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttlockModule.getLockAutomaticLockingPeriodicTime(lockData, success, fail);
+    ttlockModule.getLockAutomaticLockingPeriodicTime(lockData, (data: number[]) => {
+      success!(data[0],data[1],data[2]);
+    }, fail);
   }
 
   /**
@@ -516,7 +518,9 @@ class Ttlock {
   static getLockConfig(config: LockConfigType, lockData: string, success: null | ((type: number, isOn: boolean) => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttlockModule.getLockConfig(config, lockData, success, fail);
+    ttlockModule.getLockConfig(config, lockData, (data: any[]) => {
+      success!(data[0],data[1]);
+    }, fail);
   }
 
   /**
