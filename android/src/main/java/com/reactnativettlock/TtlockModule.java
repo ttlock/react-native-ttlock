@@ -787,7 +787,11 @@ public class TtlockModule extends ReactContextBaseJavaModule {
         TTLockClient.getDefault().getAutomaticLockingPeriod(lockData, new GetAutoLockingPeriodCallback() {
             @Override
             public void onGetAutoLockingPeriodSuccess(int currtentTime, int minTime, int maxTime) {
-                success.invoke(currtentTime, maxTime, minTime);
+                WritableArray writableArray = Arguments.createArray();
+                writableArray.pushInt(currtentTime);
+                writableArray.pushInt(maxTime);
+                writableArray.pushInt(minTime);
+                success.invoke(writableArray);
             }
 
             @Override
@@ -848,7 +852,10 @@ public class TtlockModule extends ReactContextBaseJavaModule {
             @Override
             public void onGetLockConfigSuccess(TTLockConfigType ttLockConfigType, boolean switchOn) {
                 LogUtil.d("ttLockConfigType:" + switchOn);
-                success.invoke(TTLockConfigConverter.native2RN(ttLockConfigType), switchOn);
+                WritableArray writableArray = Arguments.createArray();
+                writableArray.pushInt(TTLockConfigConverter.native2RN(ttLockConfigType));
+                writableArray.pushBoolean(switchOn);
+                success.invoke(writableArray);
             }
 
             @Override
