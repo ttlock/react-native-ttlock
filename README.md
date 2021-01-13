@@ -56,7 +56,7 @@ repositories {
 ``` 
 ## Usage Lock
 
-##### 1 Lock basic operation
+### 1 Lock basic operation
 1.1 Scan lock
 
 ``` js
@@ -217,7 +217,7 @@ Ttlock.getLockConfig(LockConfigType.Audio, lockData, (type: number, isOn: boolea
 });
 ```
 
-##### 2. Ekey
+### 2. Ekey
 
 2.1 Control lock
 
@@ -242,7 +242,7 @@ Ttlock.resetEkey(lockData, (lockDataNew) => {
 });
 ```
 
-##### 3. Passcode
+### 3. Passcode
 
 3.1 Get passcode
 
@@ -310,7 +310,7 @@ Ttlock.modifyAdminPasscode(adminPasscode, lockData, () => {
 });   
 ```
 
-##### 4. Card
+### 4. Card
 
 4.1 Add card
 
@@ -363,7 +363,7 @@ Ttlock.clearAllCards(lockData, () => {
 });   
 ```
 
-##### 5. Fingerprint
+### 5. Fingerprint
 
 5.1 Add fingerprint
 
@@ -420,7 +420,7 @@ Ttlock.clearAllFingerprints(lockData, () => {
 ```
 
 
-##### 6. Passage mode
+### 6. Passage mode
 
 6.1 Add passage mode
 
