@@ -113,7 +113,7 @@ class Ttlock {
    * Scan for nearby Bluetooth locks
    * @param callback  The Callback will be executed multiple times if there is a Bluetooth lock nearby
    */
-  static startScan(callback: null | ((lockScanModal: ScanLockModal) => void)) {
+  static startScan(callback: null | ((scanLockModal: ScanLockModal) => void)) {
     let subscription = subscriptionMap.get(TTLockEvent.ScanLock)
     if (subscription !== undefined) {
       subscription.remove()

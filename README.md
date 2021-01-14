@@ -1,25 +1,25 @@
 # react-native-ttlock
 
-##### Developers Email list
+##### Developers Email && Quick Response
 ttlock-developers-email-list@googlegroups.com
+
+## Note
+`react-native-ttlock` version `2.x.x` is not compatible with version `1.x.x`  please upgrade carefully
 
 ## Installation
 
-```sh
-npm install react-native-ttlock
-```
+1. `npm install react-native-ttlock`
+
+2. `react-native link react-native-ttlock`
 
 ## Add configuration to project
 
 
 #### iOS
 
+1. `cd ./ios && pod install && cd ../`
 
-1. In XCode  `TARGETS` ➜ `info` ➜ Add key`Privacy - Bluetooth Peripheral Usage Description` value `your description for bluetooth`
-
-2. `cd yourProjectPath` ➜ `pod install`
-
-
+2. In XCode  `TARGETS` ➜ `info` ➜ add key `Privacy - Bluetooth Peripheral Usage Description` value `your description for bluetooth` and key `Privacy - Bluetooth Always Usage Description` value `your description for bluetooth`
 
 #### Android
 1. AndroidManifest.xml configuration:   
