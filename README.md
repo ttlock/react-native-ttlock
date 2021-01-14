@@ -59,6 +59,12 @@ repositories {
         }
     }
 ``` 
+4. Support min sdk version is 18
+``` 
+defaultConfig {
+        minSdkVersion 18
+    }
+ ``` 
 ## Usage Lock
 
 ### 1 Lock basic operation
