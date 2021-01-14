@@ -26,14 +26,17 @@ ttlock-developers-email-list@googlegroups.com
 (1) Add 'xmlns:tools="http://schemas.android.com/tools"' to element   
 (2) Add 'tools:replace="android:label"' to element   
 (3) Additional permissions:  
+
 ``` 
 <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 <uses-permission android:name="android.permission.BLUETOOTH" />
 <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 ``` 
+
 2. In order to get the permission request result in ttlock plugin, in MainActivity extends ReactActivity, you need override the onRequestPermissionsResult method and add below code:   
 (1) java code:
+
 ``` 
   @Override
   public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -44,7 +47,9 @@ ttlock-developers-email-list@googlegroups.com
     ttlockModule.onRequestPermissionsResult(requestCode, permissions, grantResults);
   }
 ``` 
+
 3. When you release the apk, you need disable proguard in release builds.Config buildTypes in build.gradle like this:
+
 ``` 
 repositories {
     buildTypes {
@@ -57,6 +62,15 @@ repositories {
 ## Usage Lock
 
 ### 1 Lock basic operation
+1.0 Get bluetooth state
+
+``` js
+Ttlock.getBluetoothState((state: BluetoothState)=>{
+    console.log("bluetooth:",state);
+});
+``` 
+
+
 1.1 Scan lock
 
 ``` js
@@ -485,11 +499,13 @@ TtGateway.getNearbyWifi((list) => {
 
 ``` js
 let object: InitGatewayParam = {
-      wifi: wifi,
-      wifiPassword: wifiPassword!,
-      gatewayName: config.gatewayName,
-      ttlockUid: config.ttlockUid,
-      ttlockLoginPassword: config.ttlockLoginPassword
+    wifi: undefined,
+    wifiPassword: undefined,
+    gatewayName: "My Gateway One",
+    //test account ttlock uid 17498,  https://api.ttlock.com/v3/user/getUid
+    ttlockUid: 17498,
+   //test account ttlock login password (unencrypted password or md5 password)
+    ttlockLoginPassword: "111111"
 }
 
 TtGateway.initGateway(object, (data: InitGatewayModal)=>{
