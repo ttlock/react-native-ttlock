@@ -4,7 +4,7 @@
 ttlock-developers-email-list@googlegroups.com
 
 ## Note
-`react-native-ttlock` version `2.x.x` is not compatible with version `1.x.x`  please upgrade carefully
+`react-native-ttlock` version `2.x.x` is not compatible with version `1.x.x`  please upgrade carefully.
 
 ## Installation
 
