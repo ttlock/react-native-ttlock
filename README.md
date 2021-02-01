@@ -8,7 +8,9 @@ ttlock-developers-email-list@googlegroups.com
 
 ## Installation
 
-`yarn add  react-native-ttlock`
+`npm install react-native-ttlock`
+
+`react-native link react-native-ttlock`
 
 ## Add configuration to project
 
