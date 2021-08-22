@@ -635,7 +635,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
                 WritableArray writableArray = Arguments.createArray();
                 writableArray.pushInt(0);
                 writableArray.pushInt(totalCnt);
-                getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(TTLockEvent.addCardProgrress, writableArray);
+                getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(TTLockEvent.addFingerprintProgress, writableArray);
             }
 
             @Override
@@ -643,7 +643,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
                 WritableArray writableArray = Arguments.createArray();
                 writableArray.pushInt(currentCount);
                 writableArray.pushInt(totalCnt);
-                getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(TTLockEvent.addCardProgrress, writableArray);
+                getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(TTLockEvent.addFingerprintProgress, writableArray);
             }
 
             @Override
