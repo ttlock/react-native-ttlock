@@ -705,9 +705,9 @@ public class TtlockModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void clearAllFingerprints(String lockData, Callback success, Callback fail) {
-        TTLockClient.getDefault().clearAllICCard(lockData, null, new ClearAllICCardCallback() {
+        TTLockClient.getDefault().clearAllFingerprints(lockData, null, new ClearAllFingerprintCallback() {
             @Override
-            public void onClearAllICCardSuccess() {
+            public void onClearAllFingerprintSuccess() {
                 success.invoke();
             }
 
