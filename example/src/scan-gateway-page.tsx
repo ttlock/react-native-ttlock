@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react';
 import React from 'react';
 import { View, FlatList, StyleSheet, Text, Button } from 'react-native';
-import { TtGateway, ScanGatewayModal, ConnectState } from 'react-native-ttlock';
+import { TtGateway, ScanGatewayModal, ConnectState, GatewayType } from 'react-native-ttlock';
 import * as Toast from './toast-page';
 
 
@@ -11,8 +11,12 @@ const connectGateway = (item: ScanGatewayModal, navigation: any,store: any) => {
   TtGateway.connect(item.gatewayMac, (state: ConnectState)=> {
     if(state === ConnectState.Success){
       Toast.hidden();
-      navigation.navigate("ScanWifiPage",{store: store});
-      store.startScanWifi();
+      if(item.type === GatewayType.G2){
+        navigation.navigate("ScanWifiPage",{store: store});
+        store.startScanWifi();
+      }else{
+        navigation.navigate("GatewayPage", { type: item.type });
+      }
     }else{
       console.log(state);
     }

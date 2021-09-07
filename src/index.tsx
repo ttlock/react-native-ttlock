@@ -732,7 +732,11 @@ enum GatewayEvent {
 };
 
 
+enum GatewayType {
+  G2 =2,
+  G3 =3,
+  G4 =4
+};
 
-
-export { Ttlock, TtGateway, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState }
+export { Ttlock, TtGateway, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType}
 export * from './types'
