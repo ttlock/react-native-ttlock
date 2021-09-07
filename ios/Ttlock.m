@@ -201,7 +201,7 @@ RCT_EXPORT_METHOD(resetPasscode:(NSString *)lockData success:(RCTResponseSenderB
 
 RCT_EXPORT_METHOD(getLockSwitchState:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
-    [TTLock getLockSwitchStateWithLockData:lockData success:^(TTLockSwitchState state) {
+    [TTLock getLockSwitchStateWithLockData:lockData success:^(TTLockSwitchState state, TTDoorSensorState doorSensorState) {
         [Ttlock response:@(state) success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
         [Ttlock response:errorCode message:errorMsg fail:fail];
@@ -481,13 +481,18 @@ RCT_EXPORT_METHOD(getNearbyWifi:(RCTResponseSenderBlock)block)
 
 RCT_EXPORT_METHOD(initGateway:(NSDictionary *)dict success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
-    NSDictionary *paramDict = @{
-            @"SSID": dict[@"wifi"],
-            @"wifiPwd": dict[@"wifiPassword"],
-            @"gatewayName": dict[@"gatewayName"],
-            @"uid": dict[@"ttlockUid"],
-            @"userPwd": dict[@"ttlockLoginPassword"]
+    
+    TTGatewayType gatewayType = [dict[@"type"] intValue];
+    
+    NSDictionary *paramDict = paramDict = @{
+        @"SSID": dict[@"wifi"],
+        @"wifiPwd": dict[@"wifiPassword"],
+        @"gatewayName": dict[@"gatewayName"],
+        @"gatewayVersion": @(gatewayType),
+        @"uid": dict[@"ttlockUid"],
+        @"userPwd": dict[@"ttlockLoginPassword"]
     };
+    
     [TTGateway initializeGatewayWithInfoDic:paramDict block:^(TTSystemInfoModel *systemInfoModel, TTGatewayStatus status) {
         if (status == TTGatewaySuccess) {
             NSDictionary *resultDict = @{
