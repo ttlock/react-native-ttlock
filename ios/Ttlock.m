@@ -441,6 +441,7 @@ RCT_EXPORT_METHOD(startScanGateway)
         dict[@"gatewayName"] = model.gatewayName;
         dict[@"rssi"] = @(model.RSSI);
         dict[@"isDfuMode"] = @(model.isDfuMode);
+        dict[@"type"] = @(model.type);
         [self sendEventWithName:EVENT_SCAN_GATEWAY body:dict];
     }];
 }
