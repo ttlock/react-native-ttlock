@@ -55,17 +55,9 @@ const GatewayPage = (props: { navigation: any; route: any; }) => {
   }
 
 
-  // let WifiView = <View></View>;
-  // if(type === GatewayType.G2){
-  //   WifiView = 
-  // }
-
-
-
-
-
-  return (
-    <View style={styles.container}>
+  let WifiView = <View></View>;
+  if(type === GatewayType.G2){
+    WifiView = (
       <View>
         <Text style={{ fontSize: 40 }}>Wifi: {wifi}</Text>
         <TextInput
@@ -74,6 +66,12 @@ const GatewayPage = (props: { navigation: any; route: any; }) => {
           placeholder="Please input the wifi password"
         />
       </View>
+    )
+  }
+
+  return (
+    <View style={styles.container}>
+      {WifiView}
       <TouchableHighlight
         style={[styles.touchButton]}
         onPress={initGateway}>

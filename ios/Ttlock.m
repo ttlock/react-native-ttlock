@@ -485,14 +485,18 @@ RCT_EXPORT_METHOD(initGateway:(NSDictionary *)dict success:(RCTResponseSenderBlo
     
     TTGatewayType gatewayType = [dict[@"type"] intValue];
     
-    NSDictionary *paramDict = paramDict = @{
-        @"SSID": dict[@"wifi"],
-        @"wifiPwd": dict[@"wifiPassword"],
-        @"gatewayName": dict[@"gatewayName"],
-        @"gatewayVersion": @(gatewayType),
-        @"uid": dict[@"ttlockUid"],
-        @"userPwd": dict[@"ttlockLoginPassword"]
-    };
+    NSMutableDictionary *paramDict = @{}.mutableCopy;
+    paramDict[@"SSID"] = dict[@"wifi"];
+    paramDict[@"wifiPwd"] = dict[@"wifiPassword"];
+    paramDict[@"uid"] = dict[@"ttlockUid"];
+    paramDict[@"userPwd"] = dict[@"ttlockLoginPassword"];
+    paramDict[@"serverAddress"] = dict[@"serverIp"];
+    paramDict[@"portNumber"] = dict[@"serverPort"];
+    paramDict[@"gatewayVersion"] = @(gatewayType);
+    if (gatewayType > TTGateWayTypeG2) {
+        paramDict[@"SSID"] = @"1";
+        paramDict[@"wifiPwd"] = @"1";
+    }
     
     [TTGateway initializeGatewayWithInfoDic:paramDict block:^(TTSystemInfoModel *systemInfoModel, TTGatewayStatus status) {
         if (status == TTGatewaySuccess) {

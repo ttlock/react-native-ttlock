@@ -12,7 +12,7 @@ const connectGateway = (item: ScanGatewayModal, navigation: any,store: any) => {
     if(state === ConnectState.Success){
       Toast.hidden();
       if(item.type === GatewayType.G2){
-        navigation.navigate("ScanWifiPage",{store: store});
+        navigation.navigate("ScanWifiPage",{store: store, type: item.type});
         store.startScanWifi();
       }else{
         navigation.navigate("GatewayPage", { type: item.type });
