@@ -1,6 +1,2 @@
-/// <reference types="react" />
-declare const _default: (props: {
-    navigation: any;
-    route: any;
-}) => JSX.Element;
+declare const _default: any;
 export default _default;
