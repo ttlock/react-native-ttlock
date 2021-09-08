@@ -371,5 +371,10 @@ declare enum ConnectState {
     Success = 1,
     Fail = 2
 }
-export { Ttlock, TtGateway, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState };
+declare enum GatewayType {
+    G2 = 2,
+    G3 = 3,
+    G4 = 4
+}
+export { Ttlock, TtGateway, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType };
 export * from './types';

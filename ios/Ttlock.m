@@ -201,7 +201,7 @@ RCT_EXPORT_METHOD(resetPasscode:(NSString *)lockData success:(RCTResponseSenderB
 
 RCT_EXPORT_METHOD(getLockSwitchState:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
-    [TTLock getLockSwitchStateWithLockData:lockData success:^(TTLockSwitchState state) {
+    [TTLock getLockSwitchStateWithLockData:lockData success:^(TTLockSwitchState state, TTDoorSensorState doorSensorState) {
         [Ttlock response:@(state) success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
         [Ttlock response:errorCode message:errorMsg fail:fail];
@@ -441,6 +441,7 @@ RCT_EXPORT_METHOD(startScanGateway)
         dict[@"gatewayName"] = model.gatewayName;
         dict[@"rssi"] = @(model.RSSI);
         dict[@"isDfuMode"] = @(model.isDfuMode);
+        dict[@"type"] = @(model.type);
         [self sendEventWithName:EVENT_SCAN_GATEWAY body:dict];
     }];
 }
@@ -481,13 +482,22 @@ RCT_EXPORT_METHOD(getNearbyWifi:(RCTResponseSenderBlock)block)
 
 RCT_EXPORT_METHOD(initGateway:(NSDictionary *)dict success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
-    NSDictionary *paramDict = @{
-            @"SSID": dict[@"wifi"],
-            @"wifiPwd": dict[@"wifiPassword"],
-            @"gatewayName": dict[@"gatewayName"],
-            @"uid": dict[@"ttlockUid"],
-            @"userPwd": dict[@"ttlockLoginPassword"]
-    };
+    
+    TTGatewayType gatewayType = [dict[@"type"] intValue];
+    
+    NSMutableDictionary *paramDict = @{}.mutableCopy;
+    paramDict[@"SSID"] = dict[@"wifi"];
+    paramDict[@"wifiPwd"] = dict[@"wifiPassword"];
+    paramDict[@"uid"] = dict[@"ttlockUid"];
+    paramDict[@"userPwd"] = dict[@"ttlockLoginPassword"];
+    paramDict[@"serverAddress"] = dict[@"serverIp"];
+    paramDict[@"portNumber"] = dict[@"serverPort"];
+    paramDict[@"gatewayVersion"] = @(gatewayType);
+    if (gatewayType > TTGateWayTypeG2) {
+        paramDict[@"SSID"] = @"1";
+        paramDict[@"wifiPwd"] = @"1";
+    }
+    
     [TTGateway initializeGatewayWithInfoDic:paramDict block:^(TTSystemInfoModel *systemInfoModel, TTGatewayStatus status) {
         if (status == TTGatewaySuccess) {
             NSDictionary *resultDict = @{

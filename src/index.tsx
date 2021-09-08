@@ -9,8 +9,6 @@ import type { ScanGatewayModal, ScanLockModal, InitGatewayParam, CardFingerprint
 const ttlockModule = NativeModules.Ttlock;
 const ttlockEventEmitter = new NativeEventEmitter(ttlockModule);
 
-
-
 const subscriptionMap = new Map();
 
 class TtGateway {
@@ -723,16 +721,20 @@ enum TTLockEvent {
   AddCardProgrress = "EventAddCardProgrress",
   AddFingerprintProgress = "EventAddFingerprintProgrress",
   ListenBluetoothState = "EventBluetoothState"
-};
+}
 
 
 enum GatewayEvent {
   ScanGateway = "EventScanGateway",
   ScanWifi = "EventScanWifi"
-};
+}
 
 
+enum GatewayType {
+  G2 =2,
+  G3 =3,
+  G4 =4
+}
 
-
-export { Ttlock, TtGateway, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState }
+export { Ttlock, TtGateway, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType}
 export * from './types'
