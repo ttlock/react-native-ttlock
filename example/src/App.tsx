@@ -9,10 +9,6 @@ import ScanGatewayPage from './scan-gateway-page'
 import GatewayPage from './gateway-page'
 import ScanWifiPage from './scan-wifi-page'
 
-
-
-
-
 const Stack = createStackNavigator();
 
 export default function App() {
