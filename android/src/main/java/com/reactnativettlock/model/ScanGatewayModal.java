@@ -9,4 +9,5 @@ public class ScanGatewayModal {
     public String gatewayMac;
     public boolean isDfuMode;
     public int rssi;
+    public int type;
 }

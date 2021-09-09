@@ -30,6 +30,7 @@ import com.ttlock.bl.sdk.api.ExtendedBluetoothDevice;
 import com.ttlock.bl.sdk.api.TTLockClient;
 import com.ttlock.bl.sdk.callback.AddFingerprintCallback;
 import com.ttlock.bl.sdk.callback.AddICCardCallback;
+import com.ttlock.bl.sdk.callback.ClearAllFingerprintCallback;
 import com.ttlock.bl.sdk.callback.ClearAllICCardCallback;
 import com.ttlock.bl.sdk.callback.ClearPassageModeCallback;
 import com.ttlock.bl.sdk.callback.ControlLockCallback;
@@ -189,6 +190,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
                 map.putString(TTGatewayFieldConstant.GATEWAY_MAC, device.getAddress());
                 map.putBoolean(TTGatewayFieldConstant.IS_DFU_MODE, device.isDfuMode());
                 map.putInt(TTGatewayFieldConstant.RSSI, device.getRssi());
+                map.putInt(TTGatewayFieldConstant.TYPE, device.getGatewayType());
                 getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(TTGatewayEvent.scanGateway, map);
             }
 
@@ -222,6 +224,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
         GatewayClient.getDefault().connectGateway(mac, new ConnectCallback() {
             @Override
             public void onConnectSuccess(ExtendedBluetoothDevice device) {
+                LogUtil.d("connected:" + device);
                 flag = true;
                 callback.invoke(1);
             }
@@ -285,6 +288,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
             gatewayInfo.wifiPwd = readableMap.getString(TTGatewayFieldConstant.WIFI_PASSWORD);
             gatewayInfo.uid = readableMap.getInt(TTGatewayFieldConstant.TTLOCK_UID);
             gatewayInfo.userPwd = readableMap.getString(TTGatewayFieldConstant.TTLOCK_LOGIN_PASSWORD);
+            gatewayInfo.plugVersion = readableMap.getInt(TTGatewayFieldConstant.TYPE);
 
             GatewayClient.getDefault().initGateway(gatewayInfo, new InitGatewayCallback() {
                 @Override
@@ -635,7 +639,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
                 WritableArray writableArray = Arguments.createArray();
                 writableArray.pushInt(0);
                 writableArray.pushInt(totalCnt);
-                getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(TTLockEvent.addCardProgrress, writableArray);
+                getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(TTLockEvent.addFingerprintProgress, writableArray);
             }
 
             @Override
@@ -643,7 +647,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
                 WritableArray writableArray = Arguments.createArray();
                 writableArray.pushInt(currentCount);
                 writableArray.pushInt(totalCnt);
-                getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(TTLockEvent.addCardProgrress, writableArray);
+                getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(TTLockEvent.addFingerprintProgress, writableArray);
             }
 
             @Override
@@ -705,15 +709,15 @@ public class TtlockModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void clearAllFingerprints(String lockData, Callback success, Callback fail) {
-        TTLockClient.getDefault().clearAllICCard(lockData, null, new ClearAllICCardCallback() {
+        TTLockClient.getDefault().clearAllFingerprints(lockData, null, new ClearAllFingerprintCallback() {
             @Override
-            public void onClearAllICCardSuccess() {
+            public void onClearAllFingerprintSuccess() {
                 success.invoke();
             }
 
             @Override
-            public void onFail(LockError error) {
-                lockErrorCallback(error, fail);
+            public void onFail(LockError lockError) {
+                lockErrorCallback(lockError, fail);
             }
         });
     }

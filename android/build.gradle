@@ -34,7 +34,7 @@ android {
     versionCode 1
     versionName "1.0"
 //    ndk {
-//      // ÉèÖÃÖ§³ÖµÄ SO ¿â¹¹¼Ü
+//      // ï¿½ï¿½ï¿½ï¿½Ö§ï¿½Öµï¿½ SO ï¿½â¹¹ï¿½ï¿½
 //      abiFilters 'armeabi', 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'//, 'mips', 'mips64'
 //    }
   }
@@ -61,7 +61,7 @@ android {
     sourceCompatibility JavaVersion.VERSION_1_8
   }
 
-  //Ìí¼Ó±¾µØ²Ö¿â£¬²¢°ÑlibsÄ¿Â¼×÷Îª²Ö¿âµØÖ·
+  //ï¿½ï¿½Ó±ï¿½ï¿½Ø²Ö¿â£¬ï¿½ï¿½ï¿½ï¿½libsÄ¿Â¼ï¿½ï¿½Îªï¿½Ö¿ï¿½ï¿½Ö·
   repositories {
     flatDir {
       dirs 'libs'
@@ -150,7 +150,7 @@ dependencies {
   // noinspection GradleDynamicVersion
   api 'com.facebook.react:react-native:+'
 //  implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-  implementation 'com.tongtonglock:ttlock:3.1.2'
+  implementation 'com.ttlock:ttlock:3.1.7'
 //  implementation(name: 'ttlock-release_3.1.2', ext: 'aar')
   implementation 'com.google.code.gson:gson:2.6.1'
 }
