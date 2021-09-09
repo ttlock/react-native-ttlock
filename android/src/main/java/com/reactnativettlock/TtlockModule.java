@@ -73,6 +73,7 @@ import com.ttlock.bl.sdk.gateway.callback.ScanWiFiByGatewayCallback;
 import com.ttlock.bl.sdk.gateway.model.ConfigureGatewayInfo;
 import com.ttlock.bl.sdk.gateway.model.DeviceInfo;
 import com.ttlock.bl.sdk.gateway.model.GatewayError;
+import com.ttlock.bl.sdk.gateway.model.GatewayType;
 import com.ttlock.bl.sdk.gateway.model.WiFi;
 import com.ttlock.bl.sdk.util.FeatureValueUtil;
 import com.ttlock.bl.sdk.util.LogUtil;
@@ -284,11 +285,14 @@ public class TtlockModule extends ReactContextBaseJavaModule {
         if (readableMap != null) {
             ConfigureGatewayInfo gatewayInfo = new ConfigureGatewayInfo();
             gatewayInfo.plugName = readableMap.getString(TTGatewayFieldConstant.GATEWAY_NAME);
-            gatewayInfo.ssid = readableMap.getString(TTGatewayFieldConstant.WIFI);
-            gatewayInfo.wifiPwd = readableMap.getString(TTGatewayFieldConstant.WIFI_PASSWORD);
+            gatewayInfo.plugVersion = readableMap.getInt(TTGatewayFieldConstant.TYPE);
+            if (gatewayInfo.plugVersion == GatewayType.G2) {//G2网关才有WIFI跟WIFI 密码
+                gatewayInfo.ssid = readableMap.getString(TTGatewayFieldConstant.WIFI);
+                gatewayInfo.wifiPwd = readableMap.getString(TTGatewayFieldConstant.WIFI_PASSWORD);
+            }
             gatewayInfo.uid = readableMap.getInt(TTGatewayFieldConstant.TTLOCK_UID);
             gatewayInfo.userPwd = readableMap.getString(TTGatewayFieldConstant.TTLOCK_LOGIN_PASSWORD);
-            gatewayInfo.plugVersion = readableMap.getInt(TTGatewayFieldConstant.TYPE);
+
 
             GatewayClient.getDefault().initGateway(gatewayInfo, new InitGatewayCallback() {
                 @Override
