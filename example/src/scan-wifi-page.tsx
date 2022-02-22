@@ -5,32 +5,32 @@ import { observer } from 'mobx-react';
 import * as Toast from './toast-page';
 
 
-const gotoInitGateway = (item: ScanWifiModal, navigation: any) => {
-  navigation.navigate("GatewayPage", { wifi: item.wifi });
+const gotoInitGateway = (item: ScanWifiModal, type: number, navigation: any) => {
+  navigation.navigate("GatewayPage", { wifi: item.wifi , type: type});
 }
 
-const renderItem = (item: ScanWifiModal, navigation: any) => {
+const renderItem = (item: ScanWifiModal, type: number, navigation: any) => {
   let titleColor = "black";
   let title = "Init Gateway"
   return (
     <View style={styles.item}>
       <Text style={{ color: titleColor, fontSize: 20, lineHeight: 40 }} >{item.wifi}</Text>
-      <Button title={title} color="blue" onPress={() => { gotoInitGateway(item, navigation) }}>
+      <Button title={title} color="blue" onPress={() => { gotoInitGateway(item,type, navigation) }}>
       </Button>
     </View>
   );
 }
 
 const ScanWifiPage = (props: any) => {
-  const { navigation, route } = props;
-  const {store} = route.params;
+  const { navigation, route} = props;
+  const {store, type} = route.params;
 
   Toast.showToast("scan wifi ...");
   return (
     <View>
       <FlatList
         data={store.wifiList}
-        renderItem={({ item }) => {return renderItem(item, navigation)}}
+        renderItem={({ item }) => {return renderItem(item, type, navigation)}}
         keyExtractor={item => item.wifi}
       />
     </View>

@@ -14,7 +14,8 @@ export interface ScanGatewayModal {
   gatewayName: string,
   gatewayMac: string,
   isDfuMode: boolean,
-  rssi: number
+  rssi: number,
+  type: number
 }
 
 export interface ScanWifiModal {
@@ -24,10 +25,11 @@ export interface ScanWifiModal {
 
 export interface InitGatewayParam {
   gatewayName: string,
-  wifi: string,
-  wifiPassword: string,
+  wifi: string|undefined,
+  wifiPassword: string|undefined,
   ttlockUid: number,
   ttlockLoginPassword: string,
+  type: number
 }
 
 export interface InitGatewayModal {
