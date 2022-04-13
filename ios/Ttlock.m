@@ -105,6 +105,16 @@ RCT_EXPORT_METHOD(resetLock:(NSString *)lockData success:(RCTResponseSenderBlock
 }
 
 
+RCT_EXPORT_METHOD(getLockVersionWithLockMac:(NSString *)lockMac success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    [TTLock getLockVersionWithLockMac:lockMac success:^(NSDictionary *lockVersion) {
+        [Ttlock response:lockVersion success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock response:errorCode message:errorMsg fail:fail];
+    }];
+}
+
+
 RCT_EXPORT_METHOD(controlLock:(NSInteger)controlAction lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     
