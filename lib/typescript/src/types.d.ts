@@ -16,6 +16,13 @@ export interface ScanGatewayModal {
     rssi: number;
     type: number;
 }
+export interface LockVersion {
+    protocolVersion: string;
+    protocolType: string;
+    groupId: string;
+    orgId: string;
+    scene: string;
+}
 export interface ScanWifiModal {
     wifi: string;
     rssi: number;

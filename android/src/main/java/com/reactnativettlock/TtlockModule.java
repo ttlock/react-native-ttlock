@@ -42,6 +42,7 @@ import com.ttlock.bl.sdk.callback.GetAutoLockingPeriodCallback;
 import com.ttlock.bl.sdk.callback.GetLockConfigCallback;
 import com.ttlock.bl.sdk.callback.GetLockStatusCallback;
 import com.ttlock.bl.sdk.callback.GetLockTimeCallback;
+import com.ttlock.bl.sdk.callback.GetLockVersionCallback;
 import com.ttlock.bl.sdk.callback.GetOperationLogCallback;
 import com.ttlock.bl.sdk.callback.GetRemoteUnlockStateCallback;
 import com.ttlock.bl.sdk.callback.InitLockCallback;
@@ -366,6 +367,10 @@ public class TtlockModule extends ReactContextBaseJavaModule {
             lockErrorCallback(LockError.DATA_FORMAT_ERROR, fail);
             LogUtil.d("device is null");
             return;
+        }
+        String clientPara = readableMap.getString(TTLockFieldConstant.CLIENT_PARA);
+        if (!TextUtils.isEmpty(clientPara)) {
+            device.setManufacturerId(clientPara);
         }
         TTLockClient.getDefault().initLock(device, new InitLockCallback() {
             @Override
@@ -932,6 +937,21 @@ public class TtlockModule extends ReactContextBaseJavaModule {
             @Override
             public void onFail(LockError error) {
                 lockErrorCallback(error, fail);
+            }
+        });
+    }
+
+    @ReactMethod
+    public void getLockVersionWithLockMac(String lockData, Callback success, Callback fail) {
+        TTLockClient.getDefault().getLockVersion(lockData, new GetLockVersionCallback() {
+            @Override
+            public void onGetLockVersionSuccess(String lockVersion) {
+                success.invoke(lockVersion);
+            }
+
+            @Override
+            public void onFail(LockError lockError) {
+                lockErrorCallback(lockError, fail);
             }
         });
     }

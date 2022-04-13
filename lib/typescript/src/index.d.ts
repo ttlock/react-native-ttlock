@@ -1,4 +1,4 @@
-import type { ScanGatewayModal, ScanLockModal, InitGatewayParam, CardFingerprintCycleParam, ScanWifiModal, InitGatewayModal } from './types';
+import type { ScanGatewayModal, ScanLockModal, InitGatewayParam, CardFingerprintCycleParam, ScanWifiModal, InitGatewayModal, LockVersion } from './types';
 declare class TtGateway {
     static defaultCallback: () => void;
     /**
@@ -49,6 +49,7 @@ declare class Ttlock {
      * @param fail
      */
     static initLock(object: object, success: null | ((lockData: string) => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static getLockVersionWithLockMac(lockMac: string, success: null | ((lockVersion: LockVersion) => void), fail: null | ((errorCode: number, description: string) => void)): void;
     /**
      * Reset the lock.
      * @param lockData

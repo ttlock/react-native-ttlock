@@ -132,5 +132,8 @@
       "module",
       "typescript"
     ]
+  },
+  "dependencies": {
+    "@react-native-community/masked-view": "^0.1.11"
   }
 }
