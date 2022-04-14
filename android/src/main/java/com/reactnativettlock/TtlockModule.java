@@ -368,9 +368,11 @@ public class TtlockModule extends ReactContextBaseJavaModule {
             LogUtil.d("device is null");
             return;
         }
-        String clientPara = readableMap.getString(TTLockFieldConstant.CLIENT_PARA);
-        if (!TextUtils.isEmpty(clientPara)) {
-            device.setManufacturerId(clientPara);
+        if (readableMap.hasKey(TTLockFieldConstant.CLIENT_PARA)) {
+            String clientPara = readableMap.getString(TTLockFieldConstant.CLIENT_PARA);
+            if (!TextUtils.isEmpty(clientPara)) {
+                device.setManufacturerId(clientPara);
+            }
         }
         TTLockClient.getDefault().initLock(device, new InitLockCallback() {
             @Override
