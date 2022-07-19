@@ -417,7 +417,7 @@ class Ttlock {
    * @param success 
    * @param fail 
    */
-  static modifyAdminPasscode(adminPasscode: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+  static modifyAdminPasscode(adminPasscode: string, lockData: string, success: null | ((lockData: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
     ttlockModule.modifyAdminPasscode(adminPasscode, lockData, success, fail);

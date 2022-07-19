@@ -18,7 +18,8 @@ Pod::Spec.new do |s|
 
   #TTLock 依赖
   s.platform = :ios, '9.0'
-  s.dependency 'TTLock', '3.1.9'
+  s.vendored_frameworks = "ios/Frameworks/**/*.framework"
+  s.public_header_files = 'ios/Classes/**/*.h'
   
   s.dependency "React"
 
