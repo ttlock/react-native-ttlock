@@ -26,7 +26,7 @@ RCT_EXPORT_MODULE()
 
 - (instancetype)init{
     if (self = [super init]) {
-        __weak Ttlock *weakSelf = self;
+//        __weak Ttlock *weakSelf = self;
         [TTLock setupBluetooth:^(TTBluetoothState state) {
 //            if (isAddListenBluetoothState) {
 //                [weakSelf sendEventWithName:EVENT_BLUETOOTH_STATE body:@(state)];

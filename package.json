@@ -1,6 +1,6 @@
 {
   "name": "react-native-ttlock",
-  "version": "2.0.3",
+  "version": "2.0.0",
   "description": "Ttlock react native module",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
