@@ -17,7 +17,6 @@ A new flutter plugin project.
   s.public_header_files = '/*.h'
   s.platform = :ios, '9.0'
   s.vendored_frameworks = "Frameworks/**/*.framework"
-  s.public_header_files = 'Classes/**/*.h'
   s.static_framework = true
   
 
