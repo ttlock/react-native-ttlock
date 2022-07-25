@@ -8,6 +8,10 @@ buildscript {
         targetSdkVersion = 28
     }
     repositories {
+        mavenCentral()
+        maven {
+            url = "https://plugins.gradle.org/m2/"
+        }
         google()
         jcenter()
     }
@@ -21,6 +25,10 @@ buildscript {
 
 allprojects {
     repositories {
+        mavenCentral()
+        maven {
+            url = "https://plugins.gradle.org/m2/"
+        }
         mavenLocal()
         maven {
             // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
