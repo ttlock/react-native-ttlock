@@ -282,7 +282,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.zjlg.lock;
+				PRODUCT_BUNDLE_IDENTIFIER = org.reactjs.native.TtlockExample.TtlockExample;
 				PRODUCT_NAME = TtlockExample;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "TtlockExample-Bridging-Header.h";
