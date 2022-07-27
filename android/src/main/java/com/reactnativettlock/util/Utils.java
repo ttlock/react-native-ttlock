@@ -25,7 +25,6 @@ public class Utils {
         }
         return json;
     }
-
     public static List<CyclicConfig> readableArray2CyclicList(ReadableArray readableArray) {
         List<CyclicConfig> cyclicConfigs = new ArrayList<>();
         if (readableArray != null) {

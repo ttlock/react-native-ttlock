@@ -393,7 +393,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
             lockErrorCallback(LockError.DATA_FORMAT_ERROR, fail);
             return;
         }
-        TTLockClient.getDefault().resetLock(lockData, null, new ResetLockCallback() {
+        TTLockClient.getDefault().resetLock(lockData, new ResetLockCallback() {
             @Override
             public void onResetLockSuccess() {
                 success.invoke();
@@ -412,7 +412,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
             lockErrorCallback(LockError.DATA_FORMAT_ERROR, fail);
             return;
         }
-        TTLockClient.getDefault().resetEkey(lockData, null, new ResetKeyCallback() {
+        TTLockClient.getDefault().resetEkey(lockData, new ResetKeyCallback() {
             @Override
             public void onResetKeySuccess(String lockData) {
                 success.invoke(lockData);
@@ -431,7 +431,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
             lockErrorCallback(LockError.DATA_FORMAT_ERROR, fail);
             return;
         }
-        TTLockClient.getDefault().controlLock(RNControlAction.RN2Native(controlAction), lockData, null, new ControlLockCallback() {
+        TTLockClient.getDefault().controlLock(RNControlAction.RN2Native(controlAction), lockData, new ControlLockCallback() {
             @Override
             public void onControlLockSuccess(ControlLockResult controlLockResult) {
                 WritableArray writableArray = Arguments.createArray();
@@ -456,7 +456,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
             return;
         }
         LogUtil.d("startDate:" + startDate);
-        TTLockClient.getDefault().createCustomPasscode(passcode, (long)startDate, (long)endDate, lockData, null, new CreateCustomPasscodeCallback() {
+        TTLockClient.getDefault().createCustomPasscode(passcode, (long)startDate, (long)endDate, lockData, new CreateCustomPasscodeCallback() {
             @Override
             public void onCreateCustomPasscodeSuccess(String passcode) {
                 success.invoke();
@@ -475,7 +475,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
             lockErrorCallback(LockError.DATA_FORMAT_ERROR, fail);
             return;
         }
-        TTLockClient.getDefault().modifyPasscode(passcodeOrigin, passcodeNew, (long)startDate, (long)endDate, lockData, null, new ModifyPasscodeCallback() {
+        TTLockClient.getDefault().modifyPasscode(passcodeOrigin, passcodeNew, (long)startDate, (long)endDate, lockData, new ModifyPasscodeCallback() {
             @Override
             public void onModifyPasscodeSuccess() {
                 success.invoke();
@@ -494,7 +494,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
             lockErrorCallback(LockError.DATA_FORMAT_ERROR, fail);
             return;
         }
-        TTLockClient.getDefault().deletePasscode(passcode, lockData, null, new DeletePasscodeCallback() {
+        TTLockClient.getDefault().deletePasscode(passcode, lockData, new DeletePasscodeCallback() {
             @Override
             public void onDeletePasscodeSuccess() {
                 success.invoke();
@@ -513,7 +513,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
             lockErrorCallback(LockError.DATA_FORMAT_ERROR, fail);
             return;
         }
-        TTLockClient.getDefault().resetPasscode(lockData, null, new ResetPasscodeCallback() {
+        TTLockClient.getDefault().resetPasscode(lockData, new ResetPasscodeCallback() {
             @Override
             public void onResetPasscodeSuccess(String lockData) {
                 success.invoke(lockData);
@@ -532,7 +532,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
             lockErrorCallback(LockError.DATA_FORMAT_ERROR, fail);
             return;
         }
-        TTLockClient.getDefault().getLockStatus(lockData, null, new GetLockStatusCallback() {
+        TTLockClient.getDefault().getLockStatus(lockData, new GetLockStatusCallback() {
             @Override
             public void onGetLockStatusSuccess(int status) {
                 success.invoke(status);
@@ -606,7 +606,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
             lockErrorCallback(LockError.DATA_FORMAT_ERROR, fail);
             return;
         }
-        TTLockClient.getDefault().deleteICCard(cardNumber, lockData, null, new DeleteICCardCallback() {
+        TTLockClient.getDefault().deleteICCard(cardNumber, lockData, new DeleteICCardCallback() {
             @Override
             public void onDeleteICCardSuccess() {
                 success.invoke();
@@ -621,7 +621,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void clearAllCards(String lockData, Callback success, Callback fail) {
-        TTLockClient.getDefault().clearAllICCard(lockData, null, new ClearAllICCardCallback() {
+        TTLockClient.getDefault().clearAllICCard(lockData, new ClearAllICCardCallback() {
             @Override
             public void onClearAllICCardSuccess() {
                 success.invoke();
@@ -705,7 +705,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
             lockErrorCallback(LockError.DATA_FORMAT_ERROR, fail);
             return;
         }
-        TTLockClient.getDefault().deleteFingerprint(fingerprintNumber, lockData, null, new DeleteFingerprintCallback() {
+        TTLockClient.getDefault().deleteFingerprint(fingerprintNumber, lockData, new DeleteFingerprintCallback() {
             @Override
             public void onDeleteFingerprintSuccess() {
                 success.invoke();
@@ -720,7 +720,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void clearAllFingerprints(String lockData, Callback success, Callback fail) {
-        TTLockClient.getDefault().clearAllFingerprints(lockData, null, new ClearAllFingerprintCallback() {
+        TTLockClient.getDefault().clearAllFingerprints(lockData, new ClearAllFingerprintCallback() {
             @Override
             public void onClearAllFingerprintSuccess() {
                 success.invoke();
@@ -739,7 +739,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
             lockErrorCallback(LockError.DATA_FORMAT_ERROR, fail);
             return;
         }
-        TTLockClient.getDefault().modifyAdminPasscode(adminPasscode, lockData, null, new ModifyAdminPasscodeCallback() {
+        TTLockClient.getDefault().modifyAdminPasscode(adminPasscode, lockData, new ModifyAdminPasscodeCallback() {
             @Override
             public void onModifyAdminPasscodeSuccess(String passcode) {
                 success.invoke(passcode);
@@ -754,7 +754,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void setLockTime(double timestamp, String lockData, Callback success, Callback fail) {
-        TTLockClient.getDefault().setLockTime((long) timestamp, lockData, null, new SetLockTimeCallback() {
+        TTLockClient.getDefault().setLockTime((long) timestamp, lockData, new SetLockTimeCallback() {
             @Override
             public void onSetTimeSuccess() {
                 success.invoke();
@@ -769,7 +769,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void getLockTime(String lockData, Callback success, Callback fail) {
-        TTLockClient.getDefault().getLockTime(lockData, null, new GetLockTimeCallback() {
+        TTLockClient.getDefault().getLockTime(lockData, new GetLockTimeCallback() {
             @Override
             public void onGetLockTimeSuccess(long lockTimestamp) {
                 success.invoke(String.valueOf(lockTimestamp));
@@ -784,7 +784,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void getLockOperationRecord(int type, String lockData, Callback success, Callback fail) {
-        TTLockClient.getDefault().getOperationLog(type == 0 ? LogType.NEW : LogType.ALL, lockData, null, new GetOperationLogCallback() {
+        TTLockClient.getDefault().getOperationLog(type == 0 ? LogType.NEW : LogType.ALL, lockData, new GetOperationLogCallback() {
             @Override
             public void onGetLogSuccess(String log) {
                 success.invoke(log);
@@ -818,7 +818,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void setLockAutomaticLockingPeriodicTime(int seconds, String lockData, Callback success, Callback fail) {
-        TTLockClient.getDefault().setAutomaticLockingPeriod(seconds, lockData, null, new SetAutoLockingPeriodCallback() {
+        TTLockClient.getDefault().setAutomaticLockingPeriod(seconds, lockData, new SetAutoLockingPeriodCallback() {
             @Override
             public void onSetAutoLockingPeriodSuccess() {
                 success.invoke();
@@ -833,7 +833,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void getLockRemoteUnlockSwitchState(String lockData, Callback success, Callback fail) {
-        TTLockClient.getDefault().getRemoteUnlockSwitchState(lockData, null, new GetRemoteUnlockStateCallback() {
+        TTLockClient.getDefault().getRemoteUnlockSwitchState(lockData, new GetRemoteUnlockStateCallback() {
             @Override
             public void onGetRemoteUnlockSwitchStateSuccess(boolean enabled) {
                 success.invoke(enabled);
@@ -848,7 +848,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void setLockRemoteUnlockSwitchState(boolean isOn, String lockData, Callback success, Callback fail) {
-        TTLockClient.getDefault().setRemoteUnlockSwitchState(isOn, lockData, null, new SetRemoteUnlockSwitchCallback() {
+        TTLockClient.getDefault().setRemoteUnlockSwitchState(isOn, lockData, new SetRemoteUnlockSwitchCallback() {
             @Override
             public void onSetRemoteUnlockSwitchSuccess(String lockData) {
                 success.invoke(lockData);
@@ -915,7 +915,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
 
         LogUtil.d("weekdays:" + passageModeConfig.getRepeatWeekOrDays());
 
-        TTLockClient.getDefault().setPassageMode(passageModeConfig, lockData, null, new SetPassageModeCallback() {
+        TTLockClient.getDefault().setPassageMode(passageModeConfig, lockData, new SetPassageModeCallback() {
             @Override
             public void onSetPassageModeSuccess() {
                 success.invoke();
@@ -930,7 +930,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void clearAllPassageModes(String lockData, Callback success, Callback fail) {
-        TTLockClient.getDefault().clearPassageMode(lockData, null, new ClearPassageModeCallback() {
+        TTLockClient.getDefault().clearPassageMode(lockData, new ClearPassageModeCallback() {
             @Override
             public void onClearPassageModeSuccess() {
                 success.invoke();
