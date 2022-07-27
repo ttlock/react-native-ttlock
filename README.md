@@ -3,15 +3,11 @@
 ##### Developers Email && Quick Response
 ttlock-developers-email-list@googlegroups.com
 
-## Note
-`react-native-ttlock` version `2.x.x` is not compatible with version `1.x.x`  please upgrade carefully.
-
 ## Installation
 
-`yarn add react-native-ttlock`
+Move `react-native-ttlock` to `yourProject/node_modules`
 
 ## Add configuration to project
-
 
 #### iOS
 
