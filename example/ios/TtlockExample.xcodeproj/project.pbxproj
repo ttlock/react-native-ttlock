@@ -282,7 +282,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.reactjs.native.TtlockExample.TtlockExample;
+				PRODUCT_BUNDLE_IDENTIFIER = com.justfor.test;
 				PRODUCT_NAME = TtlockExample;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "TtlockExample-Bridging-Header.h";
@@ -313,7 +313,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.TtlockExample.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.justfor.test;
 				PRODUCT_NAME = TtlockExample;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "TtlockExample-Bridging-Header.h";
