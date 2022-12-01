@@ -26,7 +26,7 @@ RCT_EXPORT_MODULE()
 
 - (instancetype)init{
     if (self = [super init]) {
-        __weak Ttlock *weakSelf = self;
+//        __weak Ttlock *weakSelf = self;
         [TTLock setupBluetooth:^(TTBluetoothState state) {
 //            if (isAddListenBluetoothState) {
 //                [weakSelf sendEventWithName:EVENT_BLUETOOTH_STATE body:@(state)];
@@ -223,40 +223,22 @@ RCT_EXPORT_METHOD(addCard:(NSArray *)cycleList startDate:(nonnull NSNumber *)sta
 {
 
     __weak Ttlock *weakSelf = self;
-    if (cycleList == nil || cycleList.count == 0) {
-        [TTLock addICCardStartDate:startDate.longLongValue endDate:endDate.longLongValue lockData:lockData progress:^(TTAddICState state) {
-            [weakSelf sendEventWithName:EVENT_ADD_CARD_PROGRESS body:nil];
-        } success:^(NSString *cardNumber) {
-            [Ttlock response:cardNumber success:success];
-        } failure:^(TTError errorCode, NSString *errorMsg) {
-            [Ttlock response:errorCode message:errorMsg fail:fail];
-        }];
-    }else{
-        [TTLock addICCardWithCyclicConfig:cycleList startDate:startDate.longLongValue endDate:endDate.longLongValue lockData:lockData progress:^(TTAddICState state) {[weakSelf sendEventWithName:EVENT_ADD_CARD_PROGRESS body:nil];
-        } success:^(NSString *cardNumber) {
-            [Ttlock response:cardNumber success:success];
-        } failure:^(TTError errorCode, NSString *errorMsg) {
-            [Ttlock response:errorCode message:errorMsg fail:fail];
-        }];
-    }
+    [TTLock addICCardWithCyclicConfig:cycleList startDate:startDate.longLongValue endDate:endDate.longLongValue lockData:lockData progress:^(TTAddICState state) {[weakSelf sendEventWithName:EVENT_ADD_CARD_PROGRESS body:nil];
+    } success:^(NSString *cardNumber) {
+        [Ttlock response:cardNumber success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock response:errorCode message:errorMsg fail:fail];
+    }];
 }
 
 RCT_EXPORT_METHOD(modifyCardValidityPeriod:(NSString *)cardNumber cycleList:(NSArray *)cycleList startDate:(nonnull NSNumber *)startDate endDate:(nonnull NSNumber *)endDate lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     
-    if (cycleList == nil || cycleList.count == 0) {
-        [TTLock modifyICCardValidityPeriodWithCardNumber:cardNumber startDate:startDate.longLongValue endDate:endDate.longLongValue lockData:lockData success:^{
-            [Ttlock response:nil success:success];
-        } failure:^(TTError errorCode, NSString *errorMsg) {
-            [Ttlock response:errorCode message:errorMsg fail:fail];
-        }];
-    }else{
-        [TTLock modifyICCardValidityPeriodWithCardNumber:cardNumber startDate:startDate.longLongValue endDate:endDate.longLongValue lockData:lockData success:^{
-            [Ttlock response:nil success:success];
-        } failure:^(TTError errorCode, NSString *errorMsg) {
-            [Ttlock response:errorCode message:errorMsg fail:fail];
-        }];
-    }
+    [TTLock modifyICCardValidityPeriodWithCyclicConfig:cycleList cardNumber:cardNumber startDate:startDate.longLongValue endDate:endDate.longLongValue lockData:lockData success:^{
+        [Ttlock response:nil success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock response:errorCode message:errorMsg fail:fail];
+    }];
 }
 
 
@@ -284,41 +266,23 @@ RCT_EXPORT_METHOD(addFingerprint:(NSArray *)cycleList startDate:(nonnull NSNumbe
 {
     
     __weak Ttlock *weakSelf = self;
-    if (cycleList == nil || cycleList.count == 0) {
-        [TTLock addFingerprintStartDate:startDate.longLongValue endDate:endDate.longLongValue lockData:lockData progress:^(int currentCount, int totalCount) {
-            [weakSelf sendEventWithName:EVENT_ADD_FINGERPRINT_PROGRESS body:@[@(currentCount),@(totalCount)]];
-        } success:^(NSString *fingerprintNumber) {
-            [Ttlock response:fingerprintNumber success:success];
-        } failure:^(TTError errorCode, NSString *errorMsg) {
-            [Ttlock response:errorCode message:errorMsg fail:fail];
-        }];
-    }else{
-        [TTLock addFingerprintWithCyclicConfig:cycleList startDate:startDate.longLongValue endDate:endDate.longLongValue lockData:lockData progress:^(int currentCount, int totalCount) {
-            [weakSelf sendEventWithName:EVENT_ADD_FINGERPRINT_PROGRESS body:@[@(currentCount),@(totalCount)]];
-        } success:^(NSString *fingerprintNumber) {
-            [Ttlock response:fingerprintNumber success:success];
-        } failure:^(TTError errorCode, NSString *errorMsg) {
-            [Ttlock response:errorCode message:errorMsg fail:fail];
-        }];
-    }
+    [TTLock addFingerprintWithCyclicConfig:cycleList startDate:startDate.longLongValue endDate:endDate.longLongValue lockData:lockData progress:^(int currentCount, int totalCount) {
+        [weakSelf sendEventWithName:EVENT_ADD_FINGERPRINT_PROGRESS body:@[@(currentCount),@(totalCount)]];
+    } success:^(NSString *fingerprintNumber) {
+        [Ttlock response:fingerprintNumber success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock response:errorCode message:errorMsg fail:fail];
+    }];
 }
 
 RCT_EXPORT_METHOD(modifyFingerprintValidityPeriod:(NSString *)fingerprintNumber cycleList:(NSArray *)cycleList startDate:(nonnull NSNumber *)startDate endDate:(nonnull NSNumber *)endDate lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     
-    if (cycleList == nil || cycleList.count == 0) {
-        [TTLock modifyFingerprintValidityPeriodWithFingerprintNumber:fingerprintNumber startDate:startDate.longLongValue endDate:endDate.longLongValue lockData:lockData success:^{
-            [Ttlock response:nil success:success];
-        } failure:^(TTError errorCode, NSString *errorMsg) {
-            [Ttlock response:errorCode message:errorMsg fail:fail];
-        }];
-    }else{
-        [TTLock modifyFingerprintValidityPeriodWithCyclicConfig:cycleList fingerprintNumber:fingerprintNumber startDate:startDate.longLongValue endDate:endDate.longLongValue lockData:lockData success:^{
-            [Ttlock response:nil success:success];
-        } failure:^(TTError errorCode, NSString *errorMsg) {
-            [Ttlock response:errorCode message:errorMsg fail:fail];
-        }];
-    }
+    [TTLock modifyFingerprintValidityPeriodWithCyclicConfig:cycleList fingerprintNumber:fingerprintNumber startDate:startDate.longLongValue endDate:endDate.longLongValue lockData:lockData success:^{
+        [Ttlock response:nil success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock response:errorCode message:errorMsg fail:fail];
+    }];
 }
 
 
