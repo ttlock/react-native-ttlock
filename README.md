@@ -30,6 +30,28 @@ ttlock-developers-email-list@googlegroups.com
 <uses-permission android:name="android.permission.BLUETOOTH" />
 <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+
+android 12 needs below permission.
+  <!--
+ Needed only if your app looks for Bluetooth devices.
+         You must add an attribute to this permission, or declare the
+         ACCESS_FINE_LOCATION permission, depending on the results when you
+         check location usage in your app.
+    -->
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_SCAN"
+        android:usesPermissionFlags="neverForLocation"
+        tools:targetApi="s" />
+    <!--
+ Needed only if your app makes the device discoverable to Bluetooth
+         devices.
+    -->
+    <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
+    <!--
+ Needed only if your app communicates with already-paired Bluetooth
+         devices.
+    -->
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
 ``` 
 
 2. In order to get the permission request result in ttlock plugin, in MainActivity extends ReactActivity, you need override the onRequestPermissionsResult method and add below code:   
@@ -79,6 +101,7 @@ Ttlock.getBluetoothState((state: BluetoothState)=>{
 
 ``` js
 //Start scan lock
+android 12 needs request android.permission.BLUETOOTH_SCAN before Ttlock.startScan
 Ttlock.startScan((scanLockModal: ScanLockModal) => {
     //todo
 });
@@ -92,6 +115,8 @@ Ttlock.stopScan();
 
 
 ``` js
+android 12 needs android.permission.BLUETOOTH_CONNECT permission before calling apis.
+All apis needs android.permission.BLUETOOTH_CONNECT permission
 const param = {
     lockMac: scanLockModal.lockMac,
     lockVersion: scanLockModal.lockVersion

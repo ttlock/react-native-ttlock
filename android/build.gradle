@@ -30,7 +30,7 @@ android {
   compileSdkVersion getExtOrIntegerDefault('compileSdkVersion')
   buildToolsVersion getExtOrDefault('buildToolsVersion')
   defaultConfig {
-    minSdkVersion 18
+    minSdkVersion 21
     targetSdkVersion getExtOrIntegerDefault('targetSdkVersion')
     versionCode 1
     versionName "1.0"
@@ -40,9 +40,17 @@ android {
 //    }
   }
 
-//  packagingOptions {
+  packagingOptions {
+    pickFirst "lib/armeabi-v7a/libfbjni.so"
+    pickFirst "lib/arm64-v8a/libc++_shared.so"
+    pickFirst "lib/arm64-v8a/libfbjni.so"
+    pickFirst "lib/x86_64/libfbjni.so"
+    pickFirst "lib/x86/libfbjni.so"
+    pickFirst "lib/x86/libc++_shared.so"
+    pickFirst "lib/x86_64/libc++_shared.so"
+    pickFirst "lib/armeabi-v7a/libc++_shared.so"
 //    exclude "lib/arm64-v8a/librealm-jni.so"
-//  }
+  }
   
   buildTypes {
     release {
