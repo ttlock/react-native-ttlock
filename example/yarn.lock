@@ -3780,6 +3780,11 @@ react-native-screens@^2.14.0:
   resolved "https://registry.yarnpkg.com/react-native-screens/-/react-native-screens-2.18.1.tgz#47b9991c6f762d00d0ed3233e5283d523e859885"
   integrity sha512-r5WZLpmx2hHjC1RgMdPq5YpSU9tEhBpUaZ5M1SUtNIONyiLqQVxabhRCINdebIk4depJiIl7yw2Q85zJyeX6fw==
 
+react-native-ttlock@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/react-native-ttlock/-/react-native-ttlock-2.0.1.tgz#d9c5c8b7dd0f1a22c81c5c93cfcf23bf1a2a6fc9"
+  integrity sha512-1X/SilRk+JM+h3kR6BJDjwwv/SkcPXAhjCWdZWspgL5PIfkzd5CIYQBJjo18ce1NwyHrXXuRKN4wgCl47rXzfA==
+
 react-native@0.62.2:
   version "0.62.2"
   resolved "https://registry.yarnpkg.com/react-native/-/react-native-0.62.2.tgz#d831e11a3178705449142df19a70ac2ca16bad10"
