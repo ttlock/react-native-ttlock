@@ -156,6 +156,15 @@ RCT_EXPORT_METHOD(getLockTime:(NSString *)lockData success:(RCTResponseSenderBlo
     }];
 }
 
+RCT_EXPORT_METHOD(getLockElectricQuantity:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    [TTLock getElectricQuantityWithLockData:lockData success:^(NSInteger electricQuantity) {
+        [Ttlock response:@(electricQuantity) success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock response:errorCode message:errorMsg fail:fail];
+    }];
+}
+
 RCT_EXPORT_METHOD(getLockOperationRecord:(int)type lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     TTOperateLogType logType = type + 1;
@@ -379,6 +388,35 @@ RCT_EXPORT_METHOD(setLockConfig:(int)config isOn:(BOOL)isOn lockData:(NSString *
 }
 
 
+RCT_EXPORT_METHOD(setLockSoundVolume:(int)soundVolume isOn:(BOOL)isOn lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    [TTLock setLockSoundWithSoundVolume:soundVolume lockData:lockData success:^{
+        [Ttlock response:nil success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock response:errorCode message:errorMsg fail:fail];
+    }];
+}
+
+
+RCT_EXPORT_METHOD(getUnlockDirection:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    [TTLock getUnlockDirectionWithLockData:lockData success:^(TTUnlockDirection direction) {
+        [Ttlock response:@(direction) success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock response:errorCode message:errorMsg fail:fail];
+    }];
+}
+
+RCT_EXPORT_METHOD(setUnlockDirection:(int)unlockDirection lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    [TTLock setUnlockDirection:unlockDirection lockData:lockData success:^{
+        [Ttlock response:nil success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock response:errorCode message:errorMsg fail:fail];
+    }];
+}
+
+
 RCT_EXPORT_METHOD(addPassageMode:(int)type weekly:(NSArray<NSNumber *> *)weekly monthly:(NSArray<NSNumber *> *)monthly startDate:(int)startDate endDate:(int)endDate lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     TTPassageModeType modeType = type + 1;
@@ -464,6 +502,7 @@ RCT_EXPORT_METHOD(initGateway:(NSDictionary *)dict success:(RCTResponseSenderBlo
     paramDict[@"wifiPwd"] = dict[@"wifiPassword"];
     paramDict[@"uid"] = dict[@"ttlockUid"];
     paramDict[@"userPwd"] = dict[@"ttlockLoginPassword"];
+    paramDict[@"gatewayName"] = dict[@"gatewayName"];
     paramDict[@"serverAddress"] = dict[@"serverIp"];
     paramDict[@"portNumber"] = dict[@"serverPort"];
     paramDict[@"gatewayVersion"] = @(gatewayType);
@@ -471,6 +510,13 @@ RCT_EXPORT_METHOD(initGateway:(NSDictionary *)dict success:(RCTResponseSenderBlo
         paramDict[@"SSID"] = @"1";
         paramDict[@"wifiPwd"] = @"1";
     }
+    
+    paramDict[@"type"] = dict[@"ipSettingType"];
+    paramDict[@"ipAddress"] = dict[@"ipAddress"];
+    paramDict[@"subnetMask"] = dict[@"subnetMask"];
+    paramDict[@"router"] = dict[@"router"];
+    paramDict[@"preferredDns"] = dict[@"preferredDns"];
+    paramDict[@"alternateDns"] = dict[@"alternateDns"];
     
     [TTGateway initializeGatewayWithInfoDic:paramDict block:^(TTSystemInfoModel *systemInfoModel, TTGatewayStatus status) {
         if (status == TTGatewaySuccess) {

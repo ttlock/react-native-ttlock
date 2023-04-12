@@ -189,7 +189,7 @@ PODS:
     - React-Core
   - react-native-ttlock (0.1.0):
     - React-Core
-    - TTLock (= 3.1.9)
+    - TTLock
   - React-RCTActionSheet (0.63.4):
     - React-Core/RCTActionSheetHeaders (= 0.63.4)
   - React-RCTAnimation (0.63.4):
@@ -258,7 +258,7 @@ PODS:
     - React-Core
   - RNScreens (2.18.1):
     - React-Core
-  - TTLock (3.1.9)
+  - TTLock (3.2.0)
   - Yoga (1.14.0)
 
 DEPENDENCIES:
@@ -386,7 +386,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 93bd528844ad21dc07aab1c67cb10abae6df6949
   React-jsinspector: 58aef7155bc9a9683f5b60b35eccea8722a4f53a
   react-native-safe-area-context: 9e40fb181dac02619414ba1294d6c2a807056ab9
-  react-native-ttlock: 0adb5f8ed9114d3a931234da3d357aa763a06da7
+  react-native-ttlock: 13de49934beacec2ab282b25add833af2720c44d
   React-RCTActionSheet: 89a0ca9f4a06c1f93c26067af074ccdce0f40336
   React-RCTAnimation: 1bde3ecc0c104c55df246eda516e0deb03c4e49b
   React-RCTBlob: a97d378b527740cc667e03ebfa183a75231ab0f0
@@ -401,7 +401,7 @@ SPEC CHECKSUMS:
   RNGestureHandler: a479ebd5ed4221a810967000735517df0d2db211
   RNReanimated: c1b56d030d1616239861534d9adb531f8cffab68
   RNScreens: f7ad633b2e0190b77b6a7aab7f914fad6f198d8d
-  TTLock: a8a0db90d25e776ce5217c514fe6af1afda85de0
+  TTLock: 8eb887bd7033c95e20b7e533f3accb3a5e7c0947
   Yoga: 4bd86afe9883422a7c4028c00e34790f560923d6
 
 PODFILE CHECKSUM: 61d3e43654c87a3c90f5deca5bc3dd1a50cb4bf1

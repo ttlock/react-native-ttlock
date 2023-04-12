@@ -11,6 +11,97 @@ const ttlockEventEmitter = new NativeEventEmitter(ttlockModule);
 
 const subscriptionMap = new Map();
 
+
+class TtRemoteDevice {
+  static defaultCallback = function () { };
+
+  /**
+   * Scan for nearby gateways （Only newly powered gateways can be scanned）
+   * @param callback  If there is a reenergized gateway nearby, the callback will be performed multiple times
+   */
+  static startScan(callback: ((scanGatewayModal: ScanGatewayModal) => void)) {
+    let subscription = subscriptionMap.get(GatewayEvent.ScanGateway)
+    if (subscription !== undefined) {
+      subscription.remove()
+    }
+    subscription = ttlockEventEmitter.addListener(GatewayEvent.ScanGateway, callback);
+    subscriptionMap.set(GatewayEvent.ScanGateway, subscription);
+    ttlockModule.startScanGateway();
+  }
+
+  /**
+   * Stop scanning nearby Bluetooth locks
+   */
+  static stopScan() {
+    ttlockModule.stopScanGateway();
+    let subscription = subscriptionMap.get(GatewayEvent.ScanGateway)
+    if (subscription !== undefined) {
+      subscription.remove();
+    }
+    subscriptionMap.delete(GatewayEvent.ScanGateway);
+  }
+
+  /**
+   * Connected to the gateway Only newly powered gateways can be connected）
+   * @param mac 
+   * @param callback 
+   */
+  static connect(mac: string, callback: ((state: ConnectState) => void)) {
+    callback = callback || this.defaultCallback;
+    ttlockModule.connect(mac, (state: number) => {
+      let connectState = [ConnectState.Timeout,ConnectState.Success,ConnectState.Fail][state];
+      callback!(connectState);
+    });
+  }
+
+  /**
+   * Read wifi near the gateway
+   * @param progress 
+   * @param finish 
+   * @param fail 
+   */
+  static getNearbyWifi(progress: ((scanWifiModal: ScanWifiModal[]) => void), finish: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    progress = progress || this.defaultCallback;
+    finish = finish || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+
+    let subscription = ttlockEventEmitter.addListener(GatewayEvent.ScanWifi, (responData) => {
+      progress(responData);
+    });
+
+    ttlockModule.getNearbyWifi((state: number) => {
+      subscription.remove();
+      if (state === 0) {
+        finish!();
+      } else {
+        fail!(1, "Failed to get nearby wifi. Please confirm whether there is wifi nearby or reconnect to the gateway try again");
+      }
+    });
+  }
+
+  /**
+   * Initialize gateway
+   * @param object 
+   * @param success 
+   * @param fail 
+   */
+  static initGateway(object: InitGatewayParam, success: ((initGatewayModal: InitGatewayModal) => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    ttlockModule.initGateway(object, success, (errorCode: number) => {
+      let description = "Init gateway fail.";
+      if (errorCode === 3) {
+        description += "Wrong wifi";
+      } else if (errorCode === 4) {
+        description += "Wrong wifi password";
+      }
+      fail!(errorCode, description);
+    });
+  }
+
+}
+
+
 class TtGateway {
   static defaultCallback = function () { };
 
@@ -448,6 +539,11 @@ class Ttlock {
     ttlockModule.getLockTime(lockData, success, fail);
   }
 
+  static getLockElectricQuantity(lockData: string, success: null | ((electricQuantity: number) => void), fail: null | ((errorCode: number, description: string) => void)) {
+    fail = fail || this.defaultCallback;
+    success = success || this.defaultCallback;
+    ttlockModule.getLockElectricQuantity(lockData,success,fail);
+  }
 
   /**
    * Read the operation record of the lock. 
@@ -541,6 +637,29 @@ class Ttlock {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
     ttlockModule.setLockConfig(config, isOn, lockData, success, fail);
+  }
+
+
+  static setLockSoundVolume(soundVolume: LockSoundVolume, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    ttlockModule.setLockSoundVolume(soundVolume, lockData, success, fail);
+  }
+
+
+  static getUnlockDirection(lockData: string, success: ((direction: UnlockDirection) => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    ttlockModule.getUnlockDirection(lockData,(unlockDirection: number) => {
+      success(unlockDirection === 1 ? UnlockDirection.Left : UnlockDirection.Right);
+    },fail);
+  }
+
+
+  static setUnlockDirection(direction: UnlockDirection, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    ttlockModule.setLockConfig(direction, lockData, success, fail);
   }
 
 
@@ -701,6 +820,22 @@ enum LockConfigType {
   PrivacyLock = 5
 }
 
+enum LockSoundVolume {
+  On = -1,
+  Off = 0,
+  Livel_1 = 1,
+  Livel_2 = 2,
+  Livel_3 = 3,
+  Livel_4 = 4,
+  Livel_5 = 5
+}
+
+
+enum UnlockDirection {
+  Left = 1,
+  Right = 2
+}
+
 enum LockPassageMode {
   Weekly = 0,
   Monthly = 1
@@ -744,5 +879,10 @@ enum GatewayType {
   G4 =4
 }
 
-export { Ttlock, TtGateway, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType}
+enum GatewayIpSettingType {
+  STATIC_IP = 0,
+  DHCP = 1
+}
+
+export { Ttlock, TtGateway, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType, GatewayIpSettingType, LockSoundVolume}
 export * from './types'

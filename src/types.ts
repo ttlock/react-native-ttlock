@@ -34,12 +34,19 @@ export interface ScanWifiModal {
 }
 
 export interface InitGatewayParam {
+  type: number,
   gatewayName: string,
   wifi: string|undefined,
   wifiPassword: string|undefined,
   ttlockUid: number,
   ttlockLoginPassword: string,
-  type: number
+  
+  ipSettingType: number|undefined,
+  ipAddress: string|undefined,
+  subnetMask: string|undefined,
+  router: string|undefined,
+  preferredDns: string|undefined,
+  alternateDns: string|undefined
 }
 
 export interface InitGatewayModal {
