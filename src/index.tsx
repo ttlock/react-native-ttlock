@@ -4,12 +4,51 @@ import {
   // EmitterSubscription,
 } from 'react-native';
 
-import type { ScanGatewayModal, ScanLockModal, InitGatewayParam, CycleDateParam, ScanWifiModal, InitGatewayModal, LockVersion } from './types'
+import type { ScanGatewayModal, ScanLockModal, InitGatewayParam, CycleDateParam, ScanWifiModal, InitGatewayModal, LockVersion, ScanRemoteDeviceModal } from './types'
 
 const ttlockModule = NativeModules.Ttlock;
 const ttlockEventEmitter = new NativeEventEmitter(ttlockModule);
 
 const subscriptionMap = new Map();
+
+class TtRemoteDeivce {
+
+  static defaultCallback = function () { };
+
+  static startScan(callback: ((scanModal: ScanRemoteDeviceModal) => void)) {
+    let subscription = subscriptionMap.get(TtRemoteDeviceEvent.EventScanRemoteDevice)
+    if (subscription !== undefined) {
+      subscription.remove()
+    }
+    subscription = ttlockEventEmitter.addListener(TtRemoteDeviceEvent.EventScanRemoteDevice, callback);
+    subscriptionMap.set(TtRemoteDeviceEvent.EventScanRemoteDevice, subscription);
+    ttlockModule.startScanRemoteDevice();
+  }
+
+  static stopScan() {
+    ttlockModule.stopScanRemoteDevice();
+    let subscription = subscriptionMap.get(TtRemoteDeviceEvent.EventScanRemoteDevice)
+    if (subscription !== undefined) {
+      subscription.remove();
+    }
+    subscriptionMap.delete(TtRemoteDeviceEvent.EventScanRemoteDevice);
+  }
+
+  static init(mac: string, lockData: string, success: ((electricQuantity: number) => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    ttlockModule.initRemoteDevice(mac, lockData, success, (errorCode: number) => {
+      let description = "Init remote device fail.";
+      if (errorCode === -1) {
+        description += "Wrong CRC";
+      } else if (errorCode === -2) {
+        description += "Connect timeout";
+      }
+      fail!(errorCode, description);
+    });
+  }
+
+}
 
 class TtGateway {
   static defaultCallback = function () { };
@@ -104,8 +143,6 @@ class TtGateway {
 class Ttlock {
 
   static defaultCallback = function () { };
-
-
 
   /**
    * Scan for nearby Bluetooth locks
@@ -823,6 +860,10 @@ enum TTLockEvent {
   ListenBluetoothState = "EventBluetoothState"
 }
 
+enum TtRemoteDeviceEvent {
+  EventScanRemoteDevice = "EventScanRemoteDevice"
+
+}
 
 enum GatewayEvent {
   ScanGateway = "EventScanGateway",
@@ -841,5 +882,5 @@ enum GatewayIpSettingType {
   DHCP = 1
 }
 
-export { Ttlock, TtGateway, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType, GatewayIpSettingType, LockSoundVolume }
+export { Ttlock, TtGateway, TtRemoteDeivce, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType, GatewayIpSettingType, LockSoundVolume, TtRemoteDeviceEvent as RemoteDeviceEvent }
 export * from './types'

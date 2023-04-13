@@ -359,8 +359,6 @@ const LockPage = (props: any) => {
   );
 
 
-
-
   return (
     <FlatList
       data={lockSupportFunctions}

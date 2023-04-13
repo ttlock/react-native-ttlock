@@ -1,6 +1,6 @@
 
 import { makeAutoObservable, runInAction } from "mobx"
-import { Ttlock, TtGateway, ScanLockModal, ScanGatewayModal, ScanWifiModal } from 'react-native-ttlock';
+import { Ttlock, TtGateway, TtRemoteDeivce, ScanLockModal, ScanGatewayModal, ScanWifiModal, ScanRemoteDeviceModal } from 'react-native-ttlock';
 
 
 class Store {
@@ -15,13 +15,13 @@ class Store {
 
   wifiList: ScanWifiModal[] = []
 
+  remoteDeviceList: ScanRemoteDeviceModal[] = []
+
 
   startScanLock() {
     runInAction(() => {
       this.lockList = [];
     });
-
-
 
     Ttlock.startScan((scanLockModal: ScanLockModal) => {
       let isContainModal = false;
@@ -50,8 +50,6 @@ class Store {
           this.lockList = this.lockList.concat([]);
         }
       });
-
-
     });
   }
 
@@ -61,7 +59,6 @@ class Store {
     });
     TtGateway.startScan((data) => {
       let isContainData = false;
-
       runInAction(() => {
         this.gatewayList.forEach((oldData) => {
           if (oldData.gatewayMac === data.gatewayMac) {
@@ -82,6 +79,23 @@ class Store {
     }, () => {
       // finished
     }, null)
+  }
+
+  startScanRemoteDevice() {
+    TtRemoteDeivce.startScan((sancModel)=>{
+      let isContainData = false;
+      runInAction(() => {
+        this.remoteDeviceList.forEach((oldData) => {
+          if (oldData.remoteDeviceMac === sancModel.remoteDeviceMac) {
+            isContainData = true;
+          }
+        });
+        if (isContainData === false) {
+          this.remoteDeviceList.push(sancModel);
+          this.remoteDeviceList = this.remoteDeviceList.slice();
+        }
+      });
+    })
   }
 
 

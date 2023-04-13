@@ -10,6 +10,7 @@
 #define EVENT_BLUETOOTH_STATE @"EventBluetoothState"
 #define EVENT_SCAN_GATEWAY @"EventScanGateway"
 #define EVENT_SCAN_WIFI @"EventScanWifi"
+#define EVENT_SCAN_REMOTE_DEVICE @"EventScanRemoteDevice"
 
 
 //static bool isAddListenBluetoothState = false;
@@ -61,6 +62,8 @@ RCT_EXPORT_METHOD(getBluetoothState:(RCTResponseSenderBlock)callbackBlock)
     [Ttlock response:@(bluetoothState) success:callbackBlock];
     
 }
+
+
 
 #pragma mark - Lock
 RCT_EXPORT_METHOD(startScan)
@@ -447,6 +450,14 @@ RCT_EXPORT_METHOD(clearAllPassageModes:(NSString *)lockData success:(RCTResponse
 }
 
 
+RCT_EXPORT_METHOD(sanRemoteDevice:(NSString *)remoteDeviceMac cyclicConfig:(NSArray<NSDictionary *> *)cyclicConfig startDate:(long long)startDate endDate:(long long)endDate lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    
+    [TTWirelessKeyFob startScanWithBlock:^(TTWirelessKeyFobScanModel *model) {
+        
+    }];
+}
+
 
 RCT_EXPORT_METHOD(addRemoteDevice:(NSString *)remoteDeviceMac cyclicConfig:(NSArray<NSDictionary *> *)cyclicConfig startDate:(long long)startDate endDate:(long long)endDate lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
@@ -580,6 +591,38 @@ RCT_EXPORT_METHOD(initGateway:(NSDictionary *)dict success:(RCTResponseSenderBlo
                 @"firmwareRevision":NOT_NULL_STRING(systemInfoModel.firmwareRevision)
             };
             [Ttlock response:resultDict success:success];
+        }else{
+            [Ttlock response:status  message:nil fail:fail];
+        }
+    }];
+}
+
+
+
+
+#pragma mark - RemoteDevice
+RCT_EXPORT_METHOD(startScanRemoteDevice)
+{
+    
+    [TTWirelessKeyFob startScanWithBlock:^(TTWirelessKeyFobScanModel *model) {
+        NSMutableDictionary *data = @{}.mutableCopy;
+        data[@"remoteDeviceName"] = model.keyFobName;
+        data[@"rssi"] = @(model.RSSI);
+        data[@"remoteDeviceMac"] = model.keyFobMac;
+        [self sendEventWithName:EVENT_SCAN_REMOTE_DEVICE body:data];
+    }];
+}
+
+RCT_EXPORT_METHOD(stopScanRemoteDevice)
+{
+    [TTWirelessKeyFob stopScan];
+}
+
+RCT_EXPORT_METHOD(initRemoteDevice:(NSString *)mac lockData:(NSString *) lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    [TTWirelessKeyFob initializeWithKeyFobMac:mac lockData:lockData block:^(TTKeyFobStatus status, int electricQuantity) {
+        if (status == TTKeyFobSuccess) {
+            [Ttlock response:nil success:success];
         }else{
             [Ttlock response:status  message:nil fail:fail];
         }

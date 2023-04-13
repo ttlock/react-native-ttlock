@@ -18,6 +18,12 @@ export interface ScanGatewayModal {
   type: number
 }
 
+export interface ScanRemoteDeviceModal {
+  remoteDeviceName: string,
+  remoteDeviceMac: string,
+  rssi: number
+}
+
 
 export interface LockVersion {
   protocolVersion: string,
