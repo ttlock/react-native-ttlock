@@ -56,7 +56,7 @@ export interface InitGatewayModal {
 }
 
 
-export interface CardFingerprintCycleParam {
+export interface CycleDateParam {
   weekDay: number,
   startTime: number,
   endTime: number

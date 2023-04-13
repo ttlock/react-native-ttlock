@@ -388,10 +388,19 @@ RCT_EXPORT_METHOD(setLockConfig:(int)config isOn:(BOOL)isOn lockData:(NSString *
 }
 
 
-RCT_EXPORT_METHOD(setLockSoundVolume:(int)soundVolume isOn:(BOOL)isOn lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+RCT_EXPORT_METHOD(setLockSoundVolume:(int)soundVolume lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock setLockSoundWithSoundVolume:soundVolume lockData:lockData success:^{
         [Ttlock response:nil success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock response:errorCode message:errorMsg fail:fail];
+    }];
+}
+
+RCT_EXPORT_METHOD(getLockSoundVolume:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    [TTLock getLockSoundWithLockData:lockData success:^(TTSoundVolume soundVolume) {
+        [Ttlock response:@(soundVolume) success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
         [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
@@ -433,16 +442,61 @@ RCT_EXPORT_METHOD(clearAllPassageModes:(NSString *)lockData success:(RCTResponse
     [TTLock clearPassageModeWithLockData:lockData success:^{
         [Ttlock response:nil success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        NSLog(@"clearAllPassageModes");
         [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
+
+
+
+RCT_EXPORT_METHOD(addRemoteDevice:(NSString *)remoteDeviceMac cyclicConfig:(NSArray<NSDictionary *> *)cyclicConfig startDate:(long long)startDate endDate:(long long)endDate lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    
+    [TTLock addWirelessKeyFobWithCyclicConfig:cyclicConfig keyFobMac:remoteDeviceMac startDate:startDate endDate:endDate lockData:lockData success:^{
+        [Ttlock response:nil success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock response:errorCode message:errorMsg fail:fail];
+    }];
+}
+
+RCT_EXPORT_METHOD(modifyRemoteDevice:(NSString *)remoteDeviceMac cyclicConfig:(NSArray<NSDictionary *> *)cyclicConfig startDate:(long long)startDate endDate:(long long)endDate lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    
+    [TTLock modifyWirelessKeyFobValidityPeriodWithCyclicConfig:cyclicConfig keyFobMac:remoteDeviceMac startDate:startDate endDate:endDate lockData:lockData success:^{
+        [Ttlock response:nil success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock response:errorCode message:errorMsg fail:fail];
+    }];
+}
+
+
+RCT_EXPORT_METHOD(deleteRemoteDevice:(NSString *)remoteDeviceMac lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    [TTLock deleteWirelessKeyFobWithKeyFobMac:remoteDeviceMac lockData:lockData success:^{
+        [Ttlock response:nil success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock response:errorCode message:errorMsg fail:fail];
+    }];
+}
+
+RCT_EXPORT_METHOD(clearAllRemoteDevice:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    [TTLock clearWirelessKeyFobsWithLockData:lockData success:^{
+        [Ttlock response:nil success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock response:errorCode message:errorMsg fail:fail];
+    }];
+}
+
+
 
 RCT_EXPORT_METHOD(supportFunction:(int)fuction lockData:(NSString *)lockData callback:(RCTResponseSenderBlock)callback)
 {
     BOOL isSupport = [TTUtil lockFeatureValue:lockData suportFunction:fuction];
     [Ttlock response:@(isSupport) success:callback];
 }
+
+
+
 
 #pragma mark - Gateway
 RCT_EXPORT_METHOD(startScanGateway)
@@ -527,19 +581,6 @@ RCT_EXPORT_METHOD(initGateway:(NSDictionary *)dict success:(RCTResponseSenderBlo
             };
             [Ttlock response:resultDict success:success];
         }else{
-//            NSDictionary *codeMap = @{
-//                @(1):@0,
-//                @(3):@1,
-//                @(4):@2,
-//                @(-1):@3,
-//                @(-2):@4,
-//                @(-3):@5,
-//                @(-4):@6,
-//                @(-5):@7,
-//                @(-6):@8,
-//                @(-7):@9,
-//            };
-//            NSInteger errorCode = [codeMap[@(status)] intValue];
             [Ttlock response:status  message:nil fail:fail];
         }
     }];
