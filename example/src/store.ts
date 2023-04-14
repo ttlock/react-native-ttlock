@@ -1,6 +1,6 @@
 
 import { makeAutoObservable, runInAction } from "mobx"
-import { Ttlock, TtGateway, TtRemoteDeivce, ScanLockModal, ScanGatewayModal, ScanWifiModal, ScanRemoteDeviceModal } from 'react-native-ttlock';
+import { Ttlock, TtGateway, TtRemoteKey, ScanLockModal, ScanGatewayModal, ScanWifiModal, ScanRemoteKeyModal } from 'react-native-ttlock';
 
 
 class Store {
@@ -15,7 +15,7 @@ class Store {
 
   wifiList: ScanWifiModal[] = []
 
-  remoteDeviceList: ScanRemoteDeviceModal[] = []
+  remoteKeyList: ScanRemoteKeyModal[] = []
 
 
   startScanLock() {
@@ -100,22 +100,22 @@ class Store {
     }, null)
   }
 
-  startScanRemoteDevice() {
+  startScanRemoteKey() {
     runInAction(() => {
       this.gatewayList = [];
     });
 
-    TtRemoteDeivce.startScan((sancModel)=>{
+    TtRemoteKey.startScan((sancModel)=>{
       let isContainData = false;
       runInAction(() => {
-        this.remoteDeviceList.forEach((oldData) => {
-          if (oldData.remoteDeviceMac === sancModel.remoteDeviceMac) {
+        this.remoteKeyList.forEach((oldData) => {
+          if (oldData.remoteKeyMac === sancModel.remoteKeyMac) {
             isContainData = true;
           }
         });
         if (isContainData === false) {
-          this.remoteDeviceList.push(sancModel);
-          this.remoteDeviceList = this.remoteDeviceList.slice();
+          this.remoteKeyList.push(sancModel);
+          this.remoteKeyList = this.remoteKeyList.slice();
         }
       });
     })

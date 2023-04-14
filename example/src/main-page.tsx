@@ -30,16 +30,6 @@ const MainPage = ({ navigation }: {navigation: any}) => {
         }}>
         <Text style={styles.touchButtonText}>Gateway</Text>
       </TouchableHighlight>
-
-      <TouchableHighlight
-        style={[styles.touchButton]}
-        onPress={() => {
-          navigation.navigate("ScanRemoteDeivcePage");
-        }}>
-        <Text style={styles.touchButtonText}>Remote Device</Text>
-      </TouchableHighlight>
-     
-
     </View>
   );
 }

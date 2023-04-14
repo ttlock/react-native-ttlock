@@ -18,9 +18,9 @@ export interface ScanGatewayModal {
   type: number
 }
 
-export interface ScanRemoteDeviceModal {
-  remoteDeviceName: string,
-  remoteDeviceMac: string,
+export interface ScanRemoteKeyModal {
+  remoteKeyName: string,
+  remoteKeyMac: string,
   rssi: number
 }
 

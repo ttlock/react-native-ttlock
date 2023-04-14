@@ -4,41 +4,41 @@ import {
   // EmitterSubscription,
 } from 'react-native';
 
-import type { ScanGatewayModal, ScanLockModal, InitGatewayParam, CycleDateParam, ScanWifiModal, InitGatewayModal, LockVersion, ScanRemoteDeviceModal } from './types'
+import type { ScanGatewayModal, ScanLockModal, InitGatewayParam, CycleDateParam, ScanWifiModal, InitGatewayModal, LockVersion, ScanRemoteKeyModal } from './types'
 
 const ttlockModule = NativeModules.Ttlock;
 const ttlockEventEmitter = new NativeEventEmitter(ttlockModule);
 
 const subscriptionMap = new Map();
 
-class TtRemoteDeivce {
+class TtRemoteKey {
 
   static defaultCallback = function () { };
 
-  static startScan(callback: ((scanModal: ScanRemoteDeviceModal) => void)) {
-    let subscription = subscriptionMap.get(TtRemoteDeviceEvent.ScanRemoteDevice)
+  static startScan(callback: ((scanModal: ScanRemoteKeyModal) => void)) {
+    let subscription = subscriptionMap.get(TtRemoteKeyEvent.ScanRemoteKey)
     if (subscription !== undefined) {
       subscription.remove()
     }
-    subscription = ttlockEventEmitter.addListener(TtRemoteDeviceEvent.ScanRemoteDevice, callback);
-    subscriptionMap.set(TtRemoteDeviceEvent.ScanRemoteDevice, subscription);
-    ttlockModule.startScanRemoteDevice();
+    subscription = ttlockEventEmitter.addListener(TtRemoteKeyEvent.ScanRemoteKey, callback);
+    subscriptionMap.set(TtRemoteKeyEvent.ScanRemoteKey, subscription);
+    ttlockModule.startScanRemoteKey();
   }
 
   static stopScan() {
-    ttlockModule.stopScanRemoteDevice();
-    let subscription = subscriptionMap.get(TtRemoteDeviceEvent.ScanRemoteDevice)
+    ttlockModule.stopScanRemoteKey();
+    let subscription = subscriptionMap.get(TtRemoteKeyEvent.ScanRemoteKey)
     if (subscription !== undefined) {
       subscription.remove();
     }
-    subscriptionMap.delete(TtRemoteDeviceEvent.ScanRemoteDevice);
+    subscriptionMap.delete(TtRemoteKeyEvent.ScanRemoteKey);
   }
 
   static init(mac: string, lockData: string, success: ((electricQuantity: number) => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttlockModule.initRemoteDevice(mac, lockData, success, (errorCode: number) => {
-      let description = "Init remote device fail.";
+    ttlockModule.initRemoteKey(mac, lockData, success, (errorCode: number) => {
+      let description = "Init remote key fail.";
       if (errorCode === -1) {
         description += "Wrong CRC";
       } else if (errorCode === -2) {
@@ -652,30 +652,30 @@ class Ttlock {
     ttlockModule.clearAllPassageModes(lockData, success, fail);
   }
 
-  static addRemoteDevice(remoteDeviceMac: string, cycleDateList: null | CycleDateParam[], startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+  static addRemoteKey(remoteKeyMac: string, cycleDateList: null | CycleDateParam[], startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    // cycleDateList = cycleDateList || [];
-
-    ttlockModule.addRemoteDevice(remoteDeviceMac, cycleDateList, startDate, endDate, lockData, success, fail);
+    cycleDateList = cycleDateList || [];
+    ttlockModule.addRemoteKey(remoteKeyMac, cycleDateList, startDate, endDate, lockData, success, fail);
   }
 
-  static modifyRemoteDevice(remoteDeviceMac: string, cycleDateList: null | CycleDateParam[], startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+  static modifyRemoteKey(remoteKeyMac: string, cycleDateList: null | CycleDateParam[], startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttlockModule.modifyRemoteDevice(remoteDeviceMac, cycleDateList, startDate, endDate, lockData, success, fail);
+    cycleDateList = cycleDateList || [];
+    ttlockModule.modifyRemoteKey(remoteKeyMac, cycleDateList, startDate, endDate, lockData, success, fail);
   }
 
-  static deleteRemoteDevice(remoteDeviceMac: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+  static deleteRemoteKey(remoteKeyMac: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttlockModule.deleteRemoteDevice(remoteDeviceMac, lockData, success, fail);
+    ttlockModule.deleteRemoteKey(remoteKeyMac, lockData, success, fail);
   }
 
-  static clearAllRemoteDevice(lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+  static clearAllRemoteKey(lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttlockModule.clearAllRemoteDevice(lockData, success, fail);
+    ttlockModule.clearAllRemoteKey(lockData, success, fail);
   }
 
 
@@ -771,7 +771,7 @@ enum LockFunction {
   NoBroadcastInNormal = 21,
   PassageMode = 22,
   TurnOffAutoLock = 23,
-  WirelessKeypad = 24,
+  RemoteKeypad = 24,
   Light = 25,
   HotelCardBlacklist = 26,
   IdentityCard = 27,
@@ -783,7 +783,7 @@ enum LockFunction {
   FingerVein = 37,
   NbAwake = 39,
   RecoverCyclePasscode = 40,
-  WirelessKeyFob = 41,
+  RemoteKey = 41,
   GetAccessoryElectricQuantity = 42,
   SoundVolume = 43,
   QRCode = 44,
@@ -860,8 +860,8 @@ enum TTLockEvent {
   ListenBluetoothState = "EventBluetoothState",
 }
 
-enum TtRemoteDeviceEvent {
-  ScanRemoteDevice = "EventScanRemoteDevice"
+enum TtRemoteKeyEvent {
+  ScanRemoteKey = "EventScanRemoteKey"
 
 }
 
@@ -882,5 +882,5 @@ enum GatewayIpSettingType {
   DHCP = 1
 }
 
-export { Ttlock, TtGateway, TtRemoteDeivce, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType, GatewayIpSettingType, LockSoundVolume, TtRemoteDeviceEvent as RemoteDeviceEvent }
+export { Ttlock, TtGateway, TtRemoteKey, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType, GatewayIpSettingType, LockSoundVolume, TtRemoteKeyEvent }
 export * from './types'

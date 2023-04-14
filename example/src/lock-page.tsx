@@ -3,68 +3,75 @@ import { FlatList, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { Ttlock, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, LockSoundVolume } from 'react-native-ttlock';
 import * as Toast from './toast-page';
 
-const getLockSupportFunctionList = (lockData: string) => {
+const getLockSupportOperationList = (lockData: string) => {
 
   const functionAllList: LockFunctionItemData[] = [
-    {lockFunction: "Unlock", lockFuctionValue: null },
-    {lockFunction: "Lock", lockFuctionValue: LockFunction.Locking },
-    {lockFunction: "Get lock time", lockFuctionValue: null },
-    {lockFunction: "Set lock time", lockFuctionValue: null },
-    {lockFunction: "Get lock operate record", lockFuctionValue: null },
-    {lockFunction: "Get lock electric quantity", lockFuctionValue: null },
-    {lockFunction: "Create custom passcode 1122", lockFuctionValue: LockFunction.ManagePasscode },
-    {lockFunction: "Modify passcode 1122 -> 2233", lockFuctionValue: LockFunction.ManagePasscode },
-    {lockFunction: "Delete passcode 2233", lockFuctionValue: LockFunction.Passcode },
-    {lockFunction: "Reset passcode", lockFuctionValue: LockFunction.Passcode },
-    {lockFunction: "Get lock switch state", lockFuctionValue: null },
+    {lockOperation: "Unlock", lockFuctionValue: null },
+    {lockOperation: "Lock", lockFuctionValue: LockFunction.Locking },
+    {lockOperation: "Get lock time", lockFuctionValue: null },
+    {lockOperation: "Set lock time", lockFuctionValue: null },
+    {lockOperation: "Get lock operate record", lockFuctionValue: null },
+    {lockOperation: "Get lock electric quantity", lockFuctionValue: null },
+    {lockOperation: "Create custom passcode 1122", lockFuctionValue: LockFunction.ManagePasscode },
+    {lockOperation: "Modify passcode 1122 -> 2233", lockFuctionValue: LockFunction.ManagePasscode },
+    {lockOperation: "Delete passcode 2233", lockFuctionValue: LockFunction.Passcode },
+    {lockOperation: "Reset passcode", lockFuctionValue: LockFunction.Passcode },
+    {lockOperation: "Get lock switch state", lockFuctionValue: null },
 
-    {lockFunction: "Add IC card", lockFuctionValue: LockFunction.IcCard },
-    {lockFunction: "Modify IC card validity period", lockFuctionValue: LockFunction.IcCard },
-    {lockFunction: "Delete IC card", lockFuctionValue: LockFunction.IcCard },
-    {lockFunction: "Clear all IC cards", lockFuctionValue: LockFunction.IcCard },
+    {lockOperation: "Add IC card", lockFuctionValue: LockFunction.IcCard },
+    {lockOperation: "Modify IC card validity period", lockFuctionValue: LockFunction.IcCard },
+    {lockOperation: "Delete IC card", lockFuctionValue: LockFunction.IcCard },
+    {lockOperation: "Clear all IC cards", lockFuctionValue: LockFunction.IcCard },
 
-    {lockFunction: "Add fingerprint", lockFuctionValue: LockFunction.Fingerprint },
-    {lockFunction: "Modify fingerprint validity period", lockFuctionValue: LockFunction.Fingerprint },
-    {lockFunction: "Delete fingerprint", lockFuctionValue: LockFunction.Fingerprint },
-    {lockFunction: "Clear all fingerprints", lockFuctionValue: LockFunction.Fingerprint },
+    {lockOperation: "Add fingerprint", lockFuctionValue: LockFunction.Fingerprint },
+    {lockOperation: "Modify fingerprint validity period", lockFuctionValue: LockFunction.Fingerprint },
+    {lockOperation: "Delete fingerprint", lockFuctionValue: LockFunction.Fingerprint },
+    {lockOperation: "Clear all fingerprints", lockFuctionValue: LockFunction.Fingerprint },
 
 
-    {lockFunction: "Get lock automatic locking periodic time", lockFuctionValue: LockFunction.AutoLock },
-    {lockFunction: "Set lock automatic locking periodic time", lockFuctionValue: LockFunction.AutoLock },
+    {lockOperation: "Get lock automatic locking periodic time", lockFuctionValue: LockFunction.AutoLock },
+    {lockOperation: "Set lock automatic locking periodic time", lockFuctionValue: LockFunction.AutoLock },
 
-    {lockFunction: "Set lock remote unlock switch state", lockFuctionValue: LockFunction.RemoteUnlockSwicth },
+    {lockOperation: "Set lock remote unlock switch state", lockFuctionValue: LockFunction.RemoteUnlockSwicth },
 
-    {lockFunction: "Get lock config", lockFuctionValue: null },
-    {lockFunction: "Set lock config", lockFuctionValue: null },
+    {lockOperation: "Get lock config", lockFuctionValue: null },
+    {lockOperation: "Set lock config", lockFuctionValue: null },
 
-    {lockFunction: "Get lock sound volume", lockFuctionValue: LockFunction.SoundVolume },
-    {lockFunction: "Set lock sound volume", lockFuctionValue: LockFunction.SoundVolume },
+    {lockOperation: "Get lock sound volume", lockFuctionValue: LockFunction.SoundVolume },
+    {lockOperation: "Set lock sound volume", lockFuctionValue: LockFunction.SoundVolume },
 
-    {lockFunction: "Add passage mode", lockFuctionValue: LockFunction.PassageMode },
-    {lockFunction: "Clear all passageModes", lockFuctionValue: LockFunction.PassageMode },
+    {lockOperation: "Add passage mode", lockFuctionValue: LockFunction.PassageMode },
+    {lockOperation: "Clear all passageModes", lockFuctionValue: LockFunction.PassageMode },
 
-    {lockFunction: "Modify admin passcode to 9999", lockFuctionValue: LockFunction.Passcode },
-    {lockFunction: "Reset ekey", lockFuctionValue: null },
-    {lockFunction: "Rest lock", lockFuctionValue: null },
-    {lockFunction: "Get lock version", lockFuctionValue: null },
+    {lockOperation: "Init remote key", lockFuctionValue: null},
+
+    {lockOperation: "Add remote key to lock", lockFuctionValue: LockFunction.RemoteKey },
+    {lockOperation: "Modify remote key valid date", lockFuctionValue: LockFunction.RemoteKey },
+    {lockOperation: "Delete remote key from lock", lockFuctionValue: LockFunction.RemoteKey },
+    {lockOperation: "Clear all remote key from lock", lockFuctionValue: LockFunction.RemoteKey },
+
+    {lockOperation: "Modify admin passcode to 9999", lockFuctionValue: LockFunction.Passcode },
+    {lockOperation: "Reset ekey", lockFuctionValue: null },
+    {lockOperation: "Rest lock", lockFuctionValue: null },
+    {lockOperation: "Get lock version", lockFuctionValue: null },
   ]
 
-  let supportFunctionList: string[] = []
+  let supportOperationList: string[] = []
   functionAllList.map((item: LockFunctionItemData) => {
     if (item.lockFuctionValue) {
       Ttlock.supportFunction(item.lockFuctionValue!, lockData, (isSupport: boolean) => {
         if (!isSupport) {
-          console.log("The lock not support function " + item.lockFunction);
+          console.log("The lock not support function " + item.lockOperation);
         } else {
-          supportFunctionList.push(item.lockFunction);
+          supportOperationList.push(item.lockOperation);
         }
       })
     } else {
-      supportFunctionList.push(item.lockFunction);
+      supportOperationList.push(item.lockOperation);
     }
   });
 
-  return supportFunctionList;
+  return supportOperationList;
 
 }
 
@@ -86,44 +93,44 @@ const failedCallback = function (errorCode: number, errorMessage: string) {
 var cardNumber: undefined | string;
 var fingerprintNumber: undefined | string;
 
-const lockFunctionClick = (lockFunction: string, lockData: string, lockMac: string) => {
-  Toast.showToastLoad(lockFunction +  "...");
+const operationClick = (lockOperation: string, lockData: string, lockMac: string, navigation: any) => {
+  Toast.showToastLoad(lockOperation +  "...");
 
-  if (lockFunction === "Unlock") {
+  if (lockOperation === "Unlock") {
     Ttlock.controlLock(LockControlType.Unlock, lockData, (lockTime: number, electricQuantity: number, uniqueId: number) => {
       let text = "lockTime:" + lockTime + "\n" + "electricQuantity:" + electricQuantity + "\n" + "uniqueId:" + uniqueId;
       successCallback(text);
     }, failedCallback)
   }
 
-  if (lockFunction === "Lock") {
+  if (lockOperation === "Lock") {
     Ttlock.controlLock(LockControlType.Lock, lockData, (lockTime: number, electricQuantity: number, uniqueId: number) => {
       let text = "lockTime:" + lockTime + "\n" + "electricQuantity:" + electricQuantity + "\n" + "uniqueId:" + uniqueId;
       successCallback(text);
     }, failedCallback)
   }
 
-  if (lockFunction === "Get lock time") {
+  if (lockOperation === "Get lock time") {
     Ttlock.getLockTime(lockData, (lockTimestamp: number) => {
       let text = "lockTimestamp:" + lockTimestamp;
       successCallback(text);
     }, failedCallback);
   }
-  else if (lockFunction === "Set lock time") {
+  else if (lockOperation === "Set lock time") {
     let timestamp = new Date().getTime();
     Ttlock.setLockTime(timestamp, lockData, () => {
       successCallback("set lock time success");
     }, failedCallback);
   }
-  else if (lockFunction === "Get lock electric quantity") {
+  else if (lockOperation === "Get lock electric quantity") {
     Ttlock.getLockElectricQuantity(lockData, (electricQuantity: number) => {
       successCallback("lock electric quantity: " + electricQuantity.toString());
     }, failedCallback);
   }
-  else if (lockFunction === "Get lock operate record") {
+  else if (lockOperation === "Get lock operate record") {
     Ttlock.getLockOperationRecord(LockRecordType.Latest, lockData, successCallback, failedCallback);
   }
-  else if (lockFunction === "Create custom passcode 1122") {
+  else if (lockOperation === "Create custom passcode 1122") {
     // passcode valid 24 hours
     let startDate = new Date().getTime();
     let endDate = startDate + 24 * 3600 * 1000;
@@ -131,7 +138,7 @@ const lockFunctionClick = (lockFunction: string, lockData: string, lockMac: stri
       successCallback("create cutome passcode success");
     }, failedCallback);
   }
-  else if (lockFunction === "Modify passcode 1122 -> 2233") {
+  else if (lockOperation === "Modify passcode 1122 -> 2233") {
 
     // passcode valid one minute
     let startDate = new Date().getTime();
@@ -141,13 +148,13 @@ const lockFunctionClick = (lockFunction: string, lockData: string, lockMac: stri
     }, failedCallback);
   }
 
-  else if (lockFunction === "Delete passcode 2233") {
+  else if (lockOperation === "Delete passcode 2233") {
     Ttlock.deletePasscode("2233", lockData, () => {
       successCallback("delete passcode success");
     }, failedCallback);
   }
 
-  else if (lockFunction === "Reset passcode") {
+  else if (lockOperation === "Reset passcode") {
     Ttlock.resetPasscode(lockData, (lockDataNew: string) => {
       //important: upload lockDataNew to ttlock server. 
       successCallback("reset passcode success, please upload lockDataNew to server");
@@ -155,7 +162,7 @@ const lockFunctionClick = (lockFunction: string, lockData: string, lockMac: stri
     }, failedCallback);
   }
 
-  else if (lockFunction === "Get lock switch state") {
+  else if (lockOperation === "Get lock switch state") {
 
     Ttlock.getLockSwitchState(lockData, (state: LockState) => {
       let text = "state:" + state;
@@ -164,7 +171,7 @@ const lockFunctionClick = (lockFunction: string, lockData: string, lockMac: stri
 
 
   }
-  else if (lockFunction === "Add IC card") {
+  else if (lockOperation === "Add IC card") {
     // card valid one day
     let startDate = new Date().getTime();
     let endDate = startDate + 24 * 3600 * 1000;
@@ -174,7 +181,7 @@ const lockFunctionClick = (lockFunction: string, lockData: string, lockMac: stri
       successCallback(text);
     }, failedCallback);
   }
-  else if (lockFunction === "Modify IC card validity period") {
+  else if (lockOperation === "Modify IC card validity period") {
     if (cardNumber === undefined) {
       Toast.showToast("Please add a card first");
       return;
@@ -187,7 +194,7 @@ const lockFunctionClick = (lockFunction: string, lockData: string, lockMac: stri
       successCallback(text);
     }, failedCallback);
   }
-  else if (lockFunction === "Delete IC card") {
+  else if (lockOperation === "Delete IC card") {
     if (cardNumber === undefined) {
       Toast.showToast("Please add a card first");
       return;
@@ -198,14 +205,14 @@ const lockFunctionClick = (lockFunction: string, lockData: string, lockMac: stri
       cardNumber = undefined;
     }, failedCallback);
   }
-  else if (lockFunction === "Clear all IC cards") {
+  else if (lockOperation === "Clear all IC cards") {
     Ttlock.clearAllCards(lockData, () => {
       let text = "Clear all IC cards success";
       successCallback(text);
       cardNumber = undefined;
     }, failedCallback);
   }
-  else if (lockFunction === "Add fingerprint") {
+  else if (lockOperation === "Add fingerprint") {
     // fingerprint valid one day
     let startDate = new Date().getTime();
     let endDate = startDate + 24 * 3600 * 1000;
@@ -218,7 +225,7 @@ const lockFunctionClick = (lockFunction: string, lockData: string, lockMac: stri
       successCallback(text);
     }, failedCallback);
   }
-  else if (lockFunction === "Modify fingerprint validity period") {
+  else if (lockOperation === "Modify fingerprint validity period") {
     if (fingerprintNumber === undefined) {
       Toast.showToast("Please add a fingerprint first");
       return;
@@ -232,7 +239,7 @@ const lockFunctionClick = (lockFunction: string, lockData: string, lockMac: stri
       successCallback(text);
     }, failedCallback);
   }
-  else if (lockFunction === "Delete fingerprint") {
+  else if (lockOperation === "Delete fingerprint") {
     if (fingerprintNumber === undefined) {
       Toast.showToast("Please add a fingerprint first");
       return;
@@ -243,7 +250,7 @@ const lockFunctionClick = (lockFunction: string, lockData: string, lockMac: stri
       fingerprintNumber = undefined;
     }, failedCallback);
   }
-  else if (lockFunction === "Clear all fingerprints") {
+  else if (lockOperation === "Clear all fingerprints") {
 
     Ttlock.clearAllFingerprints(lockData, () => {
       let text = "clear all fingerprints success";
@@ -251,20 +258,20 @@ const lockFunctionClick = (lockFunction: string, lockData: string, lockMac: stri
       fingerprintNumber = undefined;
     }, failedCallback);
   }
-  else if (lockFunction === "Get lock automatic locking periodic time") {
+  else if (lockOperation === "Get lock automatic locking periodic time") {
     Ttlock.getLockAutomaticLockingPeriodicTime(lockData, (currentTime: number, maxTime: number, minTime: number) => {
       let text = "currentTime:" + currentTime + "\n" + "maxTime:" + maxTime + "\n" + "minTime:" + minTime;
       successCallback(text);
     }, failedCallback);
   }
-  else if (lockFunction === "Set lock automatic locking periodic time") {
+  else if (lockOperation === "Set lock automatic locking periodic time") {
     let seconds = 20;
     Ttlock.setLockAutomaticLockingPeriodicTime(seconds, lockData, () => {
       let text = "set lock automatic lock periodic time success";
       successCallback(text);
     }, failedCallback);
   }
-  else if (lockFunction === "Set lock remote unlock switch state") {
+  else if (lockOperation === "Set lock remote unlock switch state") {
     let isOn = true;
     Ttlock.setLockRemoteUnlockSwitchState(isOn, lockData, (lockDataNew: string) => {
       let text = "set lock remote unlock switch success, please upload lockDataNew to server";
@@ -272,33 +279,33 @@ const lockFunctionClick = (lockFunction: string, lockData: string, lockMac: stri
       console.log(lockDataNew);
     }, failedCallback);
   }
-  else if (lockFunction === "Get lock config") {
+  else if (lockOperation === "Get lock config") {
     Ttlock.getLockConfig(LockConfigType.Audio, lockData, (type: number, isOn: boolean) => {
       let text = "type:" + type + "\n" + "isOn:" + isOn;
       successCallback(text);
     }, failedCallback);
   }
-  else if (lockFunction === "Set lock config") {
+  else if (lockOperation === "Set lock config") {
     let isOn = true;
     Ttlock.setLockConfig(LockConfigType.Audio, isOn, lockData, () => {
       let text = "config lock success";
       successCallback(text);
     }, failedCallback);
   }
-  else if (lockFunction === "Get lock sound volume") {
+  else if (lockOperation === "Get lock sound volume") {
     Ttlock.getLockSoundVolume(lockData, (soundVolume: LockSoundVolume) => {
       let text = "get lock sounde volume: " + soundVolume.toString();
       successCallback(text);
     }, failedCallback);
   }
-  else if (lockFunction === "Set lock sound volume") {
+  else if (lockOperation === "Set lock sound volume") {
     Ttlock.setLockSoundVolume(LockSoundVolume.Livel_3, lockData, () => {
       let text = "set lock sound volume success";
       successCallback(text);
     }, failedCallback);
   }
 
-  else if (lockFunction === "Add passage mode") {
+  else if (lockOperation === "Add passage mode") {
     //minutes  8:00 am ---   17:00 pm
     let startTime = 8 * 60;
     let endTime = 17 * 60;
@@ -308,26 +315,39 @@ const lockFunctionClick = (lockFunction: string, lockData: string, lockMac: stri
     }, failedCallback);
 
   }
-  else if (lockFunction === "Clear all passageModes") {
+  else if (
+  lockOperation === "Init remote key"
+  || lockOperation === "Add remote key to lock" 
+  || lockOperation === "Modify remote key valid date"
+  || lockOperation === "Delete remote key from lock") {
+    navigation.navigate("ScanRemoteKeyPage", {operation: lockOperation, lockData: lockData});
+  }
+  else if (lockOperation === "Clear all remote key from lock") {
+    Ttlock.clearAllRemoteKey(lockData, ()=>{
+      let text = "clear remote key success";
+      successCallback(text);
+    }, failedCallback)
+  }
+  else if (lockOperation === "Clear all passageModes") {
     Ttlock.clearAllPassageModes(lockData, () => {
       let text = "clear all passage modes success";
       successCallback(text);
     }, failedCallback);
   }
-  else if (lockFunction === "Modify admin passcode to 9999") {
+  else if (lockOperation === "Modify admin passcode to 9999") {
     let adminPasscode = "9999";
     Ttlock.modifyAdminPasscode(adminPasscode, lockData, () => {
       let text = "modify admin passcode success";
       successCallback(text);
     }, failedCallback);
   }
-  else if (lockFunction === "Rest lock") {
+  else if (lockOperation === "Rest lock") {
     Ttlock.resetLock(lockData, () => {
       let text = "reset lock success";
       successCallback(text);
     }, failedCallback)
   }
-  else if (lockFunction === "Reset ekey") {
+  else if (lockOperation === "Reset ekey") {
     Ttlock.resetEkey(lockData, (lockDataNew) => {
       //important: upload lockDataNew to ttlock server. 
       let text = "reset ekey success";
@@ -335,7 +355,7 @@ const lockFunctionClick = (lockFunction: string, lockData: string, lockMac: stri
       console.log(lockDataNew);
     }, failedCallback)
   }
-  else if (lockFunction === "Get lock version") {
+  else if (lockOperation === "Get lock version") {
     Ttlock.getLockVersionWithLockMac(lockMac, (lockVersion) => {
       let text = "get lock version";
       successCallback(text);
@@ -346,13 +366,13 @@ const lockFunctionClick = (lockFunction: string, lockData: string, lockMac: stri
 
 
 const LockPage = (props: any) => {
-  const { route } = props;
+  const { route, navigation } = props;
   const { lockData, lockMac } = route.params;
-  const lockSupportFunctions = getLockSupportFunctionList(lockData);
+  const lockSupportOperations = getLockSupportOperationList(lockData);
   const _renderItem = ({ item }: { item: string }) => (
     <TouchableOpacity
       onPress={() => {
-        lockFunctionClick(item, lockData, lockMac);
+        operationClick(item, lockData, lockMac, navigation);
       }}>
       <Text style={styles.item}>{item}</Text>
     </TouchableOpacity>
@@ -361,7 +381,7 @@ const LockPage = (props: any) => {
 
   return (
     <FlatList
-      data={lockSupportFunctions}
+      data={lockSupportOperations}
       renderItem={_renderItem}
       keyExtractor={item => item}
     />
@@ -380,7 +400,7 @@ const styles = StyleSheet.create({
 
 
 interface LockFunctionItemData {
-  lockFunction: string,
+  lockOperation: string,
   lockFuctionValue: null | LockFunction
 }
 

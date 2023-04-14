@@ -13,7 +13,6 @@ const initLock = (scanLockModal: ScanLockModal, navigation: any) => {
     lockVersion: scanLockModal.lockVersion
   }
   Ttlock.initLock(object, (lockData) => {
-    console.log("锁数据：" + lockData);
     Ttlock.stopScan();
     navigation.navigate("LockPage", { scanLockModal: scanLockModal, lockData: lockData, lockMac: scanLockModal.lockMac});
     Toast.hidden();
@@ -38,12 +37,11 @@ const ScanLockPage = (props: { navigation: any; route: any; }) => {
   const { navigation } = props;
 
   useEffect(() => {
+    Ttlock.getBluetoothState((state: BluetoothState)=>{
+      console.log("BluetoothState：", state);
+    });
     store.startScanLock();
    },[])
-
-  Ttlock.getBluetoothState((state: BluetoothState)=>{
-    console.log("BluetoothState：", state);
-  });
 
   return (
     <FlatList
