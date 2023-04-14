@@ -5,11 +5,12 @@ import { TtRemoteDeivce, ScanRemoteDeviceModal } from 'react-native-ttlock';
 import * as Toast from './toast-page';
 import store from './store'
 
-const initRemoteDevice = (item: ScanRemoteDeviceModal, lockData: string, navigation: any,store: any) => {
+const initRemoteDevice = (item: ScanRemoteDeviceModal, lockData: string, navigation: any) => {
   Toast.showToastLoad("init...")
   TtRemoteDeivce.stopScan();
   TtRemoteDeivce.init(item.remoteDeviceMac, lockData, (electricQuantity: number) => {
     Toast.showToast("init remote device success")
+    navigation.pop();
   }, (errorCode: number, description: string)=>{
     Toast.showToast("init remote device fail " + errorCode.toString())
 
@@ -17,8 +18,8 @@ const initRemoteDevice = (item: ScanRemoteDeviceModal, lockData: string, navigat
 }
 
 
-const renderItem = (item: ScanRemoteDeviceModal, lockData: string, navigation: any,store: any) => {
-  return (<TouchableOpacity onPress={()=>{initRemoteDevice(item, lockData,navigation,store)}}>
+const renderItem = (item: ScanRemoteDeviceModal, lockData: string, navigation: any) => {
+  return (<TouchableOpacity onPress={()=>{initRemoteDevice(item, lockData,navigation)}}>
         <Text style={styles.item}>{item.remoteDeviceName}</Text>
       </TouchableOpacity>);
 }
@@ -36,7 +37,7 @@ const ScanRemoteDevicePage = (props: any) => {
   return (
     <FlatList
       data={store.remoteDeviceList}
-      renderItem={({ item })=> renderItem(item,lockData,navigation,store)}
+      renderItem={({ item })=> renderItem(item,lockData,navigation)}
       keyExtractor={item => item.remoteDeviceMac}
     />
   );
