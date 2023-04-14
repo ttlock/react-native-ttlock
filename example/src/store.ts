@@ -82,7 +82,12 @@ class Store {
   }
 
   startScanRemoteDevice() {
+    runInAction(() => {
+      this.gatewayList = [];
+    });
+
     TtRemoteDeivce.startScan((sancModel)=>{
+      console.log(sancModel);
       let isContainData = false;
       runInAction(() => {
         this.remoteDeviceList.forEach((oldData) => {

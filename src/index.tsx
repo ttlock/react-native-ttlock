@@ -16,22 +16,22 @@ class TtRemoteDeivce {
   static defaultCallback = function () { };
 
   static startScan(callback: ((scanModal: ScanRemoteDeviceModal) => void)) {
-    let subscription = subscriptionMap.get(TtRemoteDeviceEvent.EventScanRemoteDevice)
+    let subscription = subscriptionMap.get(TtRemoteDeviceEvent.ScanRemoteDevice)
     if (subscription !== undefined) {
       subscription.remove()
     }
-    subscription = ttlockEventEmitter.addListener(TtRemoteDeviceEvent.EventScanRemoteDevice, callback);
-    subscriptionMap.set(TtRemoteDeviceEvent.EventScanRemoteDevice, subscription);
+    subscription = ttlockEventEmitter.addListener(TtRemoteDeviceEvent.ScanRemoteDevice, callback);
+    subscriptionMap.set(TtRemoteDeviceEvent.ScanRemoteDevice, subscription);
     ttlockModule.startScanRemoteDevice();
   }
 
   static stopScan() {
     ttlockModule.stopScanRemoteDevice();
-    let subscription = subscriptionMap.get(TtRemoteDeviceEvent.EventScanRemoteDevice)
+    let subscription = subscriptionMap.get(TtRemoteDeviceEvent.ScanRemoteDevice)
     if (subscription !== undefined) {
       subscription.remove();
     }
-    subscriptionMap.delete(TtRemoteDeviceEvent.EventScanRemoteDevice);
+    subscriptionMap.delete(TtRemoteDeviceEvent.ScanRemoteDevice);
   }
 
   static init(mac: string, lockData: string, success: ((electricQuantity: number) => void), fail: null | ((errorCode: number, description: string) => void)) {
@@ -857,11 +857,11 @@ enum TTLockEvent {
   ScanLock = "EventScanLock",
   AddCardProgrress = "EventAddCardProgrress",
   AddFingerprintProgress = "EventAddFingerprintProgrress",
-  ListenBluetoothState = "EventBluetoothState"
+  ListenBluetoothState = "EventBluetoothState",
 }
 
 enum TtRemoteDeviceEvent {
-  EventScanRemoteDevice = "EventScanRemoteDevice"
+  ScanRemoteDevice = "EventScanRemoteDevice"
 
 }
 

@@ -45,7 +45,8 @@ RCT_EXPORT_MODULE()
       EVENT_ADD_FINGERPRINT_PROGRESS,
 //      EVENT_BLUETOOTH_STATE,
       EVENT_SCAN_GATEWAY,
-      EVENT_SCAN_WIFI];
+      EVENT_SCAN_WIFI,
+    EVENT_SCAN_REMOTE_DEVICE];
 }
 
 - (void)addListener:(NSString *)eventName
@@ -620,6 +621,7 @@ RCT_EXPORT_METHOD(stopScanRemoteDevice)
 
 RCT_EXPORT_METHOD(initRemoteDevice:(NSString *)mac lockData:(NSString *) lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
+    
     [TTWirelessKeyFob initializeWithKeyFobMac:mac lockData:lockData block:^(TTKeyFobStatus status, int electricQuantity) {
         if (status == TTKeyFobSuccess) {
             [Ttlock response:nil success:success];

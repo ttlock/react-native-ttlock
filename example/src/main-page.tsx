@@ -20,6 +20,15 @@ const MainPage = ({ navigation }: {navigation: any}) => {
       <TouchableHighlight
         style={[styles.touchButton]}
         onPress={() => {
+          // navigation.navigate("LockPage",{store: store});
+          navigation.navigate("ScanRemoteDeivcePage",{store: store});
+        }}>
+        <Text style={styles.touchButtonText}>Remote Device</Text>
+      </TouchableHighlight>
+
+      <TouchableHighlight
+        style={[styles.touchButton]}
+        onPress={() => {
           if(config.gatewayName === undefined || config.ttlockUid === undefined || config.ttlockLoginPassword === undefined){
             let warnText = "Please fill in the configuration information";
             console.log(warnText);
@@ -34,15 +43,7 @@ const MainPage = ({ navigation }: {navigation: any}) => {
       </TouchableHighlight>
 
 
-      <TouchableHighlight
-        style={[styles.touchButton]}
-        onPress={() => {
-          // navigation.navigate("LockPage",{store: store});
-          navigation.navigate("ScanRemoteDeivcePage",{store: store});
-          store.startScanRemoteDevice();
-        }}>
-        <Text style={styles.touchButtonText}>Remote Device</Text>
-      </TouchableHighlight>
+     
 
     </View>
   );
