@@ -78,9 +78,9 @@ class Store {
     TtGateway.getNearbyWifi((list) => {
       var wifiList1 = [...this.wifiList];
       wifiList1.push(...list);
-      // 根据 wifi 去重
+      //  wifi remove duplicates
      var wifiList2 = [...new Set(wifiList1.map(item => item.wifi))].map(wifi => wifiList1.find(item => item.wifi === wifi)); 
-     // 根据 rssi 升序排序
+     //  rssi sort asc
      var wifiList3 = wifiList2.sort((a, b) => a!.rssi - b!.rssi); 
 
      var wifiList4: ScanWifiModal[] = []
@@ -90,11 +90,11 @@ class Store {
         wifiList4.push(wifiList3[i]!)
       }
     }
-     this.wifiList = wifiList4;
-     
 
-      
-      console.log('wifi搜索：' + JSON.stringify(list));
+    runInAction(() => {
+      this.wifiList = wifiList4;
+    });
+     
     }, () => {
       finished();
     }, null)
