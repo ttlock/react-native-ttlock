@@ -18,7 +18,7 @@ const renderItem = (item: ScanRemoteKeyModal, operation: string, lockData: strin
         initRemoteKey(item.remoteKeyMac, lockData,navigation);
       }else if(operation === "Add remote key to lock"){
         addRemoteKeyToLock(item.remoteKeyMac,lockData,navigation);
-      }else if(operation = "Modify remote key valid date"){
+      }else if(operation === "Modify remote key valid date"){
         modifyRemoteKeyValidDate(item.remoteKeyMac,lockData,navigation);
       }else if(operation === "Delete remote key from lock"){
         deleteRemoteKeyFromLock(item.remoteKeyMac,lockData,navigation);
