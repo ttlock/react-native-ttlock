@@ -1,8 +1,9 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { View, FlatList, StyleSheet, Text, Button } from 'react-native';
 import { Ttlock, ScanLockModal, BluetoothState } from 'react-native-ttlock';
 import { observer } from 'mobx-react';
 import * as Toast from './toast-page';
+import store from './store'
 
 const initLock = (scanLockModal: ScanLockModal, navigation: any) => {
   Toast.showToastLoad("Init ...");
@@ -34,8 +35,11 @@ const renderItem = (item: ScanLockModal, navigation: any) => {
 }
 
 const ScanLockPage = (props: { navigation: any; route: any; }) => {
-  const { navigation, route } = props;
-  const { store } = route.params;
+  const { navigation } = props;
+
+  useEffect(() => {
+    store.startScanLock();
+   },[])
 
   Ttlock.getBluetoothState((state: BluetoothState)=>{
     console.log("BluetoothState：", state);

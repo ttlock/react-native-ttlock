@@ -98,7 +98,7 @@ class TtGateway {
    * @param finish 
    * @param fail 
    */
-  static getNearbyWifi(progress: ((scanWifiModal: ScanWifiModal[]) => void), finish: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+  static getNearbyWifi(progress: ((scanWifiModalList: ScanWifiModal[]) => void), finish: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
     progress = progress || this.defaultCallback;
     finish = finish || this.defaultCallback;
     fail = fail || this.defaultCallback;

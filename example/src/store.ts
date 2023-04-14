@@ -73,11 +73,30 @@ class Store {
     });
   }
 
-  startScanWifi() {
+  startScanWifi(finished:()=>void) {
+   
     TtGateway.getNearbyWifi((list) => {
-      this.wifiList = list
+      var wifiList1 = [...this.wifiList];
+      wifiList1.push(...list);
+      // 根据 wifi 去重
+     var wifiList2 = [...new Set(wifiList1.map(item => item.wifi))].map(wifi => wifiList1.find(item => item.wifi === wifi)); 
+     // 根据 rssi 升序排序
+     var wifiList3 = wifiList2.sort((a, b) => a!.rssi - b!.rssi); 
+
+     var wifiList4: ScanWifiModal[] = []
+     for (let i = 0; i < wifiList3.length; i++) {
+      if (wifiList3[i] === undefined) {
+      }else{
+        wifiList4.push(wifiList3[i]!)
+      }
+    }
+     this.wifiList = wifiList4;
+     
+
+      
+      console.log('wifi搜索：' + JSON.stringify(list));
     }, () => {
-      // finished
+      finished();
     }, null)
   }
 
@@ -87,7 +106,6 @@ class Store {
     });
 
     TtRemoteDeivce.startScan((sancModel)=>{
-      console.log(sancModel);
       let isContainData = false;
       runInAction(() => {
         this.remoteDeviceList.forEach((oldData) => {
