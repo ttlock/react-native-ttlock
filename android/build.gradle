@@ -51,7 +51,7 @@ android {
     pickFirst "lib/armeabi-v7a/libc++_shared.so"
 //    exclude "lib/arm64-v8a/librealm-jni.so"
   }
-  
+
   buildTypes {
     release {
       minifyEnabled false
@@ -159,7 +159,7 @@ dependencies {
   // noinspection GradleDynamicVersion
   api 'com.facebook.react:react-native:+'
 //  implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-  implementation 'com.ttlock:ttlock:3.2.6'
+  implementation 'com.ttlock:ttlock:3.2.8'
 //  implementation(name: 'ttlock-release', ext: 'aar')
   implementation 'com.google.code.gson:gson:2.6.1'
 }

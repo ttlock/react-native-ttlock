@@ -25,6 +25,7 @@ import com.reactnativettlock.model.TTLockConfigConverter;
 import com.reactnativettlock.model.TTLockErrorConverter;
 import com.reactnativettlock.model.TTLockEvent;
 import com.reactnativettlock.model.TTLockFieldConstant;
+import com.reactnativettlock.util.PermissionUtils;
 import com.reactnativettlock.util.Utils;
 import com.ttlock.bl.sdk.api.ExtendedBluetoothDevice;
 import com.ttlock.bl.sdk.api.TTLockClient;
@@ -108,23 +109,23 @@ public class TtlockModule extends ReactContextBaseJavaModule {
     /**
      * android 6.0
      */
-    private boolean initPermission() {
-        String permissions[] = {
-                Manifest.permission.ACCESS_FINE_LOCATION
-        };
-        ArrayList<String> toApplyList = new ArrayList<String>();
-        for (String perm : permissions) {
-            if (PackageManager.PERMISSION_GRANTED != ContextCompat.checkSelfPermission(getCurrentActivity(), perm)) {
-                toApplyList.add(perm);
-            }
-        }
-        String tmpList[] = new String[toApplyList.size()];
-        if (!toApplyList.isEmpty()) {
-            ActivityCompat.requestPermissions(getCurrentActivity(), toApplyList.toArray(tmpList), PERMISSIONS_REQUEST_CODE);
-            return false;
-        }
-        return true;
-    }
+//    private boolean initPermission() {
+//        String permissions[] = {
+//                Manifest.permission.ACCESS_FINE_LOCATION
+//        };
+//        ArrayList<String> toApplyList = new ArrayList<String>();
+//        for (String perm : permissions) {
+//            if (PackageManager.PERMISSION_GRANTED != ContextCompat.checkSelfPermission(getCurrentActivity(), perm)) {
+//                toApplyList.add(perm);
+//            }
+//        }
+//        String tmpList[] = new String[toApplyList.size()];
+//        if (!toApplyList.isEmpty()) {
+//            ActivityCompat.requestPermissions(getCurrentActivity(), toApplyList.toArray(tmpList), PERMISSIONS_REQUEST_CODE);
+//            return false;
+//        }
+//        return true;
+//    }
 
     @ReactMethod
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -180,27 +181,31 @@ public class TtlockModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void startScanGateway() {
         scanGateway = true;
-        if (!initPermission()) {
-            return;
-        }
-        GatewayClient.getDefault().prepareBTService(getCurrentActivity());
-        GatewayClient.getDefault().startScanGateway(new ScanGatewayCallback() {
+      PermissionUtils.doWithScanPermission(getCurrentActivity(), success -> {
+        if (success) {
+          GatewayClient.getDefault().prepareBTService(getCurrentActivity());
+          GatewayClient.getDefault().startScanGateway(new ScanGatewayCallback() {
             @Override
             public void onScanGatewaySuccess(ExtendedBluetoothDevice device) {
-                WritableMap map = Arguments.createMap();
-                map.putString(TTGatewayFieldConstant.GATEWAY_NAME, device.getName());
-                map.putString(TTGatewayFieldConstant.GATEWAY_MAC, device.getAddress());
-                map.putBoolean(TTGatewayFieldConstant.IS_DFU_MODE, device.isDfuMode());
-                map.putInt(TTGatewayFieldConstant.RSSI, device.getRssi());
-                map.putInt(TTGatewayFieldConstant.TYPE, device.getGatewayType());
-                getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(TTGatewayEvent.scanGateway, map);
+              WritableMap map = Arguments.createMap();
+              map.putString(TTGatewayFieldConstant.GATEWAY_NAME, device.getName());
+              map.putString(TTGatewayFieldConstant.GATEWAY_MAC, device.getAddress());
+              map.putBoolean(TTGatewayFieldConstant.IS_DFU_MODE, device.isDfuMode());
+              map.putInt(TTGatewayFieldConstant.RSSI, device.getRssi());
+              map.putInt(TTGatewayFieldConstant.TYPE, device.getGatewayType());
+              getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(TTGatewayEvent.scanGateway, map);
             }
 
             @Override
             public void onScanFailed(int errorCode) {
-                LogUtil.d("errorCode:" + errorCode);
+              LogUtil.d("errorCode:" + errorCode);
             }
-        });
+          });
+        } else {
+          LogUtil.d("no scan permission");
+        }
+      });
+
     }
 
     @ReactMethod
@@ -216,68 +221,84 @@ public class TtlockModule extends ReactContextBaseJavaModule {
             LogUtil.d("mac is null");
             return;
         }
-        this.mac = mac;
-        //{ code: 0, description: "The bluetooth connect timeout" },
-        //      { code: 1, description: "The bluetooth connect success" },
-        //      { code: 2, description: "The bluetooth connect fail" }
+        PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+          if (success) {
+            this.mac = mac;
+            //{ code: 0, description: "The bluetooth connect timeout" },
+            //      { code: 1, description: "The bluetooth connect success" },
+            //      { code: 2, description: "The bluetooth connect fail" }
 
-        //是否已经回调
-        flag = false;
-        GatewayClient.getDefault().connectGateway(mac, new ConnectCallback() {
-            @Override
-            public void onConnectSuccess(ExtendedBluetoothDevice device) {
+            //是否已经回调
+            flag = false;
+            GatewayClient.getDefault().connectGateway(mac, new ConnectCallback() {
+              @Override
+              public void onConnectSuccess(ExtendedBluetoothDevice device) {
                 LogUtil.d("connected:" + device);
                 flag = true;
                 callback.invoke(1);
-            }
+              }
 
-            @Override
-            public void onDisconnected() {
+              @Override
+              public void onDisconnected() {
                 try {//过滤掉断开连接的回调
-                    if (!flag) {
-                        flag = true;
-                        callback.invoke(0);
-                    }
+                  if (!flag) {
+                    flag = true;
+                    callback.invoke(0);
+                  }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                  e.printStackTrace();
                 }
+              }
+            });
+          } else {
+            if (!flag) {
+              flag = true;
+              callback.invoke(0);
             }
+          }
         });
+
     }
 
     @ReactMethod
     public void getNearbyWifi(Callback callback) {//0:完成 1:失败
-        if (TextUtils.isEmpty(mac)) {
-            LogUtil.d("mac is null");
-            return;
-        }
-        GatewayClient.getDefault().scanWiFiByGateway(mac, new ScanWiFiByGatewayCallback() {
+      if (TextUtils.isEmpty(mac)) {
+        LogUtil.d("mac is null");
+        return;
+      }
+      PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+        if (success) {
+          GatewayClient.getDefault().scanWiFiByGateway(mac, new ScanWiFiByGatewayCallback() {
             @Override
             public void onScanWiFiByGateway(List<WiFi> wiFis) {
-                if(wiFis != null) {
-                    WritableArray writableArray = Arguments.createArray();
-                    for (WiFi wiFi : wiFis) {
-                        WritableMap map = Arguments.createMap();
-                        map.putString(TTGatewayFieldConstant.WIFI, wiFi.getSsid());
-                        map.putInt(TTGatewayFieldConstant.RSSI, wiFi.getRssi());
-                        writableArray.pushMap(map);
-                    }
-                    //锁开关状态跟oneMeterRSSI android不需要
-                    getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(TTGatewayEvent.scanWifi, writableArray);
+              if (wiFis != null) {
+                WritableArray writableArray = Arguments.createArray();
+                for (WiFi wiFi : wiFis) {
+                  WritableMap map = Arguments.createMap();
+                  map.putString(TTGatewayFieldConstant.WIFI, wiFi.getSsid());
+                  map.putInt(TTGatewayFieldConstant.RSSI, wiFi.getRssi());
+                  writableArray.pushMap(map);
                 }
+                //锁开关状态跟oneMeterRSSI android不需要
+                getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(TTGatewayEvent.scanWifi, writableArray);
+              }
             }
 
             @Override
             public void onScanWiFiByGatewaySuccess() {
-                callback.invoke(0);
+              callback.invoke(0);
             }
 
             @Override
             public void onFail(GatewayError error) {
-                LogUtil.d("error:" + error);
-                callback.invoke(1);
+              LogUtil.d("error:" + error);
+              callback.invoke(1);
             }
-        });
+          });
+        } else {//未授权
+          callback.invoke(1);
+        }
+      });
     }
 
     @ReactMethod
@@ -319,33 +340,34 @@ public class TtlockModule extends ReactContextBaseJavaModule {
     public void startScan() {
         LogUtil.d("start scan");
         scanGateway = false;
-        if (!initPermission()) {
-            return;
-        }
-        TTLockClient.getDefault().startScanLock(new ScanLockCallback() {
-            @Override
-            public void onScanLockSuccess(ExtendedBluetoothDevice extendedBluetoothDevice) {
+        PermissionUtils.doWithScanPermission(getCurrentActivity(), success -> {
+          if (success) {
+            TTLockClient.getDefault().startScanLock(new ScanLockCallback() {
+              @Override
+              public void onScanLockSuccess(ExtendedBluetoothDevice extendedBluetoothDevice) {
 //                LogUtil.d("extendedBluetoothDevice:" + extendedBluetoothDevice);
                 if(extendedBluetoothDevice != null){
-                    cacheAndFilterScanDevice(extendedBluetoothDevice);
-                    WritableMap map = Arguments.createMap();
-                    map.putString(TTLockFieldConstant.LOCK_NAME,extendedBluetoothDevice.getName());
-                    map.putString(TTLockFieldConstant.LOCK_MAC,extendedBluetoothDevice.getAddress());
-                    map.putBoolean(TTLockFieldConstant.IS_INITED, !extendedBluetoothDevice.isSettingMode());
-                    map.putBoolean(TTLockFieldConstant.IS_KEYBOARD_ACTIVATED,extendedBluetoothDevice.isTouch());
-                    map.putInt(TTLockFieldConstant.ELECTRIC_QUANTITY,extendedBluetoothDevice.getBatteryCapacity());
-                    map.putString(TTLockFieldConstant.LOCK_VERSION, extendedBluetoothDevice.getLockVersionJson());
-                    map.putInt(TTLockFieldConstant.RSSI,extendedBluetoothDevice.getRssi());
-                    map.putInt(TTLockFieldConstant.LOCK_SWITCH_STATE, extendedBluetoothDevice.getParkStatus());
-                    //锁开关状态跟oneMeterRSSI android不需要
-                    getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(TTLockEvent.scanLock, map);
+                  cacheAndFilterScanDevice(extendedBluetoothDevice);
+                  WritableMap map = Arguments.createMap();
+                  map.putString(TTLockFieldConstant.LOCK_NAME,extendedBluetoothDevice.getName());
+                  map.putString(TTLockFieldConstant.LOCK_MAC,extendedBluetoothDevice.getAddress());
+                  map.putBoolean(TTLockFieldConstant.IS_INITED, !extendedBluetoothDevice.isSettingMode());
+                  map.putBoolean(TTLockFieldConstant.IS_KEYBOARD_ACTIVATED,extendedBluetoothDevice.isTouch());
+                  map.putInt(TTLockFieldConstant.ELECTRIC_QUANTITY,extendedBluetoothDevice.getBatteryCapacity());
+                  map.putString(TTLockFieldConstant.LOCK_VERSION, extendedBluetoothDevice.getLockVersionJson());
+                  map.putInt(TTLockFieldConstant.RSSI,extendedBluetoothDevice.getRssi());
+                  map.putInt(TTLockFieldConstant.LOCK_SWITCH_STATE, extendedBluetoothDevice.getParkStatus());
+                  //锁开关状态跟oneMeterRSSI android不需要
+                  getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(TTLockEvent.scanLock, map);
                 }
-            }
+              }
 
-            @Override
-            public void onFail(LockError error) {
+              @Override
+              public void onFail(LockError error) {
                 LogUtil.d("error:" + error);
-            }
+              }
+            });
+          }
         });
     }
 
@@ -388,165 +410,213 @@ public class TtlockModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void resetLock(String lockData, Callback success, Callback fail) {
+    public void resetLock(String lockData, Callback successCallback, Callback fail) {
         if (TextUtils.isEmpty(lockData)) {
             lockErrorCallback(LockError.DATA_FORMAT_ERROR, fail);
             return;
         }
-        TTLockClient.getDefault().resetLock(lockData, null, new ResetLockCallback() {
-            @Override
-            public void onResetLockSuccess() {
-                success.invoke();
-            }
+        PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+          if (success) {
+            TTLockClient.getDefault().resetLock(lockData, null, new ResetLockCallback() {
+              @Override
+              public void onResetLockSuccess() {
+                successCallback.invoke();
+              }
 
-            @Override
-            public void onFail(LockError error) {
+              @Override
+              public void onFail(LockError error) {
                 lockErrorCallback(error, fail);
-            }
+              }
+            });
+          } else {
+            noPermissionCallback(fail);
+          }
         });
     }
 
     @ReactMethod
-    public void resetEkey(String lockData, Callback success, Callback fail) {
+    public void resetEkey(String lockData, Callback successCallback, Callback fail) {
         if (TextUtils.isEmpty(lockData)) {
             lockErrorCallback(LockError.DATA_FORMAT_ERROR, fail);
             return;
         }
-        TTLockClient.getDefault().resetEkey(lockData, null, new ResetKeyCallback() {
-            @Override
-            public void onResetKeySuccess(String lockData) {
-                success.invoke(lockData);
-            }
+        PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+          if (success) {
+            TTLockClient.getDefault().resetEkey(lockData, null, new ResetKeyCallback() {
+              @Override
+              public void onResetKeySuccess(String lockData) {
+                successCallback.invoke(lockData);
+              }
 
-            @Override
-            public void onFail(LockError error) {
+              @Override
+              public void onFail(LockError error) {
                 lockErrorCallback(error, fail);
-            }
+              }
+            });
+          } else {
+            noPermissionCallback(fail);
+          }
         });
     }
 
     @ReactMethod
-    public void controlLock(int controlAction, String lockData, Callback success, Callback fail) {
+    public void controlLock(int controlAction, String lockData, Callback successCallback, Callback fail) {
         if (!RNControlAction.isValidAction(controlAction) || TextUtils.isEmpty(lockData)) {
             lockErrorCallback(LockError.DATA_FORMAT_ERROR, fail);
             return;
         }
-        TTLockClient.getDefault().controlLock(RNControlAction.RN2Native(controlAction), lockData, null, new ControlLockCallback() {
-            @Override
-            public void onControlLockSuccess(ControlLockResult controlLockResult) {
+        PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+          if (success) {
+            TTLockClient.getDefault().controlLock(RNControlAction.RN2Native(controlAction), lockData, null, new ControlLockCallback() {
+              @Override
+              public void onControlLockSuccess(ControlLockResult controlLockResult) {
                 WritableArray writableArray = Arguments.createArray();
                 writableArray.pushDouble(controlLockResult.getLockTime());
                 writableArray.pushInt(controlLockResult.getBattery());
                 writableArray.pushInt(controlLockResult.getUniqueid());
-                success.invoke(writableArray);
-            }
+                successCallback.invoke(writableArray);
+              }
 
-            @Override
-            public void onFail(LockError error) {
+              @Override
+              public void onFail(LockError error) {
                 lockErrorCallback(error, fail);
-            }
+              }
+            });
+          } else {
+            noPermissionCallback(fail);
+          }
         });
     }
 
     @ReactMethod
-    public void createCustomPasscode(String passcode, double startDate, double endDate, String lockData, Callback success, Callback fail) {
+    public void createCustomPasscode(String passcode, double startDate, double endDate, String lockData, Callback successCallback, Callback fail) {
         LogUtil.d("passcode:" + passcode);
         if (TextUtils.isEmpty(passcode) || TextUtils.isEmpty(lockData)) {
             lockErrorCallback(LockError.DATA_FORMAT_ERROR, fail);
             return;
         }
         LogUtil.d("startDate:" + startDate);
-        TTLockClient.getDefault().createCustomPasscode(passcode, (long)startDate, (long)endDate, lockData, null, new CreateCustomPasscodeCallback() {
-            @Override
-            public void onCreateCustomPasscodeSuccess(String passcode) {
-                success.invoke();
-            }
+        PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+          if (success) {
+            TTLockClient.getDefault().createCustomPasscode(passcode, (long)startDate, (long)endDate, lockData, null, new CreateCustomPasscodeCallback() {
+              @Override
+              public void onCreateCustomPasscodeSuccess(String passcode) {
+                successCallback.invoke();
+              }
 
-            @Override
-            public void onFail(LockError error) {
+              @Override
+              public void onFail(LockError error) {
                 lockErrorCallback(error, fail);
-            }
+              }
+            });
+          } else {
+            noPermissionCallback(fail);
+          }
         });
     }
 
     @ReactMethod
-    public void modifyPasscode(String passcodeOrigin, String passcodeNew, double startDate, double endDate, String lockData, Callback success, Callback fail) {
+    public void modifyPasscode(String passcodeOrigin, String passcodeNew, double startDate, double endDate, String lockData, Callback successCallback, Callback fail) {
         if (TextUtils.isEmpty(passcodeOrigin) || TextUtils.isEmpty(lockData)) {
             lockErrorCallback(LockError.DATA_FORMAT_ERROR, fail);
             return;
         }
-        TTLockClient.getDefault().modifyPasscode(passcodeOrigin, passcodeNew, (long)startDate, (long)endDate, lockData, null, new ModifyPasscodeCallback() {
-            @Override
-            public void onModifyPasscodeSuccess() {
-                success.invoke();
-            }
+        PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+          if (success) {
+            TTLockClient.getDefault().modifyPasscode(passcodeOrigin, passcodeNew, (long)startDate, (long)endDate, lockData, null, new ModifyPasscodeCallback() {
+              @Override
+              public void onModifyPasscodeSuccess() {
+                successCallback.invoke();
+              }
 
-            @Override
-            public void onFail(LockError error) {
+              @Override
+              public void onFail(LockError error) {
                 lockErrorCallback(error, fail);
-            }
+              }
+            });
+          } else {
+            noPermissionCallback(fail);
+          }
         });
     }
 
     @ReactMethod
-    public void deletePasscode(String passcode, String lockData, Callback success, Callback fail) {
+    public void deletePasscode(String passcode, String lockData, Callback successCallback, Callback fail) {
         if (TextUtils.isEmpty(passcode) || TextUtils.isEmpty(lockData)) {
             lockErrorCallback(LockError.DATA_FORMAT_ERROR, fail);
             return;
         }
-        TTLockClient.getDefault().deletePasscode(passcode, lockData, null, new DeletePasscodeCallback() {
-            @Override
-            public void onDeletePasscodeSuccess() {
-                success.invoke();
-            }
+        PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+          if (success) {
+            TTLockClient.getDefault().deletePasscode(passcode, lockData, null, new DeletePasscodeCallback() {
+              @Override
+              public void onDeletePasscodeSuccess() {
+                successCallback.invoke();
+              }
 
-            @Override
-            public void onFail(LockError error) {
+              @Override
+              public void onFail(LockError error) {
                 lockErrorCallback(error, fail);
-            }
+              }
+            });
+          } else {
+            noPermissionCallback(fail);
+          }
         });
     }
 
     @ReactMethod
-    public void resetPasscode(String lockData, Callback success, Callback fail) {
+    public void resetPasscode(String lockData, Callback successCallback, Callback fail) {
         if (TextUtils.isEmpty(lockData)) {
             lockErrorCallback(LockError.DATA_FORMAT_ERROR, fail);
             return;
         }
-        TTLockClient.getDefault().resetPasscode(lockData, null, new ResetPasscodeCallback() {
-            @Override
-            public void onResetPasscodeSuccess(String lockData) {
-                success.invoke(lockData);
-            }
+        PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+          if (success) {
+            TTLockClient.getDefault().resetPasscode(lockData, null, new ResetPasscodeCallback() {
+              @Override
+              public void onResetPasscodeSuccess(String lockData) {
+                successCallback.invoke(lockData);
+              }
 
-            @Override
-            public void onFail(LockError error) {
+              @Override
+              public void onFail(LockError error) {
                 lockErrorCallback(error, fail);
-            }
+              }
+            });
+          } else {
+            noPermissionCallback(fail);
+          }
         });
     }
 
     @ReactMethod
-    public void getLockSwitchState(String lockData, Callback success, Callback fail) {
+    public void getLockSwitchState(String lockData, Callback successCallback, Callback fail) {
         if (TextUtils.isEmpty(lockData)) {
             lockErrorCallback(LockError.DATA_FORMAT_ERROR, fail);
             return;
         }
-        TTLockClient.getDefault().getLockStatus(lockData, null, new GetLockStatusCallback() {
-            @Override
-            public void onGetLockStatusSuccess(int status) {
-                success.invoke(status);
-            }
+        PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+          if (success) {
+            TTLockClient.getDefault().getLockStatus(lockData, null, new GetLockStatusCallback() {
+              @Override
+              public void onGetLockStatusSuccess(int status) {
+                successCallback.invoke(status);
+              }
 
-            @Override
-            public void onFail(LockError error) {
+              @Override
+              public void onFail(LockError error) {
                 lockErrorCallback(error, fail);
-            }
+              }
+            });
+          } else {
+            noPermissionCallback(fail);
+          }
         });
     }
 
     @ReactMethod
-    public void addCard(ReadableArray cycleList, double startDate, double endDate, String lockData, Callback success, Callback fail) {
+    public void addCard(ReadableArray cycleList, double startDate, double endDate, String lockData, Callback successCallback, Callback fail) {
         //todo:测试循环IC卡数据
         LogUtil.d("cycleList:" + cycleList);
         ValidityInfo validityInfo = new ValidityInfo();
@@ -555,407 +625,534 @@ public class TtlockModule extends ReactContextBaseJavaModule {
         validityInfo.setEndDate((long) endDate);
         validityInfo.setCyclicConfigs(Utils.readableArray2CyclicList(cycleList));
 
-        TTLockClient.getDefault().addICCard(validityInfo, lockData, new AddICCardCallback() {
-            @Override
-            public void onEnterAddMode() {
+        PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+          if (success) {
+            TTLockClient.getDefault().addICCard(validityInfo, lockData, new AddICCardCallback() {
+              @Override
+              public void onEnterAddMode() {
                 //前端目前不接收任何数据
                 getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(TTLockEvent.addCardProgrress, null);
-            }
+              }
 
-            @Override
-            public void onAddICCardSuccess(long cardNum) {
-                success.invoke(String.valueOf(cardNum));
-            }
+              @Override
+              public void onAddICCardSuccess(long cardNum) {
+                successCallback.invoke(String.valueOf(cardNum));
+              }
 
-            @Override
-            public void onFail(LockError lockError) {
+              @Override
+              public void onFail(LockError lockError) {
                 lockErrorCallback(lockError, fail);
-            }
+              }
+            });
+          } else {
+            noPermissionCallback(fail);
+          }
         });
     }
 
     @ReactMethod
-    public void modifyCardValidityPeriod(String cardNumber, ReadableArray cycleList, double startDate, double endDate, String lockData, Callback success, Callback fail) {
+    public void modifyCardValidityPeriod(String cardNumber, ReadableArray cycleList, double startDate, double endDate, String lockData, Callback successCallback, Callback fail) {
         if (TextUtils.isEmpty(cardNumber)) {
             lockErrorCallback(LockError.DATA_FORMAT_ERROR, fail);
             return;
         }
 
-        ValidityInfo validityInfo = new ValidityInfo();
-        validityInfo.setModeType(cycleList == null || cycleList.size() == 0 ? ValidityInfo.TIMED : ValidityInfo.CYCLIC);
-        validityInfo.setStartDate((long) startDate);
-        validityInfo.setEndDate((long) endDate);
-        validityInfo.setCyclicConfigs(Utils.readableArray2CyclicList(cycleList));
+        PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+          if (success) {
+            ValidityInfo validityInfo = new ValidityInfo();
+            validityInfo.setModeType(cycleList == null || cycleList.size() == 0 ? ValidityInfo.TIMED : ValidityInfo.CYCLIC);
+            validityInfo.setStartDate((long) startDate);
+            validityInfo.setEndDate((long) endDate);
+            validityInfo.setCyclicConfigs(Utils.readableArray2CyclicList(cycleList));
 
-        TTLockClient.getDefault().modifyICCardValidityPeriod(validityInfo, cardNumber, lockData, new ModifyICCardPeriodCallback() {
-            @Override
-            public void onModifyICCardPeriodSuccess() {
-                success.invoke();
-            }
+            TTLockClient.getDefault().modifyICCardValidityPeriod(validityInfo, cardNumber, lockData, new ModifyICCardPeriodCallback() {
+              @Override
+              public void onModifyICCardPeriodSuccess() {
+                successCallback.invoke();
+              }
 
-            @Override
-            public void onFail(LockError lockError) {
+              @Override
+              public void onFail(LockError lockError) {
                 lockErrorCallback(lockError, fail);
-            }
+              }
+            });
+          } else {
+            noPermissionCallback(fail);
+          }
         });
     }
 
     @ReactMethod
-    public void deleteCard(String cardNumber, String lockData, Callback success, Callback fail) {
+    public void deleteCard(String cardNumber, String lockData, Callback successCallback, Callback fail) {
         if (TextUtils.isEmpty(cardNumber)) {
             lockErrorCallback(LockError.DATA_FORMAT_ERROR, fail);
             return;
         }
-        TTLockClient.getDefault().deleteICCard(cardNumber, lockData, null, new DeleteICCardCallback() {
-            @Override
-            public void onDeleteICCardSuccess() {
-                success.invoke();
-            }
+        PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+          if (success) {
+            TTLockClient.getDefault().deleteICCard(cardNumber, lockData, null, new DeleteICCardCallback() {
+              @Override
+              public void onDeleteICCardSuccess() {
+                successCallback.invoke();
+              }
 
-            @Override
-            public void onFail(LockError error) {
+              @Override
+              public void onFail(LockError error) {
                 lockErrorCallback(error, fail);
-            }
+              }
+            });
+          } else {
+            noPermissionCallback(fail);
+          }
         });
     }
 
     @ReactMethod
-    public void clearAllCards(String lockData, Callback success, Callback fail) {
-        TTLockClient.getDefault().clearAllICCard(lockData, null, new ClearAllICCardCallback() {
+    public void clearAllCards(String lockData, Callback successCallback, Callback fail) {
+      PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+        if (success) {
+          TTLockClient.getDefault().clearAllICCard(lockData, null, new ClearAllICCardCallback() {
             @Override
             public void onClearAllICCardSuccess() {
-                success.invoke();
+              successCallback.invoke();
             }
 
             @Override
             public void onFail(LockError error) {
-                lockErrorCallback(error, fail);
+              lockErrorCallback(error, fail);
             }
-        });
+          });
+        } else {
+          noPermissionCallback(fail);
+        }
+      });
     }
 
     @ReactMethod
-    public void addFingerprint(ReadableArray cycleList, double startDate, double endDate, String lockData, Callback success, Callback fail) {
-        ValidityInfo validityInfo = new ValidityInfo();
-        validityInfo.setModeType(cycleList == null || cycleList.size() == 0 ? ValidityInfo.TIMED : ValidityInfo.CYCLIC);
-        validityInfo.setStartDate((long) startDate);
-        validityInfo.setEndDate((long) endDate);
-        validityInfo.setCyclicConfigs(Utils.readableArray2CyclicList(cycleList));
+    public void addFingerprint(ReadableArray cycleList, double startDate, double endDate, String lockData, Callback successCallback, Callback fail) {
 
-        //todo:
-        TTLockClient.getDefault().addFingerprint(validityInfo, lockData, new AddFingerprintCallback() {
+      PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+        if (success) {
+          ValidityInfo validityInfo = new ValidityInfo();
+          validityInfo.setModeType(cycleList == null || cycleList.size() == 0 ? ValidityInfo.TIMED : ValidityInfo.CYCLIC);
+          validityInfo.setStartDate((long) startDate);
+          validityInfo.setEndDate((long) endDate);
+          validityInfo.setCyclicConfigs(Utils.readableArray2CyclicList(cycleList));
+
+          //todo:
+          TTLockClient.getDefault().addFingerprint(validityInfo, lockData, new AddFingerprintCallback() {
             @Override
             public void onEnterAddMode(int totalCount) {
-                totalCnt = totalCount;
-                WritableArray writableArray = Arguments.createArray();
-                writableArray.pushInt(0);
-                writableArray.pushInt(totalCnt);
-                getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(TTLockEvent.addFingerprintProgress, writableArray);
+              totalCnt = totalCount;
+              WritableArray writableArray = Arguments.createArray();
+              writableArray.pushInt(0);
+              writableArray.pushInt(totalCnt);
+              getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(TTLockEvent.addFingerprintProgress, writableArray);
             }
 
             @Override
             public void onCollectFingerprint(int currentCount) {
-                WritableArray writableArray = Arguments.createArray();
-                writableArray.pushInt(currentCount);
-                writableArray.pushInt(totalCnt);
-                getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(TTLockEvent.addFingerprintProgress, writableArray);
+              WritableArray writableArray = Arguments.createArray();
+              writableArray.pushInt(currentCount);
+              writableArray.pushInt(totalCnt);
+              getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(TTLockEvent.addFingerprintProgress, writableArray);
             }
 
             @Override
             public void onAddFingerpintFinished(long fingerprintNum) {
-                success.invoke(String.valueOf(fingerprintNum));
+              successCallback.invoke(String.valueOf(fingerprintNum));
             }
 
             @Override
             public void onFail(LockError lockError) {
-                lockErrorCallback(lockError, fail);
+              lockErrorCallback(lockError, fail);
             }
-        });
+          });
+        } else {
+          noPermissionCallback(fail);
+        }
+      });
     }
 
     @ReactMethod
-    public void modifyFingerprintValidityPeriod(String fingerprintNumber, ReadableArray cycleList, double startDate, double endDate, String lockData, Callback success, Callback fail) {
+    public void modifyFingerprintValidityPeriod(String fingerprintNumber, ReadableArray cycleList, double startDate, double endDate, String lockData, Callback successCallback, Callback fail) {
         if (TextUtils.isEmpty(fingerprintNumber)) {
             lockErrorCallback(LockError.DATA_FORMAT_ERROR, fail);
             return;
         }
 
-        ValidityInfo validityInfo = new ValidityInfo();
-        validityInfo.setModeType(cycleList == null || cycleList.size() == 0 ? ValidityInfo.TIMED : ValidityInfo.CYCLIC);
-        validityInfo.setStartDate((long) startDate);
-        validityInfo.setEndDate((long) endDate);
-        validityInfo.setCyclicConfigs(Utils.readableArray2CyclicList(cycleList));
+        PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+          if (success) {
+            ValidityInfo validityInfo = new ValidityInfo();
+            validityInfo.setModeType(cycleList == null || cycleList.size() == 0 ? ValidityInfo.TIMED : ValidityInfo.CYCLIC);
+            validityInfo.setStartDate((long) startDate);
+            validityInfo.setEndDate((long) endDate);
+            validityInfo.setCyclicConfigs(Utils.readableArray2CyclicList(cycleList));
 
-        TTLockClient.getDefault().modifyFingerprintValidityPeriod(validityInfo, fingerprintNumber, lockData, new ModifyFingerprintPeriodCallback() {
-            @Override
-            public void onModifyPeriodSuccess() {
-                success.invoke();
-            }
+            TTLockClient.getDefault().modifyFingerprintValidityPeriod(validityInfo, fingerprintNumber, lockData, new ModifyFingerprintPeriodCallback() {
+              @Override
+              public void onModifyPeriodSuccess() {
+                successCallback.invoke();
+              }
 
-            @Override
-            public void onFail(LockError lockError) {
+              @Override
+              public void onFail(LockError lockError) {
                 lockErrorCallback(lockError, fail);
-            }
+              }
+            });
+          } else {
+            noPermissionCallback(fail);
+          }
         });
     }
 
     @ReactMethod
-    public void deleteFingerprint(String fingerprintNumber, String lockData, Callback success, Callback fail) {
+    public void deleteFingerprint(String fingerprintNumber, String lockData, Callback successCallback, Callback fail) {
         if (TextUtils.isEmpty(fingerprintNumber)) {
             lockErrorCallback(LockError.DATA_FORMAT_ERROR, fail);
             return;
         }
-        TTLockClient.getDefault().deleteFingerprint(fingerprintNumber, lockData, null, new DeleteFingerprintCallback() {
-            @Override
-            public void onDeleteFingerprintSuccess() {
-                success.invoke();
-            }
+        PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+          if (success) {
+            TTLockClient.getDefault().deleteFingerprint(fingerprintNumber, lockData, null, new DeleteFingerprintCallback() {
+              @Override
+              public void onDeleteFingerprintSuccess() {
+                successCallback.invoke();
+              }
 
-            @Override
-            public void onFail(LockError error) {
+              @Override
+              public void onFail(LockError error) {
                 lockErrorCallback(error, fail);
-            }
+              }
+            });
+          } else {
+            noPermissionCallback(fail);
+          }
         });
     }
 
     @ReactMethod
-    public void clearAllFingerprints(String lockData, Callback success, Callback fail) {
-        TTLockClient.getDefault().clearAllFingerprints(lockData, null, new ClearAllFingerprintCallback() {
+    public void clearAllFingerprints(String lockData, Callback successCallback, Callback fail) {
+      PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+        if (success) {
+          TTLockClient.getDefault().clearAllFingerprints(lockData, null, new ClearAllFingerprintCallback() {
             @Override
             public void onClearAllFingerprintSuccess() {
-                success.invoke();
+              successCallback.invoke();
             }
 
             @Override
             public void onFail(LockError lockError) {
-                lockErrorCallback(lockError, fail);
+              lockErrorCallback(lockError, fail);
             }
-        });
+          });
+        } else {
+          noPermissionCallback(fail);
+        }
+      });
     }
 
     @ReactMethod
-    public void modifyAdminPasscode(String adminPasscode, String lockData, Callback success, Callback fail) {
+    public void modifyAdminPasscode(String adminPasscode, String lockData, Callback successCallback, Callback fail) {
         if (TextUtils.isEmpty(adminPasscode)) {
             lockErrorCallback(LockError.DATA_FORMAT_ERROR, fail);
             return;
         }
-        TTLockClient.getDefault().modifyAdminPasscode(adminPasscode, lockData, null, new ModifyAdminPasscodeCallback() {
-            @Override
-            public void onModifyAdminPasscodeSuccess(String passcode) {
-                success.invoke(passcode);
-            }
+        PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+          if (success) {
+            TTLockClient.getDefault().modifyAdminPasscode(adminPasscode, lockData, null, new ModifyAdminPasscodeCallback() {
+              @Override
+              public void onModifyAdminPasscodeSuccess(String passcode) {
+                successCallback.invoke(passcode);
+              }
 
-            @Override
-            public void onFail(LockError error) {
+              @Override
+              public void onFail(LockError error) {
                 lockErrorCallback(error, fail);
-            }
+              }
+            });
+          } else {
+            noPermissionCallback(fail);
+          }
         });
     }
 
     @ReactMethod
-    public void setLockTime(double timestamp, String lockData, Callback success, Callback fail) {
-        TTLockClient.getDefault().setLockTime((long) timestamp, lockData, null, new SetLockTimeCallback() {
+    public void setLockTime(double timestamp, String lockData, Callback successCallback, Callback fail) {
+      PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+        if (success) {
+          TTLockClient.getDefault().setLockTime((long) timestamp, lockData, null, new SetLockTimeCallback() {
             @Override
             public void onSetTimeSuccess() {
-                success.invoke();
+              successCallback.invoke();
             }
 
             @Override
             public void onFail(LockError error) {
-                lockErrorCallback(error, fail);
+              lockErrorCallback(error, fail);
             }
-        });
+          });
+        } else {
+          noPermissionCallback(fail);
+        }
+      });
     }
 
     @ReactMethod
-    public void getLockTime(String lockData, Callback success, Callback fail) {
-        TTLockClient.getDefault().getLockTime(lockData, null, new GetLockTimeCallback() {
+    public void getLockTime(String lockData, Callback successCallback, Callback fail) {
+      PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+        if (success) {
+          TTLockClient.getDefault().getLockTime(lockData, null, new GetLockTimeCallback() {
             @Override
             public void onGetLockTimeSuccess(long lockTimestamp) {
-                success.invoke(String.valueOf(lockTimestamp));
+              successCallback.invoke(String.valueOf(lockTimestamp));
             }
 
             @Override
             public void onFail(LockError error) {
-                lockErrorCallback(error, fail);
+              lockErrorCallback(error, fail);
             }
-        });
+          });
+        } else {
+          noPermissionCallback(fail);
+        }
+      });
     }
 
     @ReactMethod
-    public void getLockOperationRecord(int type, String lockData, Callback success, Callback fail) {
-        TTLockClient.getDefault().getOperationLog(type == 0 ? LogType.NEW : LogType.ALL, lockData, null, new GetOperationLogCallback() {
+    public void getLockOperationRecord(int type, String lockData, Callback successCallback, Callback fail) {
+      PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+        if (success) {
+          TTLockClient.getDefault().getOperationLog(type == 0 ? LogType.NEW : LogType.ALL, lockData, null, new GetOperationLogCallback() {
             @Override
             public void onGetLogSuccess(String log) {
-                success.invoke(log);
+              successCallback.invoke(log);
             }
 
             @Override
             public void onFail(LockError error) {
-                lockErrorCallback(error, fail);
+              lockErrorCallback(error, fail);
             }
-        });
+          });
+        } else {
+          noPermissionCallback(fail);
+        }
+      });
     }
 
     @ReactMethod
-    public void getLockAutomaticLockingPeriodicTime(String lockData, Callback success, Callback fail) {
-        TTLockClient.getDefault().getAutomaticLockingPeriod(lockData, new GetAutoLockingPeriodCallback() {
+    public void getLockAutomaticLockingPeriodicTime(String lockData, Callback successCallback, Callback fail) {
+      PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+        if (success) {
+          TTLockClient.getDefault().getAutomaticLockingPeriod(lockData, new GetAutoLockingPeriodCallback() {
             @Override
             public void onGetAutoLockingPeriodSuccess(int currtentTime, int minTime, int maxTime) {
-                WritableArray writableArray = Arguments.createArray();
-                writableArray.pushInt(currtentTime);
-                writableArray.pushInt(maxTime);
-                writableArray.pushInt(minTime);
-                success.invoke(writableArray);
+              WritableArray writableArray = Arguments.createArray();
+              writableArray.pushInt(currtentTime);
+              writableArray.pushInt(maxTime);
+              writableArray.pushInt(minTime);
+              successCallback.invoke(writableArray);
             }
 
             @Override
             public void onFail(LockError error) {
-                lockErrorCallback(error, fail);
+              lockErrorCallback(error, fail);
             }
-        });
+          });
+        } else {
+          noPermissionCallback(fail);
+        }
+      });
     }
 
     @ReactMethod
-    public void setLockAutomaticLockingPeriodicTime(int seconds, String lockData, Callback success, Callback fail) {
-        TTLockClient.getDefault().setAutomaticLockingPeriod(seconds, lockData, null, new SetAutoLockingPeriodCallback() {
+    public void setLockAutomaticLockingPeriodicTime(int seconds, String lockData, Callback successCallback, Callback fail) {
+      PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+        if (success) {
+          TTLockClient.getDefault().setAutomaticLockingPeriod(seconds, lockData, null, new SetAutoLockingPeriodCallback() {
             @Override
             public void onSetAutoLockingPeriodSuccess() {
-                success.invoke();
+              successCallback.invoke();
             }
 
             @Override
             public void onFail(LockError error) {
-                lockErrorCallback(error, fail);
+              lockErrorCallback(error, fail);
             }
-        });
+          });
+        } else {
+          noPermissionCallback(fail);
+        }
+      });
     }
 
     @ReactMethod
-    public void getLockRemoteUnlockSwitchState(String lockData, Callback success, Callback fail) {
-        TTLockClient.getDefault().getRemoteUnlockSwitchState(lockData, null, new GetRemoteUnlockStateCallback() {
+    public void getLockRemoteUnlockSwitchState(String lockData, Callback successCallback, Callback fail) {
+      PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+        if (success) {
+          TTLockClient.getDefault().getRemoteUnlockSwitchState(lockData, null, new GetRemoteUnlockStateCallback() {
             @Override
             public void onGetRemoteUnlockSwitchStateSuccess(boolean enabled) {
-                success.invoke(enabled);
+              successCallback.invoke(enabled);
             }
 
             @Override
             public void onFail(LockError error) {
-                lockErrorCallback(error, fail);
+              lockErrorCallback(error, fail);
             }
-        });
+          });
+        } else {
+          noPermissionCallback(fail);
+        }
+      });
     }
 
     @ReactMethod
-    public void setLockRemoteUnlockSwitchState(boolean isOn, String lockData, Callback success, Callback fail) {
-        TTLockClient.getDefault().setRemoteUnlockSwitchState(isOn, lockData, null, new SetRemoteUnlockSwitchCallback() {
+    public void setLockRemoteUnlockSwitchState(boolean isOn, String lockData, Callback successCallback, Callback fail) {
+      PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+        if (success) {
+          TTLockClient.getDefault().setRemoteUnlockSwitchState(isOn, lockData, null, new SetRemoteUnlockSwitchCallback() {
             @Override
             public void onSetRemoteUnlockSwitchSuccess(String lockData) {
-                success.invoke(lockData);
+              successCallback.invoke(lockData);
             }
 
             @Override
             public void onFail(LockError error) {
-                lockErrorCallback(error, fail);
+              lockErrorCallback(error, fail);
             }
-        });
+          });
+        } else {
+          noPermissionCallback(fail);
+        }
+      });
     }
 
     @ReactMethod
-    public void getLockConfig(int config, String lockData, Callback success, Callback fail) {
-        TTLockClient.getDefault().getLockConfig(TTLockConfigConverter.RN2Native(config), lockData, new GetLockConfigCallback() {
+    public void getLockConfig(int config, String lockData, Callback successCallback, Callback fail) {
+      PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+        if (success) {
+          TTLockClient.getDefault().getLockConfig(TTLockConfigConverter.RN2Native(config), lockData, new GetLockConfigCallback() {
             @Override
             public void onGetLockConfigSuccess(TTLockConfigType ttLockConfigType, boolean switchOn) {
-                LogUtil.d("ttLockConfigType:" + switchOn);
-                WritableArray writableArray = Arguments.createArray();
-                writableArray.pushInt(TTLockConfigConverter.native2RN(ttLockConfigType));
-                writableArray.pushBoolean(switchOn);
-                success.invoke(writableArray);
+              LogUtil.d("ttLockConfigType:" + switchOn);
+              WritableArray writableArray = Arguments.createArray();
+              writableArray.pushInt(TTLockConfigConverter.native2RN(ttLockConfigType));
+              writableArray.pushBoolean(switchOn);
+              successCallback.invoke(writableArray);
             }
 
             @Override
             public void onFail(LockError error) {
-                lockErrorCallback(error, fail);
+              lockErrorCallback(error, fail);
             }
-        });
+          });
+        } else {
+          noPermissionCallback(fail);
+        }
+      });
     }
 
     @ReactMethod
-    public void setLockConfig(int config, boolean isOn, String lockData, Callback success, Callback fail) {
+    public void setLockConfig(int config, boolean isOn, String lockData, Callback successCallback, Callback fail) {
         TTLockConfigType ttLockConfigType = TTLockConfigConverter.RN2Native(config);
         if (ttLockConfigType == null) {
             lockErrorCallback(LockError.DATA_FORMAT_ERROR, fail);
             return;
         }
         LogUtil.d("ttLockConfigType:" + isOn);
-        TTLockClient.getDefault().setLockConfig(ttLockConfigType, isOn, lockData, new SetLockConfigCallback() {
-            @Override
-            public void onSetLockConfigSuccess(TTLockConfigType ttLockConfigType) {
-                success.invoke();
-            }
+        PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+          if (success) {
+            TTLockClient.getDefault().setLockConfig(ttLockConfigType, isOn, lockData, new SetLockConfigCallback() {
+              @Override
+              public void onSetLockConfigSuccess(TTLockConfigType ttLockConfigType) {
+                successCallback.invoke();
+              }
 
-            @Override
-            public void onFail(LockError error) {
+              @Override
+              public void onFail(LockError error) {
                 lockErrorCallback(error, fail);
-            }
+              }
+            });
+          } else {
+            noPermissionCallback(fail);
+          }
         });
     }
 
     @ReactMethod
-    public void addPassageMode(int type, ReadableArray weekly, ReadableArray monthly, int startDate, int endDate, String lockData, Callback success, Callback fail) {
-        PassageModeConfig passageModeConfig = new PassageModeConfig();
-        passageModeConfig.setModeType(type == 0 ? PassageModeType.Weekly : PassageModeType.Monthly);
-        if (passageModeConfig.getModeType() == PassageModeType.Weekly) {
+    public void addPassageMode(int type, ReadableArray weekly, ReadableArray monthly, int startDate, int endDate, String lockData, Callback successCallback, Callback fail) {
+      PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+        if (success) {
+          PassageModeConfig passageModeConfig = new PassageModeConfig();
+          passageModeConfig.setModeType(type == 0 ? PassageModeType.Weekly : PassageModeType.Monthly);
+          if (passageModeConfig.getModeType() == PassageModeType.Weekly) {
             passageModeConfig.setRepeatWeekOrDays(Utils.readableArray2IntJson(weekly));
-        } else {
+          } else {
             passageModeConfig.setRepeatWeekOrDays(Utils.readableArray2IntJson(monthly));
-        }
-        passageModeConfig.setStartDate(startDate);
-        passageModeConfig.setEndDate(endDate);
+          }
+          passageModeConfig.setStartDate(startDate);
+          passageModeConfig.setEndDate(endDate);
 
-        LogUtil.d("weekdays:" + passageModeConfig.getRepeatWeekOrDays());
+          LogUtil.d("weekdays:" + passageModeConfig.getRepeatWeekOrDays());
 
-        TTLockClient.getDefault().setPassageMode(passageModeConfig, lockData, null, new SetPassageModeCallback() {
+          TTLockClient.getDefault().setPassageMode(passageModeConfig, lockData, null, new SetPassageModeCallback() {
             @Override
             public void onSetPassageModeSuccess() {
-                success.invoke();
+              successCallback.invoke();
             }
 
             @Override
             public void onFail(LockError error) {
-                lockErrorCallback(error, fail);
+              lockErrorCallback(error, fail);
             }
-        });
+          });
+        } else {
+          noPermissionCallback(fail);
+        }
+      });
     }
 
     @ReactMethod
-    public void clearAllPassageModes(String lockData, Callback success, Callback fail) {
-        TTLockClient.getDefault().clearPassageMode(lockData, null, new ClearPassageModeCallback() {
+    public void clearAllPassageModes(String lockData, Callback successCallback, Callback fail) {
+      PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+        if (success) {
+          TTLockClient.getDefault().clearPassageMode(lockData, null, new ClearPassageModeCallback() {
             @Override
             public void onClearPassageModeSuccess() {
-                success.invoke();
+              successCallback.invoke();
             }
 
             @Override
             public void onFail(LockError error) {
-                lockErrorCallback(error, fail);
+              lockErrorCallback(error, fail);
             }
-        });
+          });
+        } else {
+          noPermissionCallback(fail);
+        }
+      });
     }
 
     @ReactMethod
-    public void getLockVersionWithLockMac(String lockData, Callback success, Callback fail) {
-        TTLockClient.getDefault().getLockVersion(lockData, new GetLockVersionCallback() {
+    public void getLockVersionWithLockMac(String lockData, Callback successCallback, Callback fail) {
+      PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+        if (success) {
+          TTLockClient.getDefault().getLockVersion(lockData, new GetLockVersionCallback() {
             @Override
             public void onGetLockVersionSuccess(String lockVersion) {
-                success.invoke(lockVersion);
+              successCallback.invoke(lockVersion);
             }
 
             @Override
             public void onFail(LockError lockError) {
-                lockErrorCallback(lockError, fail);
+              lockErrorCallback(lockError, fail);
             }
-        });
+          });
+        } else {
+          noPermissionCallback(fail);
+        }
+      });
     }
 
     @ReactMethod
@@ -975,6 +1172,10 @@ public class TtlockModule extends ReactContextBaseJavaModule {
         if (fail != null) {
             fail.invoke(TTLockErrorConverter.native2RN(lockError), lockError.getErrorMsg());
         }
+    }
+
+    private void noPermissionCallback(Callback fail) {
+      lockErrorCallback(LockError.LOCK_NO_PERMISSION, fail);
     }
 
 
