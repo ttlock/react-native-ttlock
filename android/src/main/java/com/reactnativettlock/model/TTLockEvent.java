@@ -8,4 +8,5 @@ public class TTLockEvent {
     public static final String addCardProgrress = "EventAddCardProgrress";
     public static final String addFingerprintProgress = "EventAddFingerprintProgrress";
     public static final String bluetoothState = "EventBluetoothState";
+    public static final String scanRemoteKey = "EventScanRemoteKey";
 }

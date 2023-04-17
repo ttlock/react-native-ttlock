@@ -1,6 +1,6 @@
 
 import { makeAutoObservable, runInAction } from "mobx"
-import { Ttlock, TtGateway, ScanLockModal, ScanGatewayModal, ScanWifiModal } from 'react-native-ttlock';
+import { Ttlock, TtGateway, TtRemoteKey, ScanLockModal, ScanGatewayModal, ScanWifiModal, ScanRemoteKeyModal } from 'react-native-ttlock';
 
 
 class Store {
@@ -15,13 +15,13 @@ class Store {
 
   wifiList: ScanWifiModal[] = []
 
+  remoteKeyList: ScanRemoteKeyModal[] = []
+
 
   startScanLock() {
     runInAction(() => {
       this.lockList = [];
     });
-
-
 
     Ttlock.startScan((scanLockModal: ScanLockModal) => {
       let isContainModal = false;
@@ -50,8 +50,6 @@ class Store {
           this.lockList = this.lockList.concat([]);
         }
       });
-
-
     });
   }
 
@@ -61,7 +59,6 @@ class Store {
     });
     TtGateway.startScan((data) => {
       let isContainData = false;
-
       runInAction(() => {
         this.gatewayList.forEach((oldData) => {
           if (oldData.gatewayMac === data.gatewayMac) {
@@ -76,12 +73,52 @@ class Store {
     });
   }
 
-  startScanWifi() {
+  startScanWifi(finished:()=>void) {
+   
     TtGateway.getNearbyWifi((list) => {
-      this.wifiList = list
+      var wifiList1 = [...this.wifiList];
+      wifiList1.push(...list);
+      //  wifi remove duplicates
+     var wifiList2 = [...new Set(wifiList1.map(item => item.wifi))].map(wifi => wifiList1.find(item => item.wifi === wifi)); 
+     //  rssi sort asc
+     var wifiList3 = wifiList2.sort((a, b) => a!.rssi - b!.rssi); 
+
+     var wifiList4: ScanWifiModal[] = []
+     for (let i = 0; i < wifiList3.length; i++) {
+      if (wifiList3[i] === undefined) {
+      }else{
+        wifiList4.push(wifiList3[i]!)
+      }
+    }
+
+    runInAction(() => {
+      this.wifiList = wifiList4;
+    });
+     
     }, () => {
-      // finished
+      finished();
     }, null)
+  }
+
+  startScanRemoteKey() {
+    runInAction(() => {
+      this.gatewayList = [];
+    });
+
+    TtRemoteKey.startScan((sancModel)=>{
+      let isContainData = false;
+      runInAction(() => {
+        this.remoteKeyList.forEach((oldData) => {
+          if (oldData.remoteKeyMac === sancModel.remoteKeyMac) {
+            isContainData = true;
+          }
+        });
+        if (isContainData === false) {
+          this.remoteKeyList.push(sancModel);
+          this.remoteKeyList = this.remoteKeyList.slice();
+        }
+      });
+    })
   }
 
 

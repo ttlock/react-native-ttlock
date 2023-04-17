@@ -8,6 +8,7 @@ import LockPage from './lock-page';
 import ScanGatewayPage from './scan-gateway-page'
 import GatewayPage from './gateway-page'
 import ScanWifiPage from './scan-wifi-page'
+import ScanRemoteKeyPage from './scan-remote-key-page'
 
 const Stack = createStackNavigator();
 
@@ -19,7 +20,7 @@ export default function App() {
           <Stack.Screen name="MainPage" component={MainPage} options={{ title: "Ttlock Demo" }} />
           <Stack.Screen name="ScanLockPage" component={ScanLockPage} options={{ title: "Lock" }} />
           <Stack.Screen name="ScanGatewayPage" component={ScanGatewayPage} options={{ title: "Gateway" }} />
-          {/* <Stack.Screen name="LockPage" component={LockPage} options={({ route }: { route: any }) => ({ title: route.params.scanLockModal.lockName })} /> */}
+          <Stack.Screen name="ScanRemoteKeyPage" component={ScanRemoteKeyPage} options={{ title: "RemoteKey" }} />
           <Stack.Screen name="LockPage" component={LockPage} />
           <Stack.Screen name="GatewayPage" component={GatewayPage} />
           <Stack.Screen name="ScanWifiPage" component={ScanWifiPage} />
