@@ -16,6 +16,9 @@ public class PermissionUtils {
 
   public static final int PERMISSIONS_REQUEST_CODE = 1;
 
+  private static final String[] scanConnectPermission = {Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT};
+  private static final String[] locationPermission = {Manifest.permission.ACCESS_FINE_LOCATION};
+
   public static boolean isAndroid12OrOver() {
     if (getAndroidSDKVersion() >= 31) {
       return true;
@@ -34,8 +37,8 @@ public class PermissionUtils {
   }
 
   public static boolean hasScanPermission(Activity activity) {
-    if (isAndroid12OrOver()) {//android 12及以上 扫描权限
-      return hasPermission(activity, Manifest.permission.BLUETOOTH_SCAN);
+    if (isAndroid12OrOver()) {//android 12及以上 扫描权限  获取名称需要连接权限
+      return hasPermission(activity, Manifest.permission.BLUETOOTH_SCAN) && hasPermission(activity, Manifest.permission.BLUETOOTH_CONNECT);
     } else {//以下 位置权限
       return hasPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION);
     }
@@ -55,7 +58,7 @@ public class PermissionUtils {
     } else {
         onSuccessListener.onSuccess(false);
       LogUtil.d("no scan permission");
-       ActivityCompat.requestPermissions(activity, new String[]{isAndroid12OrOver() ? Manifest.permission.BLUETOOTH_SCAN : Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_CODE);
+       ActivityCompat.requestPermissions(activity, isAndroid12OrOver() ? scanConnectPermission : locationPermission, PERMISSIONS_REQUEST_CODE);
     }
   }
 

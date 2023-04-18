@@ -1,8 +1,13 @@
 package com.reactnativettlock;
 
 import android.Manifest;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothManager;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -19,55 +24,72 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.reactnativettlock.model.RNControlAction;
+import com.reactnativettlock.model.ScanRemoteModal;
 import com.reactnativettlock.model.TTGatewayEvent;
 import com.reactnativettlock.model.TTGatewayFieldConstant;
 import com.reactnativettlock.model.TTLockConfigConverter;
 import com.reactnativettlock.model.TTLockErrorConverter;
 import com.reactnativettlock.model.TTLockEvent;
 import com.reactnativettlock.model.TTLockFieldConstant;
+import com.reactnativettlock.model.TTRemoteEvent;
+import com.reactnativettlock.model.TTRemoteFieldConstant;
 import com.reactnativettlock.util.PermissionUtils;
 import com.reactnativettlock.util.Utils;
 import com.ttlock.bl.sdk.api.ExtendedBluetoothDevice;
 import com.ttlock.bl.sdk.api.TTLockClient;
 import com.ttlock.bl.sdk.callback.AddFingerprintCallback;
 import com.ttlock.bl.sdk.callback.AddICCardCallback;
+import com.ttlock.bl.sdk.callback.AddRemoteCallback;
 import com.ttlock.bl.sdk.callback.ClearAllFingerprintCallback;
 import com.ttlock.bl.sdk.callback.ClearAllICCardCallback;
 import com.ttlock.bl.sdk.callback.ClearPassageModeCallback;
+import com.ttlock.bl.sdk.callback.ClearRemoteCallback;
 import com.ttlock.bl.sdk.callback.ControlLockCallback;
 import com.ttlock.bl.sdk.callback.CreateCustomPasscodeCallback;
 import com.ttlock.bl.sdk.callback.DeleteFingerprintCallback;
 import com.ttlock.bl.sdk.callback.DeleteICCardCallback;
 import com.ttlock.bl.sdk.callback.DeletePasscodeCallback;
+import com.ttlock.bl.sdk.callback.DeleteRemoteCallback;
 import com.ttlock.bl.sdk.callback.GetAutoLockingPeriodCallback;
+import com.ttlock.bl.sdk.callback.GetBatteryLevelCallback;
 import com.ttlock.bl.sdk.callback.GetLockConfigCallback;
+import com.ttlock.bl.sdk.callback.GetLockSoundWithSoundVolumeCallback;
 import com.ttlock.bl.sdk.callback.GetLockStatusCallback;
 import com.ttlock.bl.sdk.callback.GetLockTimeCallback;
 import com.ttlock.bl.sdk.callback.GetLockVersionCallback;
 import com.ttlock.bl.sdk.callback.GetOperationLogCallback;
 import com.ttlock.bl.sdk.callback.GetRemoteUnlockStateCallback;
+import com.ttlock.bl.sdk.callback.GetUnlockDirectionCallback;
 import com.ttlock.bl.sdk.callback.InitLockCallback;
 import com.ttlock.bl.sdk.callback.ModifyAdminPasscodeCallback;
 import com.ttlock.bl.sdk.callback.ModifyFingerprintPeriodCallback;
 import com.ttlock.bl.sdk.callback.ModifyICCardPeriodCallback;
 import com.ttlock.bl.sdk.callback.ModifyPasscodeCallback;
+import com.ttlock.bl.sdk.callback.ModifyRemoteValidityPeriodCallback;
 import com.ttlock.bl.sdk.callback.ResetKeyCallback;
 import com.ttlock.bl.sdk.callback.ResetLockCallback;
 import com.ttlock.bl.sdk.callback.ResetPasscodeCallback;
 import com.ttlock.bl.sdk.callback.ScanLockCallback;
 import com.ttlock.bl.sdk.callback.SetAutoLockingPeriodCallback;
 import com.ttlock.bl.sdk.callback.SetLockConfigCallback;
+import com.ttlock.bl.sdk.callback.SetLockSoundWithSoundVolumeCallback;
 import com.ttlock.bl.sdk.callback.SetLockTimeCallback;
 import com.ttlock.bl.sdk.callback.SetPassageModeCallback;
 import com.ttlock.bl.sdk.callback.SetRemoteUnlockSwitchCallback;
+import com.ttlock.bl.sdk.callback.SetUnlockDirectionCallback;
 import com.ttlock.bl.sdk.constant.LogType;
+import com.ttlock.bl.sdk.device.Remote;
 import com.ttlock.bl.sdk.entity.ControlLockResult;
+import com.ttlock.bl.sdk.entity.IpSetting;
 import com.ttlock.bl.sdk.entity.LockError;
 import com.ttlock.bl.sdk.entity.PassageModeConfig;
 import com.ttlock.bl.sdk.entity.PassageModeType;
+import com.ttlock.bl.sdk.entity.SoundVolume;
 import com.ttlock.bl.sdk.entity.TTLockConfigType;
+import com.ttlock.bl.sdk.entity.UnlockDirection;
 import com.ttlock.bl.sdk.entity.ValidityInfo;
 import com.ttlock.bl.sdk.gateway.api.GatewayClient;
+import com.ttlock.bl.sdk.gateway.callback.ConfigIpCallback;
 import com.ttlock.bl.sdk.gateway.callback.ConnectCallback;
 import com.ttlock.bl.sdk.gateway.callback.InitGatewayCallback;
 import com.ttlock.bl.sdk.gateway.callback.ScanGatewayCallback;
@@ -77,6 +99,11 @@ import com.ttlock.bl.sdk.gateway.model.DeviceInfo;
 import com.ttlock.bl.sdk.gateway.model.GatewayError;
 import com.ttlock.bl.sdk.gateway.model.GatewayType;
 import com.ttlock.bl.sdk.gateway.model.WiFi;
+import com.ttlock.bl.sdk.remote.api.RemoteClient;
+import com.ttlock.bl.sdk.remote.callback.InitRemoteCallback;
+import com.ttlock.bl.sdk.remote.callback.ScanRemoteCallback;
+import com.ttlock.bl.sdk.remote.model.InitRemoteResult;
+import com.ttlock.bl.sdk.remote.model.RemoteError;
 import com.ttlock.bl.sdk.util.FeatureValueUtil;
 import com.ttlock.bl.sdk.util.LogUtil;
 
@@ -89,8 +116,13 @@ public class TtlockModule extends ReactContextBaseJavaModule {
 
     private final ReactApplicationContext reactContext;
     private static final int PERMISSIONS_REQUEST_CODE = 1;
-    private boolean scanGateway;
+    public static final int TYPE_LOCK = 1;
+    public static final int TYPE_PLUG = 2;
+    public static final int TYPE_REMOTE = 3;
+//    private boolean scanGateway;
+    private int scanType;
     private static HashMap<String, ExtendedBluetoothDevice> mCachedDevice = new HashMap<>();
+    private static HashMap<String, Remote> mCachedRemote = new HashMap<>();
     private String mac;
     private int totalCnt;
     private boolean flag;
@@ -137,11 +169,17 @@ public class TtlockModule extends ReactContextBaseJavaModule {
                         if (Manifest.permission.ACCESS_FINE_LOCATION.equals(permissions[i]) && grantResults[i] == PackageManager.PERMISSION_GRANTED) {
                             // permission was granted, yay! Do the
                             // contacts-related task you need to do.
-                            if (scanGateway) {
-                                startScanGateway();
-                            } else {
-                                startScan();
-                            }
+                          switch (scanType) {
+                            case TYPE_LOCK:
+                              startScan();
+                              break;
+                            case TYPE_PLUG:
+                              startScanGateway();
+                              break;
+                            case TYPE_REMOTE:
+                              startScanRemoteKey();
+                              break;
+                          }
                         } else {
                             // permission denied, boo! Disable the
                             // functionality that depends on this permission.
@@ -177,10 +215,56 @@ public class TtlockModule extends ReactContextBaseJavaModule {
         return newAddDevice;
     }
 
+    //---------------remote------------------------------
+  @ReactMethod
+  public void startScanRemoteKey() {
+    scanType = TYPE_REMOTE;
+    PermissionUtils.doWithScanPermission(getCurrentActivity(), success -> {
+      if (success) {
+        mCachedRemote.clear();
+        RemoteClient.getDefault().prepareBTService(getCurrentActivity());
+        RemoteClient.getDefault().startScan(new ScanRemoteCallback() {
+          @Override
+          public void onScanRemote(Remote remote) {
+            mCachedRemote.put(remote.getAddress(), remote);
+            WritableMap map = Arguments.createMap();
+            map.putString(TTRemoteFieldConstant.REMOTE_KEY_NAME, remote.getName());
+            map.putString(TTRemoteFieldConstant.REMOTE_KEY_MAC, remote.getAddress());
+            map.putInt(TTRemoteFieldConstant.RSSI, remote.getRssi());
+            getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(TTRemoteEvent.ScanRemoteKey, map);
+          }
+        });
+      } else {
+        LogUtil.d("no scan permission");
+      }
+    });
+  }
+
+  @ReactMethod
+  public void stopScanRemoteKey() {
+      RemoteClient.getDefault().stopScan();
+  }
+
+  @ReactMethod
+  public void initRemoteKey(String remoteMac, String lockData, Callback success, Callback fail) {
+      RemoteClient.getDefault().initialize(mCachedRemote.get(remoteMac), lockData, new InitRemoteCallback() {
+        @Override
+        public void onInitSuccess(InitRemoteResult initRemoteResult) {
+          success.invoke(initRemoteResult.getBatteryLevel());
+        }
+
+        @Override
+        public void onFail(RemoteError remoteError) {
+          fail.invoke(remoteError.getErrorCode(), remoteError.getDescription());
+        }
+      });
+  }
+
     //-------------gateway---------------
     @ReactMethod
     public void startScanGateway() {
-        scanGateway = true;
+//        scanGateway = true;
+      scanType = TYPE_PLUG;
       PermissionUtils.doWithScanPermission(getCurrentActivity(), success -> {
         if (success) {
           GatewayClient.getDefault().prepareBTService(getCurrentActivity());
@@ -286,6 +370,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
 
             @Override
             public void onScanWiFiByGatewaySuccess() {
+              Log.e("tag", "scan wifi success");
               callback.invoke(0);
             }
 
@@ -297,6 +382,39 @@ public class TtlockModule extends ReactContextBaseJavaModule {
           });
         } else {//未授权
           callback.invoke(1);
+        }
+      });
+    }
+
+    private void configIp(ConfigureGatewayInfo gatewayInfo, IpSetting ipSetting, Callback success, Callback fail) {
+      GatewayClient.getDefault().configIp(mac, ipSetting, new ConfigIpCallback() {
+        @Override
+        public void onConfigIpSuccess() {
+          doInitGateway(gatewayInfo, success, fail);
+        }
+
+        @Override
+        public void onFail(GatewayError gatewayError) {
+          fail.invoke(gatewayError.getErrorCode());
+        }
+      });
+    }
+
+    private void doInitGateway(ConfigureGatewayInfo gatewayInfo, Callback success, Callback fail) {
+      GatewayClient.getDefault().initGateway(gatewayInfo, new InitGatewayCallback() {
+        @Override
+        public void onInitGatewaySuccess(DeviceInfo deviceInfo) {
+          WritableMap map = Arguments.createMap();
+          map.putString(TTGatewayFieldConstant.MODEL_NUM, deviceInfo.getModelNum());
+          map.putString(TTGatewayFieldConstant.HARDWARE_REVISION, deviceInfo.getHardwareRevision());
+          map.putString(TTGatewayFieldConstant.FIRMWARE_REVISION, deviceInfo.getFirmwareRevision());
+          success.invoke(map);
+        }
+
+        @Override
+        public void onFail(GatewayError error) {
+          LogUtil.d("error:" + error.getDescription());
+          fail.invoke(error.getErrorCode());
         }
       });
     }
@@ -314,23 +432,35 @@ public class TtlockModule extends ReactContextBaseJavaModule {
             }
             gatewayInfo.uid = readableMap.getInt(TTGatewayFieldConstant.TTLOCK_UID);
             gatewayInfo.userPwd = readableMap.getString(TTGatewayFieldConstant.TTLOCK_LOGIN_PASSWORD);
+            if (readableMap.hasKey(TTGatewayFieldConstant.IP_SETTING_TYPE)) {
+              int ipSettingType = readableMap.getInt(TTGatewayFieldConstant.IP_SETTING_TYPE);
+              if (ipSettingType == IpSetting.STATIC_IP) {//静态ip
+                IpSetting ipSetting = new IpSetting();
+                ipSetting.setType(IpSetting.STATIC_IP);
 
-
-            GatewayClient.getDefault().initGateway(gatewayInfo, new InitGatewayCallback() {
-                @Override
-                public void onInitGatewaySuccess(DeviceInfo deviceInfo) {
-                    WritableMap map = Arguments.createMap();
-                    map.putString(TTGatewayFieldConstant.MODEL_NUM, deviceInfo.getModelNum());
-                    map.putString(TTGatewayFieldConstant.HARDWARE_REVISION, deviceInfo.getHardwareRevision());
-                    map.putString(TTGatewayFieldConstant.FIRMWARE_REVISION, deviceInfo.getFirmwareRevision());
-                    success.invoke(map);
+                if (readableMap.hasKey(TTGatewayFieldConstant.IP_ADDRESS)) {
+                  ipSetting.setIpAddress(readableMap.getString(TTGatewayFieldConstant.IP_ADDRESS));
+                }
+                if (readableMap.hasKey(TTGatewayFieldConstant.SUBNET_MASK)) {
+                  ipSetting.setSubnetMask(readableMap.getString(TTGatewayFieldConstant.SUBNET_MASK));
+                }
+                if (readableMap.hasKey(TTGatewayFieldConstant.ROUTER)) {
+                  ipSetting.setRouter(readableMap.getString(TTGatewayFieldConstant.ROUTER));
+                }
+                if (readableMap.hasKey(TTGatewayFieldConstant.PREFERRED_DNS)) {
+                  ipSetting.setPreferredDns(readableMap.getString(TTGatewayFieldConstant.PREFERRED_DNS));
+                }
+                if (readableMap.hasKey(TTGatewayFieldConstant.ALTERNATE_DNS)) {
+                  ipSetting.setAlternateDns(readableMap.getString(TTGatewayFieldConstant.ALTERNATE_DNS));
                 }
 
-                @Override
-                public void onFail(GatewayError error) {
-                    fail.invoke(error.getErrorCode());
-                }
-            });
+                configIp(gatewayInfo, ipSetting, success, fail);
+              } else {
+                doInitGateway(gatewayInfo, success, fail);
+              }
+            } else {
+              doInitGateway(gatewayInfo, success, fail);
+            }
         }
 
     }
@@ -339,7 +469,8 @@ public class TtlockModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void startScan() {
         LogUtil.d("start scan");
-        scanGateway = false;
+//        scanGateway = false;
+        scanType = TYPE_LOCK;
         PermissionUtils.doWithScanPermission(getCurrentActivity(), success -> {
           if (success) {
             TTLockClient.getDefault().startScanLock(new ScanLockCallback() {
@@ -1154,6 +1285,268 @@ public class TtlockModule extends ReactContextBaseJavaModule {
         }
       });
     }
+
+  /**
+   *
+   * @param soundVolumeValue
+   * On = -1,
+   *   Off = 0,
+   *   Livel_1 = 1,
+   *   Livel_2 = 2,
+   *   Livel_3 = 3,
+   *   Livel_4 = 4,
+   *   Livel_5 = 5
+   * @param lockData
+   * @param successCallback
+   * @param fail
+   */
+  @ReactMethod
+  public void setLockSoundVolume(int soundVolumeValue, String lockData, Callback successCallback, Callback fail) {
+    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+      if (success) {
+        SoundVolume soundVolume = SoundVolume.OFF;
+        switch (soundVolumeValue) {
+          case -1://On = -1,
+            soundVolume = SoundVolume.ON;
+            break;
+          case 0://Off = 0,
+            soundVolume = SoundVolume.OFF;
+            break;
+          case 1:
+          case 2:
+          case 3:
+          case 4:
+          case 5:
+            soundVolume = SoundVolume.getInstance(soundVolumeValue);
+            break;
+        }
+        TTLockClient.getDefault().setLockSoundWithSoundVolume(soundVolume, lockData, new SetLockSoundWithSoundVolumeCallback() {
+          @Override
+          public void onSetLockSoundSuccess() {
+            successCallback.invoke();
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            lockErrorCallback(lockError, fail);
+          }
+        });
+      } else {
+        noPermissionCallback(fail);
+      }
+    });
+  }
+
+  @ReactMethod
+  public void getLockSoundVolume(String lockData, Callback successCallback, Callback fail) {
+    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+      if (success) {
+        TTLockClient.getDefault().getLockSoundWithSoundVolume(lockData, new GetLockSoundWithSoundVolumeCallback() {
+          @Override
+          public void onGetLockSoundSuccess(boolean enable, SoundVolume soundVolume) {
+//            On = -1,
+//              Off = 0,
+//              Livel_1 = 1,
+//              Livel_2 = 2,
+//              Livel_3 = 3,
+//              Livel_4 = 4,
+//              Livel_5 = 5
+            int soundVolumeValue = 0;
+            if (enable) {
+              switch (soundVolume) {
+                case ON:
+                  soundVolumeValue = -1;
+                  break;
+                case OFF:
+                  soundVolumeValue = 0;
+                  break;
+                default:
+                  soundVolumeValue = soundVolume.getValue();
+                  break;
+              }
+            }
+            successCallback.invoke(soundVolumeValue);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            lockErrorCallback(lockError, fail);
+          }
+        });
+      } else {
+        noPermissionCallback(fail);
+      }
+    });
+  }
+
+  /**
+   *
+   * @param direction
+   * Left = 1,
+   *   Right = 2
+   * @param lockData
+   * @param successCallback
+   * @param fail
+   */
+  @ReactMethod
+  public void setUnlockDirection(int direction, String lockData, Callback successCallback, Callback fail) {
+    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+      if (success) {
+        TTLockClient.getDefault().setUnlockDirection(direction == 1 ? UnlockDirection.LEFT : UnlockDirection.RIGHT, lockData, new SetUnlockDirectionCallback() {
+          @Override
+          public void onSetUnlockDirectionSuccess() {
+            successCallback.invoke();
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            lockErrorCallback(lockError, fail);
+          }
+        });
+      } else {
+        noPermissionCallback(fail);
+      }
+    });
+  }
+
+  @ReactMethod
+  public void getUnlockDirection(String lockData, Callback successCallback, Callback fail) {
+    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+      if (success) {
+        TTLockClient.getDefault().getUnlockDirection(lockData, new GetUnlockDirectionCallback() {
+          @Override
+          public void onGetUnlockDirectionSuccess(UnlockDirection unlockDirection) {
+//             Left = 1,
+//             Right = 2
+            successCallback.invoke(unlockDirection.getValue() == 1 ? 1 : 2);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            lockErrorCallback(lockError, fail);
+          }
+        });
+      } else {
+        noPermissionCallback(fail);
+      }
+    });
+  }
+
+  @ReactMethod
+  public void addRemoteKey(String remoteMac, ReadableArray cycleList, double startDate, double endDate, String lockData, Callback successCallback, Callback fail) {
+    ValidityInfo validityInfo = new ValidityInfo();
+    validityInfo.setModeType(cycleList == null || cycleList.size() == 0 ? ValidityInfo.TIMED : ValidityInfo.CYCLIC);
+    validityInfo.setStartDate((long) startDate);
+    validityInfo.setEndDate((long) endDate);
+    validityInfo.setCyclicConfigs(Utils.readableArray2CyclicList(cycleList));
+    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+      if (success) {
+        TTLockClient.getDefault().addRemote(remoteMac, validityInfo, lockData, new AddRemoteCallback() {
+          @Override
+          public void onAddSuccess() {
+            successCallback.invoke();
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            lockErrorCallback(lockError, fail);
+          }
+        });
+      } else {
+        noPermissionCallback(fail);
+      }
+    });
+  }
+
+  @ReactMethod
+  public void modifyRemoteKey(String remoteMac, ReadableArray cycleList, double startDate, double endDate, String lockData, Callback successCallback, Callback fail) {
+    ValidityInfo validityInfo = new ValidityInfo();
+    validityInfo.setModeType(cycleList == null || cycleList.size() == 0 ? ValidityInfo.TIMED : ValidityInfo.CYCLIC);
+    validityInfo.setStartDate((long) startDate);
+    validityInfo.setEndDate((long) endDate);
+    validityInfo.setCyclicConfigs(Utils.readableArray2CyclicList(cycleList));
+
+    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+      if (success) {
+        TTLockClient.getDefault().modifyRemoteValidityPeriod(remoteMac, validityInfo, lockData, new ModifyRemoteValidityPeriodCallback() {
+          @Override
+          public void onModifySuccess() {
+            successCallback.invoke();
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            lockErrorCallback(lockError, fail);
+          }
+        });
+      } else {
+        noPermissionCallback(fail);
+      }
+    });
+  }
+
+  @ReactMethod
+  public void deleteRemoteKey(String remoteMac, String lockData, Callback successCallback, Callback fail) {
+    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+      if (success) {
+        TTLockClient.getDefault().deleteRemote(remoteMac, lockData, new DeleteRemoteCallback() {
+          @Override
+          public void onDeleteSuccess() {
+            successCallback.invoke();
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            lockErrorCallback(lockError, fail);
+          }
+        });
+      } else {
+        noPermissionCallback(fail);
+      }
+    });
+  }
+
+  @ReactMethod
+  public void getLockElectricQuantity(String lockData, Callback successCallback, Callback fail) {
+    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+      if (success) {
+        TTLockClient.getDefault().getBatteryLevel(lockData, null, new GetBatteryLevelCallback() {
+          @Override
+          public void onGetBatteryLevelSuccess(int battery) {
+            successCallback.invoke(battery);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            lockErrorCallback(lockError, fail);
+          }
+        });
+      } else {
+        noPermissionCallback(fail);
+      }
+    });
+  }
+
+  @ReactMethod
+  public void clearAllRemoteKey(String lockData, Callback successCallback, Callback fail) {
+    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+      if (success) {
+        TTLockClient.getDefault().clearRemote(lockData, new ClearRemoteCallback() {
+          @Override
+          public void onClearSuccess() {
+            successCallback.invoke();
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            lockErrorCallback(lockError, fail);
+          }
+        });
+      } else {
+        noPermissionCallback(fail);
+      }
+    });
+  }
 
     @ReactMethod
     public void getBluetoothState(Callback callback) {
