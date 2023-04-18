@@ -370,13 +370,11 @@ public class TtlockModule extends ReactContextBaseJavaModule {
 
             @Override
             public void onScanWiFiByGatewaySuccess() {
-              Log.e("tag", "scan wifi success");
               callback.invoke(0);
             }
 
             @Override
             public void onFail(GatewayError error) {
-              LogUtil.d("error:" + error);
               callback.invoke(1);
             }
           });

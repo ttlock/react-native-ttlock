@@ -20,7 +20,7 @@ const GatewayPage = (props: { navigation: any; route: any; }) => {
         return;
       }
   //for static ip setting
-    
+
       initGatewayParam = {
         type: type,
         gatewayName: config.gatewayName,
@@ -37,12 +37,12 @@ const GatewayPage = (props: { navigation: any; route: any; }) => {
         alternateDns: undefined
 
         //for static ip setting (option)
-        // ipSettingType: GatewayIpSettingType.STATIC_IP,
-        // ipAddress: "192.168.1.100",
-        // subnetMask: "255.255.255.0",
-        // router: "192.168.1.1",
-        // preferredDns: "xxx.xxx.xxx.xxx",
-        // alternateDns: "xxx.xxx.xxx.xxx"
+       //  ipSettingType: GatewayIpSettingType.STATIC_IP,
+       //  ipAddress: "172.16.0.199",
+       //  subnetMask: "255.255.0.0",
+       //  router: "172.16.0.1",
+       //  preferredDns: "223.6.6.6",
+       //  alternateDns: "223.5.5.5"
       }
     } else {
       initGatewayParam = {
