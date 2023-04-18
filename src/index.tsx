@@ -601,19 +601,19 @@ class Ttlock {
   }
 
 
-  static getUnlockDirection(lockData: string, success: ((direction: UnlockDirection) => void), fail: null | ((errorCode: number, description: string) => void)) {
+  static getUnlockDirection(lockData: string, success: ((direction: LockUnlockDirection) => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
     ttlockModule.getUnlockDirection(lockData, (unlockDirection: number) => {
-      success(unlockDirection === 1 ? UnlockDirection.Left : UnlockDirection.Right);
+      success(unlockDirection === 1 ? LockUnlockDirection.Left : LockUnlockDirection.Right);
     }, fail);
   }
 
 
-  static setUnlockDirection(direction: UnlockDirection, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+  static setUnlockDirection(direction: LockUnlockDirection, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttlockModule.setLockConfig(direction, lockData, success, fail);
+    ttlockModule.setUnlockDirection(direction, lockData, success, fail);
   }
 
 
@@ -780,6 +780,7 @@ enum LockFunction {
   PrivacyLock = 30,
   DeadLock = 32,
   CyclicCardOrFingerprint = 34,
+  UnlockDirection = 36,
   FingerVein = 37,
   NbAwake = 39,
   RecoverCyclePasscode = 40,
@@ -825,7 +826,7 @@ enum LockSoundVolume {
 }
 
 
-enum UnlockDirection {
+enum LockUnlockDirection {
   Left = 1,
   Right = 2
 }
@@ -882,5 +883,5 @@ enum GatewayIpSettingType {
   DHCP = 1
 }
 
-export { Ttlock, TtGateway, TtRemoteKey, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType, GatewayIpSettingType, LockSoundVolume, TtRemoteKeyEvent }
+export { Ttlock, TtGateway, TtRemoteKey, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType, GatewayIpSettingType, LockSoundVolume, TtRemoteKeyEvent, LockUnlockDirection }
 export * from './types'

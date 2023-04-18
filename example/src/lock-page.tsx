@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { Ttlock, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, LockSoundVolume } from 'react-native-ttlock';
+import { Ttlock, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, LockSoundVolume, LockUnlockDirection } from 'react-native-ttlock';
 import * as Toast from './toast-page';
 
 const getLockSupportOperationList = (lockData: string) => {
@@ -39,6 +39,10 @@ const getLockSupportOperationList = (lockData: string) => {
 
     {lockOperation: "Get lock sound volume", lockFuctionValue: LockFunction.SoundVolume },
     {lockOperation: "Set lock sound volume", lockFuctionValue: LockFunction.SoundVolume },
+
+    {lockOperation: "Get lock unlock direction", lockFuctionValue: null },
+    {lockOperation: "Set lock unlock direction", lockFuctionValue: null },
+
 
     {lockOperation: "Add passage mode", lockFuctionValue: LockFunction.PassageMode },
     {lockOperation: "Clear all passageModes", lockFuctionValue: LockFunction.PassageMode },
@@ -301,6 +305,19 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
   else if (lockOperation === "Set lock sound volume") {
     Ttlock.setLockSoundVolume(LockSoundVolume.Livel_3, lockData, () => {
       let text = "set lock sound volume success";
+      successCallback(text);
+    }, failedCallback);
+  }
+
+  else if (lockOperation === "Get lock unlock direction") {
+    Ttlock.getUnlockDirection(lockData, (unlockDirection: LockUnlockDirection) => {
+      let text = "get lock unlock direction: " + unlockDirection.toString();
+      successCallback(text);
+    }, failedCallback);
+  }
+  else if (lockOperation === "Set lock unlock direction") {
+    Ttlock.setUnlockDirection(LockUnlockDirection.Left, lockData, () => {
+      let text = "set lock unlock direction success";
       successCallback(text);
     }, failedCallback);
   }
