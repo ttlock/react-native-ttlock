@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, TextInput, StyleSheet, Text, TouchableHighlight } from 'react-native';
-import { GatewayType, TtGateway } from 'react-native-ttlock';
+import { GatewayType, TtGateway, GatewayIpSettingType } from 'react-native-ttlock';
 import type { InitGatewayParam, InitGatewayModal } from 'react-native-ttlock';
 import * as Toast from './toast-page';
 import config from './config'
@@ -19,6 +19,7 @@ const GatewayPage = (props: { navigation: any; route: any; }) => {
         Toast.showToast("please input wifi password");
         return;
       }
+  //for static ip setting
 
       initGatewayParam = {
         type: type,
@@ -27,6 +28,21 @@ const GatewayPage = (props: { navigation: any; route: any; }) => {
         ttlockLoginPassword: config.ttlockLoginPassword,
         wifi: wifi,
         wifiPassword: wifiPassword,
+
+        ipSettingType: undefined,
+        ipAddress: undefined,
+        subnetMask: undefined,
+        router: undefined,
+        preferredDns: undefined,
+        alternateDns: undefined
+
+        //for static ip setting (option)
+       //  ipSettingType: GatewayIpSettingType.STATIC_IP,
+       //  ipAddress: "172.16.0.199",
+       //  subnetMask: "255.255.0.0",
+       //  router: "172.16.0.1",
+       //  preferredDns: "223.6.6.6",
+       //  alternateDns: "223.5.5.5"
       }
     } else {
       initGatewayParam = {
@@ -36,6 +52,21 @@ const GatewayPage = (props: { navigation: any; route: any; }) => {
         ttlockLoginPassword: config.ttlockLoginPassword,
         wifi: undefined,
         wifiPassword: undefined,
+
+        ipSettingType: undefined,
+        ipAddress: undefined,
+        subnetMask: undefined,
+        router: undefined,
+        preferredDns: undefined,
+        alternateDns: undefined
+
+        //for static ip setting (option)
+        // ipSettingType: GatewayIpSettingType.STATIC_IP,
+        // ipAddress: "192.168.1.100",
+        // subnetMask: "255.255.255.0",
+        // router: "192.168.1.1",
+        // preferredDns: "xxx.xxx.xxx.xxx",
+        // alternateDns: "xxx.xxx.xxx.xxx"
       }
     }
 

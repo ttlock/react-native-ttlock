@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { View, StyleSheet, TouchableHighlight, Text } from 'react-native';
-import store from './store'
 import config from './config'
 import * as Toast from './toast-page';
 
@@ -10,12 +9,13 @@ const MainPage = ({ navigation }: {navigation: any}) => {
       <TouchableHighlight
         style={[styles.touchButton]}
         onPress={() => {
-          // navigation.navigate("LockPage",{store: store});
-          navigation.navigate("ScanLockPage",{store: store});
-          store.startScanLock();
+          // navigation.navigate("LockPage");
+          navigation.navigate("ScanLockPage");
         }}>
         <Text style={styles.touchButtonText}>Lock</Text>
       </TouchableHighlight>
+
+     
 
       <TouchableHighlight
         style={[styles.touchButton]}
@@ -26,9 +26,7 @@ const MainPage = ({ navigation }: {navigation: any}) => {
             Toast.showToast(warnText);
             return;
           }
-
-          store.startScanGateway();
-          navigation.navigate("ScanGatewayPage",{store: store});
+          navigation.navigate("ScanGatewayPage");
         }}>
         <Text style={styles.touchButtonText}>Gateway</Text>
       </TouchableHighlight>
