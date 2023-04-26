@@ -616,7 +616,7 @@ RCT_EXPORT_METHOD(initRemoteKey:(NSString *)mac lockData:(NSString *) lockData s
     
     [TTWirelessKeyFob initializeWithKeyFobMac:mac lockData:lockData block:^(TTKeyFobStatus status, int electricQuantity) {
         if (status == TTKeyFobSuccess) {
-            [Ttlock response:nil success:success];
+            [Ttlock response:@(electricQuantity) success:success];
         }else{
             [Ttlock response:status  message:nil fail:fail];
         }
