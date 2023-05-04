@@ -50,6 +50,7 @@ import com.ttlock.bl.sdk.callback.DeleteFingerprintCallback;
 import com.ttlock.bl.sdk.callback.DeleteICCardCallback;
 import com.ttlock.bl.sdk.callback.DeletePasscodeCallback;
 import com.ttlock.bl.sdk.callback.DeleteRemoteCallback;
+import com.ttlock.bl.sdk.callback.GetAccessoryBatteryLevelCallback;
 import com.ttlock.bl.sdk.callback.GetAutoLockingPeriodCallback;
 import com.ttlock.bl.sdk.callback.GetBatteryLevelCallback;
 import com.ttlock.bl.sdk.callback.GetLockConfigCallback;
@@ -79,6 +80,8 @@ import com.ttlock.bl.sdk.callback.SetRemoteUnlockSwitchCallback;
 import com.ttlock.bl.sdk.callback.SetUnlockDirectionCallback;
 import com.ttlock.bl.sdk.constant.LogType;
 import com.ttlock.bl.sdk.device.Remote;
+import com.ttlock.bl.sdk.entity.AccessoryInfo;
+import com.ttlock.bl.sdk.entity.AccessoryType;
 import com.ttlock.bl.sdk.entity.ControlLockResult;
 import com.ttlock.bl.sdk.entity.IpSetting;
 import com.ttlock.bl.sdk.entity.LockError;
@@ -100,10 +103,12 @@ import com.ttlock.bl.sdk.gateway.model.GatewayError;
 import com.ttlock.bl.sdk.gateway.model.GatewayType;
 import com.ttlock.bl.sdk.gateway.model.WiFi;
 import com.ttlock.bl.sdk.remote.api.RemoteClient;
+import com.ttlock.bl.sdk.remote.callback.GetRemoteSystemInfoCallback;
 import com.ttlock.bl.sdk.remote.callback.InitRemoteCallback;
 import com.ttlock.bl.sdk.remote.callback.ScanRemoteCallback;
 import com.ttlock.bl.sdk.remote.model.InitRemoteResult;
 import com.ttlock.bl.sdk.remote.model.RemoteError;
+import com.ttlock.bl.sdk.remote.model.SystemInfo;
 import com.ttlock.bl.sdk.util.FeatureValueUtil;
 import com.ttlock.bl.sdk.util.LogUtil;
 
@@ -251,6 +256,25 @@ public class TtlockModule extends ReactContextBaseJavaModule {
         @Override
         public void onInitSuccess(InitRemoteResult initRemoteResult) {
           success.invoke(initRemoteResult.getBatteryLevel());
+        }
+
+        @Override
+        public void onFail(RemoteError remoteError) {
+          fail.invoke(remoteError.getErrorCode(), remoteError.getDescription());
+        }
+      });
+  }
+
+  @ReactMethod
+  public void getRemoteKeySystemInfo(String remoteMac, Callback success, Callback fail) {
+      RemoteClient.getDefault().getRemoteSystemInfo(remoteMac, new GetRemoteSystemInfoCallback() {
+        @Override
+        public void onGetRemoteSystemInfoSuccess(SystemInfo systemInfo) {
+          WritableMap map = Arguments.createMap();
+          map.putString(TTRemoteFieldConstant.MODEL_NUM, systemInfo.getModelNum());
+          map.putString(TTRemoteFieldConstant.HARDWARE_REVISION, systemInfo.getHardwareRevision());
+          map.putString(TTRemoteFieldConstant.FIRMWARE_REVISION, systemInfo.getFirmwareRevision());
+          success.invoke(map);
         }
 
         @Override
@@ -1533,6 +1557,30 @@ public class TtlockModule extends ReactContextBaseJavaModule {
           @Override
           public void onClearSuccess() {
             successCallback.invoke();
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            lockErrorCallback(lockError, fail);
+          }
+        });
+      } else {
+        noPermissionCallback(fail);
+      }
+    });
+  }
+
+  @ReactMethod
+  public void getRemoteKeyElectricQuantity(String mac, String lockData, Callback successCallback, Callback fail) {
+    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+      if (success) {
+        AccessoryInfo accessoryInfo = new AccessoryInfo();
+        accessoryInfo.setAccessoryMac(mac);
+        accessoryInfo.setAccessoryType(AccessoryType.REMOTE);
+        TTLockClient.getDefault().getAccessoryBatteryLevel(accessoryInfo, lockData, new GetAccessoryBatteryLevelCallback() {
+          @Override
+          public void onGetAccessoryBatteryLevelSuccess(AccessoryInfo accessoryInfo) {
+            successCallback.invoke(accessoryInfo.getAccessoryBattery());
           }
 
           @Override

@@ -8,5 +8,9 @@ public class TTRemoteFieldConstant {
     public static final String REMOTE_KEY_MAC = "remoteKeyMac";
     public static final String RSSI = "rssi";
 
+    public static final String MODEL_NUM = "modelNum";
+    public static final String HARDWARE_REVISION = "hardwareRevision";
+    public static final String FIRMWARE_REVISION = "firmwareRevision";
+
 
 }
