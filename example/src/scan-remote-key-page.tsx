@@ -1,9 +1,10 @@
 import { observer } from 'mobx-react';
 import React, { useEffect } from 'react';
 import {FlatList, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { TtRemoteKey, ScanRemoteKeyModal as ScanRemoteKeyModal, Ttlock } from 'react-native-ttlock';
+import { TtRemoteKey, ScanRemoteKeyModal as ScanRemoteKeyModal, Ttlock, DeviceSystemModal } from 'react-native-ttlock';
 import * as Toast from './toast-page';
 import store from './store'
+import { get } from 'mobx';
 
 
 
@@ -32,11 +33,36 @@ const renderItem = (item: ScanRemoteKeyModal, operation: string, lockData: strin
 const initRemoteKey = (remoteKeyMac: string, lockData: string, navigation: any) => {
   TtRemoteKey.init(remoteKeyMac, lockData, (electricQuantity: number) => {
     Toast.showToast("init remote key success")
+
+   
+    getRemoteKeyElectricQuantity(remoteKeyMac,lockData);
+
+    getRemoteKeySystemInfo(remoteKeyMac);
+
     navigation.pop();
   }, (errorCode: number, description: string)=>{
     Toast.showToast("init remote key fail " + errorCode.toString())
 
   }); 
+}
+
+
+const getRemoteKeySystemInfo = (remoteKeyMac: string) => {
+   TtRemoteKey.getSystemInfo(remoteKeyMac,(systemModel : DeviceSystemModal)=>{
+      Toast.showToast("get remote key systemInfo: " + JSON.stringify(systemModel));
+    }, (errorCode: number, description: string)=>{
+      Toast.showToast("get remote key systemInfo: " + errorCode.toString())
+    })
+
+}
+
+const getRemoteKeyElectricQuantity = (remoteKeyMac: string, lockData: string) => {
+  TtRemoteKey.getElectricQuantity(remoteKeyMac,lockData,(electricQuantity : number)=>{
+    Toast.showToast("get remote key electric quantity: " + electricQuantity.toString());
+  }, (errorCode: number, description: string)=>{
+    Toast.showToast("get remote key electric quantity: " + errorCode.toString())
+  })
+
 }
 
 const addRemoteKeyToLock = (remoteKeyMac: string, lockData: string, navigation: any) => {
@@ -71,8 +97,6 @@ const deleteRemoteKeyFromLock = (remoteKeyMac: string, lockData: string, navigat
     Toast.showToast("delete remote key fail " + errorCode.toString())
   })
 }
-
-
 
 
 const ScanRemoteKeyPage = (props: any) => {
