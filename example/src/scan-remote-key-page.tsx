@@ -35,9 +35,9 @@ const initRemoteKey = (remoteKeyMac: string, lockData: string, navigation: any) 
     Toast.showToast("init remote key success")
 
    
-    getRemoteKeyElectricQuantity(remoteKeyMac,lockData);
+    // getRemoteKeyElectricQuantity(remoteKeyMac,lockData);
 
-    getRemoteKeySystemInfo(remoteKeyMac);
+    // getRemoteKeySystemInfo(remoteKeyMac);
 
     navigation.pop();
   }, (errorCode: number, description: string)=>{
@@ -49,6 +49,7 @@ const initRemoteKey = (remoteKeyMac: string, lockData: string, navigation: any) 
 
 const getRemoteKeySystemInfo = (remoteKeyMac: string) => {
    TtRemoteKey.getSystemInfo(remoteKeyMac,(systemModel : DeviceSystemModal)=>{
+      console.log(JSON.stringify(systemModel))
       Toast.showToast("get remote key systemInfo: " + JSON.stringify(systemModel));
     }, (errorCode: number, description: string)=>{
       Toast.showToast("get remote key systemInfo: " + errorCode.toString())
