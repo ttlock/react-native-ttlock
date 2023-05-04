@@ -4,7 +4,7 @@ import {
   // EmitterSubscription,
 } from 'react-native';
 
-import type { ScanGatewayModal, ScanLockModal, InitGatewayParam, CycleDateParam, ScanWifiModal, InitGatewayModal, LockVersion, ScanRemoteKeyModal } from './types'
+import type { ScanGatewayModal, ScanLockModal, InitGatewayParam, CycleDateParam, ScanWifiModal, InitGatewayModal, LockVersion, ScanRemoteKeyModal, DeviceSystemModal } from './types'
 
 const ttlockModule = NativeModules.Ttlock;
 const ttlockEventEmitter = new NativeEventEmitter(ttlockModule);
@@ -46,6 +46,18 @@ class TtRemoteKey {
       }
       fail!(errorCode, description);
     });
+  }
+
+  static getSystemInfo(mac: string, success: ((systemModel : DeviceSystemModal) => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    ttlockModule.getRemoteKeySystemInfo(mac,success,fail);
+  }
+
+  static getElectricQuantity(mac: string, lockData: string, success: ((electricQuantity : number) => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    ttlockModule.getRemoteKeyElectricQuantity(mac,lockData,success,fail);
   }
 
 }

@@ -18,6 +18,8 @@ export interface ScanGatewayModal {
   type: number
 }
 
+
+
 export interface ScanRemoteKeyModal {
   remoteKeyName: string,
   remoteKeyMac: string,
@@ -59,6 +61,22 @@ export interface InitGatewayModal {
   modelNum: string,
   hardwareRevision: string,
   firmwareRevision: string,
+}
+
+export interface DeviceSystemModal {
+  modelNum: string,
+  hardwareRevision: string,
+  firmwareRevision: string,
+  
+  //NB IOT LOCK
+  nbOperator: string,
+  nbNodeId: string,
+  nbCardNumber: string,
+  nbRssi: string,
+  //support TTLockFeatureValuePasscodeKeyNumber
+  passcodeKeyNumber: string,
+  lockData: string,
+  
 }
 
 

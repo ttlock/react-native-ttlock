@@ -1,5 +1,6 @@
 #import "Ttlock.h"
 #import <TTLock/TTLock.h>
+#import <objc/message.h>
 
 
 #define NOT_NULL_STRING(string) (string ?: @"")
@@ -623,6 +624,32 @@ RCT_EXPORT_METHOD(initRemoteKey:(NSString *)mac lockData:(NSString *) lockData s
     }];
 }
 
+RCT_EXPORT_METHOD(getRemoteKeySystemInfo:(NSString *)mac  success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    
+    [TTWirelessKeyFob getLockSystemInfoWithKeyFobMac:mac block:^(TTKeyFobStatus status, TTSystemInfoModel *systemModel) {
+        
+        if (status == TTKeyFobSuccess) {
+            [Ttlock response:[Ttlock dictionaryFromModel:systemModel] success:success];
+        }else{
+            [Ttlock response:status  message:nil fail:fail];
+        }
+    }];
+    
+    
+}
+
+
+RCT_EXPORT_METHOD(getRemoteKeyElectricQuantity:(NSString *)mac lockData:(NSString *) lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+
+    [TTLock getAccessoryElectricQuantityWithType:TTAccessoryTypeWirelessKeyFob accessoryMac:mac lockData:lockData success:^(NSInteger electricQuantity, long long updateDate) {
+        [Ttlock response:@(electricQuantity) success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock response:errorCode  message:nil fail:fail];
+    }];
+}
+
 #pragma mark - private method
 + (void)response:(NSObject *)data success:(RCTResponseSenderBlock)success{
     NSArray *responseData = data ? @[data] : nil;
@@ -638,6 +665,23 @@ RCT_EXPORT_METHOD(initRemoteKey:(NSString *)mac lockData:(NSString *) lockData s
         errorCode =code - 1;
     }
     fail(@[@(errorCode),NOT_NULL_STRING(message)]);
+}
+
+
++ (NSDictionary *)dictionaryFromModel:(id)model {
+    unsigned int count = 0;
+    objc_property_t *properties = class_copyPropertyList([model class], &count);
+    NSMutableDictionary *resultDict = [NSMutableDictionary dictionaryWithCapacity:count];
+    for (int i = 0; i < count; i++) {
+        objc_property_t property = properties[i];
+        NSString *propertyName = [NSString stringWithUTF8String:property_getName(property)];
+        id propertyValue = [model valueForKey:propertyName];
+        if (propertyValue) {
+            [resultDict setObject:propertyValue forKey:propertyName];
+        }
+    }
+    free(properties);
+    return resultDict;
 }
 
 @end
