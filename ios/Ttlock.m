@@ -374,7 +374,6 @@ RCT_EXPORT_METHOD(setLockRemoteUnlockSwitchState:(BOOL)isOn  lockData:(NSString 
 
 RCT_EXPORT_METHOD(getLockConfig:(int)config  lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
-    
     TTLockConfigType type = config + 1;
     [TTLock getLockConfigWithType:type lockData:lockData success:^(TTLockConfigType type, BOOL isOn) {
         [Ttlock response:@[@(type),@(isOn)] success:success];
@@ -640,11 +639,10 @@ RCT_EXPORT_METHOD(getRemoteKeySystemInfo:(NSString *)mac  success:(RCTResponseSe
 }
 
 
-RCT_EXPORT_METHOD(getRemoteKeyElectricQuantity:(NSString *)mac lockData:(NSString *) lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+RCT_EXPORT_METHOD(getAccessoryElectricQuantity:(int)type mac:(NSString *)mac lockData:(NSString *) lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
-
-    [TTLock getAccessoryElectricQuantityWithType:TTAccessoryTypeWirelessKeyFob accessoryMac:mac lockData:lockData success:^(NSInteger electricQuantity, long long updateDate) {
-        [Ttlock response:@(electricQuantity) success:success];
+    [TTLock getAccessoryElectricQuantityWithType:type accessoryMac:mac lockData:lockData success:^(NSInteger electricQuantity, long long updateDate) {
+        [Ttlock response:@[@(electricQuantity),@(updateDate)] success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
         [Ttlock response:errorCode  message:nil fail:fail];
     }];

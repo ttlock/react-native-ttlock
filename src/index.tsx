@@ -54,12 +54,6 @@ class TtRemoteKey {
     ttlockModule.getRemoteKeySystemInfo(mac,success,fail);
   }
 
-  static getElectricQuantity(mac: string, lockData: string, success: ((electricQuantity : number) => void), fail: null | ((errorCode: number, description: string) => void)) {
-    success = success || this.defaultCallback;
-    fail = fail || this.defaultCallback;
-    ttlockModule.getRemoteKeyElectricQuantity(mac,lockData,success,fail);
-  }
-
 }
 
 class TtGateway {
@@ -200,6 +194,14 @@ class Ttlock {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
     ttlockModule.getLockVersionWithLockMac(lockMac, success, fail);
+  }
+
+  static getAccessoryElectricQuantity(accessoryType : LockAccessoryType, accessoryMac: string, lockData: string, success: ((electricQuantity : number, updateDate: number) => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    ttlockModule.getAccessoryElectricQuantity(accessoryType, accessoryMac,lockData,(dataArray: number[]) => {
+      success!(dataArray[0], dataArray[1]);
+    },fail);
   }
 
 
@@ -890,10 +892,16 @@ enum GatewayType {
   G4 = 4
 }
 
+
+enum LockAccessoryType {
+  KEYPAD = 1,
+  REMOTE_KEY = 2,
+  DOOR_SENSOR = 3
+}
+
 enum GatewayIpSettingType {
   STATIC_IP = 0,
   DHCP = 1
 }
 
-export { Ttlock, TtGateway, TtRemoteKey, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType, GatewayIpSettingType, LockSoundVolume, TtRemoteKeyEvent, LockUnlockDirection }
-export * from './types'
+export { Ttlock, TtGateway, TtRemoteKey, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType, GatewayIpSettingType, LockSoundVolume, TtRemoteKeyEvent, LockUnlockDirection, LockAccessoryType, ScanRemoteKeyModal,  DeviceSystemModal}

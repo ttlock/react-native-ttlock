@@ -1,10 +1,9 @@
 import { observer } from 'mobx-react';
 import React, { useEffect } from 'react';
 import {FlatList, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { TtRemoteKey, ScanRemoteKeyModal as ScanRemoteKeyModal, Ttlock, DeviceSystemModal } from 'react-native-ttlock';
+import { TtRemoteKey, Ttlock, LockAccessoryType, ScanRemoteKeyModal, DeviceSystemModal} from 'react-native-ttlock';
 import * as Toast from './toast-page';
 import store from './store'
-import { get } from 'mobx';
 
 
 
@@ -34,6 +33,7 @@ const initRemoteKey = (remoteKeyMac: string, lockData: string, navigation: any) 
   TtRemoteKey.init(remoteKeyMac, lockData, (electricQuantity: number) => {
     Toast.showToast("init remote key success")
 
+
    
     // getRemoteKeyElectricQuantity(remoteKeyMac,lockData);
 
@@ -58,8 +58,9 @@ const getRemoteKeySystemInfo = (remoteKeyMac: string) => {
 }
 
 const getRemoteKeyElectricQuantity = (remoteKeyMac: string, lockData: string) => {
-  TtRemoteKey.getElectricQuantity(remoteKeyMac,lockData,(electricQuantity : number)=>{
-    Toast.showToast("get remote key electric quantity: " + electricQuantity.toString());
+  Ttlock.getAccessoryElectricQuantity(LockAccessoryType.REMOTE_KEY, remoteKeyMac,lockData,(electricQuantity : number, updateDate: number)=>{
+    Toast.showToast("get remote key electric quantity: " + electricQuantity.toString() + "   updateDate:" + updateDate.toString());
+    console.log("get remote key electric quantity: " + electricQuantity.toString() + "   updateDate:" + updateDate.toString())
   }, (errorCode: number, description: string)=>{
     Toast.showToast("get remote key electric quantity: " + errorCode.toString())
   })
