@@ -1571,16 +1571,28 @@ public class TtlockModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void getRemoteKeyElectricQuantity(String mac, String lockData, Callback successCallback, Callback fail) {
+  public void getAccessoryElectricQuantity(int type, String mac, String lockData, Callback successCallback, Callback fail) {
     PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
       if (success) {
         AccessoryInfo accessoryInfo = new AccessoryInfo();
         accessoryInfo.setAccessoryMac(mac);
-        accessoryInfo.setAccessoryType(AccessoryType.REMOTE);
+        AccessoryType accessoryType = null;
+        switch (type) {
+          case 1:
+            accessoryType = AccessoryType.WIRELESS_KEYPAD;
+            break;
+          case 2:
+            accessoryType = AccessoryType.REMOTE;
+            break;
+        }
+        accessoryInfo.setAccessoryType(accessoryType);
         TTLockClient.getDefault().getAccessoryBatteryLevel(accessoryInfo, lockData, new GetAccessoryBatteryLevelCallback() {
           @Override
           public void onGetAccessoryBatteryLevelSuccess(AccessoryInfo accessoryInfo) {
-            successCallback.invoke(accessoryInfo.getAccessoryBattery());
+            WritableArray writableArray = Arguments.createArray();
+            writableArray.pushInt(accessoryInfo.getAccessoryBattery());
+            writableArray.pushDouble(accessoryInfo.getBatteryDate());
+            successCallback.invoke(writableArray);
           }
 
           @Override
