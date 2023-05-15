@@ -48,7 +48,7 @@ public class PermissionUtils {
     if (isAndroid12OrOver()) {//android 12及以上 需要连接权限
       return hasPermission(activity, Manifest.permission.BLUETOOTH_CONNECT);
     } else {//12以下的不需要
-      return false;
+      return true;
     }
   }
 
