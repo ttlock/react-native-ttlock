@@ -110,6 +110,7 @@ import com.ttlock.bl.sdk.remote.model.InitRemoteResult;
 import com.ttlock.bl.sdk.remote.model.RemoteError;
 import com.ttlock.bl.sdk.remote.model.SystemInfo;
 import com.ttlock.bl.sdk.util.FeatureValueUtil;
+import com.ttlock.bl.sdk.util.GsonUtil;
 import com.ttlock.bl.sdk.util.LogUtil;
 
 import java.util.ArrayList;
@@ -255,7 +256,11 @@ public class TtlockModule extends ReactContextBaseJavaModule {
       RemoteClient.getDefault().initialize(mCachedRemote.get(remoteMac), lockData, new InitRemoteCallback() {
         @Override
         public void onInitSuccess(InitRemoteResult initRemoteResult) {
-          success.invoke(initRemoteResult.getBatteryLevel());
+          WritableArray writableArray = Arguments.createArray();
+          writableArray.pushInt(initRemoteResult.getBatteryLevel());
+          writableArray.pushString(GsonUtil.toJson(initRemoteResult.getSystemInfo()));
+          success.invoke(writableArray);
+
         }
 
         @Override
