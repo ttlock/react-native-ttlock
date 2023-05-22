@@ -596,7 +596,6 @@ RCT_EXPORT_METHOD(initGateway:(NSDictionary *)dict success:(RCTResponseSenderBlo
 #pragma mark - RemoteKey
 RCT_EXPORT_METHOD(startScanRemoteKey)
 {
-    
     [TTWirelessKeyFob startScanWithBlock:^(TTWirelessKeyFobScanModel *model) {
         NSMutableDictionary *data = @{}.mutableCopy;
         data[@"remoteKeyName"] = model.keyFobName;
@@ -613,29 +612,14 @@ RCT_EXPORT_METHOD(stopScanRemoteKey)
 
 RCT_EXPORT_METHOD(initRemoteKey:(NSString *)mac lockData:(NSString *) lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
-    
-    [TTWirelessKeyFob initializeWithKeyFobMac:mac lockData:lockData block:^(TTKeyFobStatus status, int electricQuantity) {
+    [TTWirelessKeyFob newInitializeWithKeyFobMac:mac lockData:lockData block:^(TTKeyFobStatus status, int electricQuantity, TTSystemInfoModel *systemModel) {
         if (status == TTKeyFobSuccess) {
-            [Ttlock response:@(electricQuantity) success:success];
+            [Ttlock response:@[@(electricQuantity),[Ttlock dictionaryFromModel:systemModel]] success:success];
         }else{
             [Ttlock response:status  message:nil fail:fail];
         }
     }];
-}
-
-RCT_EXPORT_METHOD(getRemoteKeySystemInfo:(NSString *)mac  success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
-{
-    
-    [TTWirelessKeyFob getLockSystemInfoWithKeyFobMac:mac block:^(TTKeyFobStatus status, TTSystemInfoModel *systemModel) {
-        
-        if (status == TTKeyFobSuccess) {
-            [Ttlock response:[Ttlock dictionaryFromModel:systemModel] success:success];
-        }else{
-            [Ttlock response:status  message:nil fail:fail];
-        }
-    }];
-    
-    
+   
 }
 
 

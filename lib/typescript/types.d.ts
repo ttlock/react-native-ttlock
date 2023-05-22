@@ -51,6 +51,17 @@ export interface InitGatewayModal {
     hardwareRevision: string;
     firmwareRevision: string;
 }
+export interface DeviceSystemModal {
+    modelNum: string;
+    hardwareRevision: string;
+    firmwareRevision: string;
+    nbOperator: string;
+    nbNodeId: string;
+    nbCardNumber: string;
+    nbRssi: string;
+    passcodeKeyNumber: string;
+    lockData: string;
+}
 export interface CycleDateParam {
     weekDay: number;
     startTime: number;

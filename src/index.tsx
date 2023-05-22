@@ -34,10 +34,12 @@ class TtRemoteKey {
     subscriptionMap.delete(TtRemoteKeyEvent.ScanRemoteKey);
   }
 
-  static init(mac: string, lockData: string, success: ((electricQuantity: number) => void), fail: null | ((errorCode: number, description: string) => void)) {
+  static init(mac: string, lockData: string, success: ((electricQuantity: number, systemModel : DeviceSystemModal) => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttlockModule.initRemoteKey(mac, lockData, success, (errorCode: number) => {
+    ttlockModule.initRemoteKey(mac, lockData, (dataArray: any[]) => {
+      success!(dataArray[0], dataArray[1]);
+    }, (errorCode: number) => {
       let description = "Init remote key fail.";
       if (errorCode === -1) {
         description += "Wrong CRC";
@@ -47,13 +49,6 @@ class TtRemoteKey {
       fail!(errorCode, description);
     });
   }
-
-  static getSystemInfo(mac: string, success: ((systemModel : DeviceSystemModal) => void), fail: null | ((errorCode: number, description: string) => void)) {
-    success = success || this.defaultCallback;
-    fail = fail || this.defaultCallback;
-    ttlockModule.getRemoteKeySystemInfo(mac,success,fail);
-  }
-
 }
 
 class TtGateway {

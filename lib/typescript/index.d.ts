@@ -1,9 +1,10 @@
-import type { ScanGatewayModal, ScanLockModal, InitGatewayParam, CycleDateParam, ScanWifiModal, InitGatewayModal, LockVersion, ScanRemoteKeyModal } from './types';
+import type { ScanGatewayModal, ScanLockModal, InitGatewayParam, CycleDateParam, ScanWifiModal, InitGatewayModal, LockVersion, ScanRemoteKeyModal, DeviceSystemModal } from './types';
 declare class TtRemoteKey {
     static defaultCallback: () => void;
     static startScan(callback: ((scanModal: ScanRemoteKeyModal) => void)): void;
     static stopScan(): void;
     static init(mac: string, lockData: string, success: ((electricQuantity: number) => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static getSystemInfo(mac: string, success: ((systemModel: DeviceSystemModal) => void), fail: null | ((errorCode: number, description: string) => void)): void;
 }
 declare class TtGateway {
     static defaultCallback: () => void;
@@ -56,6 +57,7 @@ declare class Ttlock {
      */
     static initLock(object: object, success: null | ((lockData: string) => void), fail: null | ((errorCode: number, description: string) => void)): void;
     static getLockVersionWithLockMac(lockMac: string, success: null | ((lockVersion: LockVersion) => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static getAccessoryElectricQuantity(accessoryType: LockAccessoryType, accessoryMac: string, lockData: string, success: ((electricQuantity: number, updateDate: number) => void), fail: null | ((errorCode: number, description: string) => void)): void;
     /**
      * Reset the lock.
      * @param lockData
@@ -423,9 +425,13 @@ declare enum GatewayType {
     G3 = 3,
     G4 = 4
 }
+declare enum LockAccessoryType {
+    KEYPAD = 1,
+    REMOTE_KEY = 2,
+    DOOR_SENSOR = 3
+}
 declare enum GatewayIpSettingType {
     STATIC_IP = 0,
     DHCP = 1
 }
-export { Ttlock, TtGateway, TtRemoteKey, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType, GatewayIpSettingType, LockSoundVolume, TtRemoteKeyEvent, LockUnlockDirection };
-export * from './types';
+export { Ttlock, TtGateway, TtRemoteKey, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType, GatewayIpSettingType, LockSoundVolume, TtRemoteKeyEvent, LockUnlockDirection, LockAccessoryType, ScanRemoteKeyModal, DeviceSystemModal };

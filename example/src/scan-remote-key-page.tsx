@@ -30,14 +30,13 @@ const renderItem = (item: ScanRemoteKeyModal, operation: string, lockData: strin
 }
 
 const initRemoteKey = (remoteKeyMac: string, lockData: string, navigation: any) => {
-  TtRemoteKey.init(remoteKeyMac, lockData, (electricQuantity: number) => {
+  TtRemoteKey.init(remoteKeyMac, lockData, (electricQuantity: number, systemModel : DeviceSystemModal) => {
     Toast.showToast("init remote key success")
+    console.log("electricQuantity:" + String(electricQuantity));
+    console.log("systemModel:" + JSON.stringify(systemModel));
 
-
-   
     // getRemoteKeyElectricQuantity(remoteKeyMac,lockData);
 
-    // getRemoteKeySystemInfo(remoteKeyMac);
 
     navigation.pop();
   }, (errorCode: number, description: string)=>{
@@ -46,16 +45,6 @@ const initRemoteKey = (remoteKeyMac: string, lockData: string, navigation: any) 
   }); 
 }
 
-
-const getRemoteKeySystemInfo = (remoteKeyMac: string) => {
-   TtRemoteKey.getSystemInfo(remoteKeyMac,(systemModel : DeviceSystemModal)=>{
-      console.log(JSON.stringify(systemModel))
-      Toast.showToast("get remote key systemInfo: " + JSON.stringify(systemModel));
-    }, (errorCode: number, description: string)=>{
-      Toast.showToast("get remote key systemInfo: " + errorCode.toString())
-    })
-
-}
 
 const getRemoteKeyElectricQuantity = (remoteKeyMac: string, lockData: string) => {
   Ttlock.getAccessoryElectricQuantity(LockAccessoryType.REMOTE_KEY, remoteKeyMac,lockData,(electricQuantity : number, updateDate: number)=>{
