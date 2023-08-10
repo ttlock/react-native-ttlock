@@ -3,8 +3,7 @@ declare class TtRemoteKey {
     static defaultCallback: () => void;
     static startScan(callback: ((scanModal: ScanRemoteKeyModal) => void)): void;
     static stopScan(): void;
-    static init(mac: string, lockData: string, success: ((electricQuantity: number) => void), fail: null | ((errorCode: number, description: string) => void)): void;
-    static getSystemInfo(mac: string, success: ((systemModel: DeviceSystemModal) => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static init(mac: string, lockData: string, success: ((electricQuantity: number, systemModel: DeviceSystemModal) => void), fail: null | ((errorCode: number, description: string) => void)): void;
 }
 declare class TtGateway {
     static defaultCallback: () => void;
