@@ -190,9 +190,9 @@ android {
 }
 
 repositories {
-//    flatDir {
-//        dirs "$rootDir/../../android/libs"
-//    }
+    flatDir {
+        dirs "$rootDir/../../android/libs"
+    }
 }
 
 dependencies {
