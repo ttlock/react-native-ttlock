@@ -1,4 +1,10 @@
-import type { ScanGatewayModal, ScanLockModal, InitGatewayParam, CardFingerprintCycleParam, ScanWifiModal, InitGatewayModal, LockVersion } from './types';
+import type { ScanGatewayModal, ScanLockModal, InitGatewayParam, CycleDateParam, ScanWifiModal, InitGatewayModal, LockVersion, ScanRemoteKeyModal, DeviceSystemModal } from './types';
+declare class TtRemoteKey {
+    static defaultCallback: () => void;
+    static startScan(callback: ((scanModal: ScanRemoteKeyModal) => void)): void;
+    static stopScan(): void;
+    static init(mac: string, lockData: string, success: ((electricQuantity: number, systemModel: DeviceSystemModal) => void), fail: null | ((errorCode: number, description: string) => void)): void;
+}
 declare class TtGateway {
     static defaultCallback: () => void;
     /**
@@ -22,7 +28,7 @@ declare class TtGateway {
      * @param finish
      * @param fail
      */
-    static getNearbyWifi(progress: ((scanWifiModal: ScanWifiModal[]) => void), finish: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static getNearbyWifi(progress: ((scanWifiModalList: ScanWifiModal[]) => void), finish: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
     /**
      * Initialize gateway
      * @param object
@@ -50,6 +56,7 @@ declare class Ttlock {
      */
     static initLock(object: object, success: null | ((lockData: string) => void), fail: null | ((errorCode: number, description: string) => void)): void;
     static getLockVersionWithLockMac(lockMac: string, success: null | ((lockVersion: LockVersion) => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static getAccessoryElectricQuantity(accessoryType: LockAccessoryType, accessoryMac: string, lockData: string, success: ((electricQuantity: number, updateDate: number) => void), fail: null | ((errorCode: number, description: string) => void)): void;
     /**
      * Reset the lock.
      * @param lockData
@@ -125,7 +132,7 @@ declare class Ttlock {
      * @param success
      * @param fail
      */
-    static addCard(cycleList: null | CardFingerprintCycleParam[], startDate: number, endDate: number, lockData: string, progress: (() => void), success: null | ((cardNumber: string) => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static addCard(cycleList: null | CycleDateParam[], startDate: number, endDate: number, lockData: string, progress: (() => void), success: null | ((cardNumber: string) => void), fail: null | ((errorCode: number, description: string) => void)): void;
     /**
      * Modify the validity period of the card
      * @param cardNumber
@@ -136,7 +143,7 @@ declare class Ttlock {
      * @param success
      * @param fail
      */
-    static modifyCardValidityPeriod(cardNumber: string, cycleList: null | CardFingerprintCycleParam[], startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static modifyCardValidityPeriod(cardNumber: string, cycleList: null | CycleDateParam[], startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
     /**
      * Delete the card
      * @param cardNumber
@@ -162,7 +169,7 @@ declare class Ttlock {
      * @param success
      * @param fail
      */
-    static addFingerprint(cycleList: null | CardFingerprintCycleParam[], startDate: number, endDate: number, lockData: string, progress: null | ((currentCount: number, totalCount: number) => void), success: null | ((fingerprintNumber: string) => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static addFingerprint(cycleList: null | CycleDateParam[], startDate: number, endDate: number, lockData: string, progress: null | ((currentCount: number, totalCount: number) => void), success: null | ((fingerprintNumber: string) => void), fail: null | ((errorCode: number, description: string) => void)): void;
     /**
      * Modify the validity period of the fingerprint
      * @param fingerprintNumber
@@ -173,7 +180,7 @@ declare class Ttlock {
      * @param success
      * @param fail
      */
-    static modifyFingerprintValidityPeriod(fingerprintNumber: string, cycleList: null | CardFingerprintCycleParam[], startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static modifyFingerprintValidityPeriod(fingerprintNumber: string, cycleList: null | CycleDateParam[], startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
     /**
      * Delete the fingerprint
      * @param fingerprintNumber
@@ -212,6 +219,7 @@ declare class Ttlock {
      * @param fail
      */
     static getLockTime(lockData: string, success: null | ((lockTimestamp: number) => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static getLockElectricQuantity(lockData: string, success: null | ((electricQuantity: number) => void), fail: null | ((errorCode: number, description: string) => void)): void;
     /**
      * Read the operation record of the lock.
      * @param type LockRecordType
@@ -267,6 +275,10 @@ declare class Ttlock {
      * @param fail
      */
     static setLockConfig(config: LockConfigType, isOn: boolean, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static setLockSoundVolume(soundVolume: LockSoundVolume, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static getLockSoundVolume(lockData: string, success: ((lockSoundVolume: LockSoundVolume) => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static getUnlockDirection(lockData: string, success: ((direction: LockUnlockDirection) => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static setUnlockDirection(direction: LockUnlockDirection, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
     /**
      * Set the lock always unlock.
      * @param mode LockPassageMode
@@ -287,6 +299,10 @@ declare class Ttlock {
      * @param fail
      */
     static clearAllPassageModes(lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static addRemoteKey(remoteKeyMac: string, cycleDateList: null | CycleDateParam[], startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static modifyRemoteKey(remoteKeyMac: string, cycleDateList: null | CycleDateParam[], startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static deleteRemoteKey(remoteKeyMac: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static clearAllRemoteKey(lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
     /**
      * Monitor phone's Bluetooth status
      * @param callback
@@ -319,7 +335,6 @@ declare enum LockFunction {
     GatewayUnlock = 10,
     LockFreeze = 11,
     CyclePassword = 12,
-    DoorSensor = 13,
     RemoteUnlockSwicth = 14,
     AudioSwitch = 15,
     NbIot = 16,
@@ -329,7 +344,7 @@ declare enum LockFunction {
     NoBroadcastInNormal = 21,
     PassageMode = 22,
     TurnOffAutoLock = 23,
-    WirelessKeypad = 24,
+    RemoteKeypad = 24,
     Light = 25,
     HotelCardBlacklist = 26,
     IdentityCard = 27,
@@ -338,8 +353,24 @@ declare enum LockFunction {
     PrivacyLock = 30,
     DeadLock = 32,
     CyclicCardOrFingerprint = 34,
+    UnlockDirection = 36,
     FingerVein = 37,
-    NbAwake = 39
+    NbAwake = 39,
+    RecoverCyclePasscode = 40,
+    RemoteKey = 41,
+    GetAccessoryElectricQuantity = 42,
+    SoundVolume = 43,
+    QRCode = 44,
+    SensorState = 45,
+    PassageModeAutoUn = 46,
+    DoorSensor = 50,
+    DoorSensorAlert = 51,
+    Sensitivity = 52,
+    Face = 53,
+    CpuCard = 55,
+    Wifi = 56,
+    WifiStaticIP = 58,
+    PasscodeKeyNumber = 60
 }
 declare enum LockRecordType {
     Latest = 0,
@@ -352,6 +383,19 @@ declare enum LockConfigType {
     TamperAlert = 3,
     ResetButton = 4,
     PrivacyLock = 5
+}
+declare enum LockSoundVolume {
+    On = -1,
+    Off = 0,
+    Livel_1 = 1,
+    Livel_2 = 2,
+    Livel_3 = 3,
+    Livel_4 = 4,
+    Livel_5 = 5
+}
+declare enum LockUnlockDirection {
+    Left = 1,
+    Right = 2
 }
 declare enum LockPassageMode {
     Weekly = 0,
@@ -372,10 +416,21 @@ declare enum ConnectState {
     Success = 1,
     Fail = 2
 }
+declare enum TtRemoteKeyEvent {
+    ScanRemoteKey = "EventScanRemoteKey"
+}
 declare enum GatewayType {
     G2 = 2,
     G3 = 3,
     G4 = 4
 }
-export { Ttlock, TtGateway, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType };
-export * from './types';
+declare enum LockAccessoryType {
+    KEYPAD = 1,
+    REMOTE_KEY = 2,
+    DOOR_SENSOR = 3
+}
+declare enum GatewayIpSettingType {
+    STATIC_IP = 0,
+    DHCP = 1
+}
+export { Ttlock, TtGateway, TtRemoteKey, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType, GatewayIpSettingType, LockSoundVolume, TtRemoteKeyEvent, LockUnlockDirection, LockAccessoryType, ScanRemoteKeyModal, DeviceSystemModal };

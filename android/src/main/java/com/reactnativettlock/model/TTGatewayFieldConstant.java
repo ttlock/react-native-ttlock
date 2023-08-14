@@ -10,6 +10,13 @@ public class TTGatewayFieldConstant {
     public static final String RSSI = "rssi";
     public static final String TYPE = "type";
 
+    public static final String IP_SETTING_TYPE = "ipSettingType";
+    public static final String IP_ADDRESS = "ipAddress";
+    public static final String SUBNET_MASK = "subnetMask";
+    public static final String ROUTER = "router";
+    public static final String PREFERRED_DNS = "preferredDns";
+    public static final String ALTERNATE_DNS = "alternateDns";
+
     //
     public static final String WIFI = "wifi";
 

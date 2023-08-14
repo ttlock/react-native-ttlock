@@ -16,6 +16,11 @@ export interface ScanGatewayModal {
     rssi: number;
     type: number;
 }
+export interface ScanRemoteKeyModal {
+    remoteKeyName: string;
+    remoteKeyMac: string;
+    rssi: number;
+}
 export interface LockVersion {
     protocolVersion: string;
     protocolType: string;
@@ -28,19 +33,36 @@ export interface ScanWifiModal {
     rssi: number;
 }
 export interface InitGatewayParam {
+    type: number;
     gatewayName: string;
     wifi: string | undefined;
     wifiPassword: string | undefined;
     ttlockUid: number;
     ttlockLoginPassword: string;
-    type: number;
+    ipSettingType: number | undefined;
+    ipAddress: string | undefined;
+    subnetMask: string | undefined;
+    router: string | undefined;
+    preferredDns: string | undefined;
+    alternateDns: string | undefined;
 }
 export interface InitGatewayModal {
     modelNum: string;
     hardwareRevision: string;
     firmwareRevision: string;
 }
-export interface CardFingerprintCycleParam {
+export interface DeviceSystemModal {
+    modelNum: string;
+    hardwareRevision: string;
+    firmwareRevision: string;
+    nbOperator: string;
+    nbNodeId: string;
+    nbCardNumber: string;
+    nbRssi: string;
+    passcodeKeyNumber: string;
+    lockData: string;
+}
+export interface CycleDateParam {
     weekDay: number;
     startTime: number;
     endTime: number;
