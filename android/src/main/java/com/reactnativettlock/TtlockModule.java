@@ -25,6 +25,9 @@ import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.reactnativettlock.model.RNControlAction;
 import com.reactnativettlock.model.ScanRemoteModal;
+import com.reactnativettlock.model.TTBaseFieldConstant;
+import com.reactnativettlock.model.TTDoorSensorEvent;
+import com.reactnativettlock.model.TTDoorSensorFieldConstant;
 import com.reactnativettlock.model.TTGatewayEvent;
 import com.reactnativettlock.model.TTGatewayFieldConstant;
 import com.reactnativettlock.model.TTLockConfigConverter;
@@ -37,6 +40,7 @@ import com.reactnativettlock.util.PermissionUtils;
 import com.reactnativettlock.util.Utils;
 import com.ttlock.bl.sdk.api.ExtendedBluetoothDevice;
 import com.ttlock.bl.sdk.api.TTLockClient;
+import com.ttlock.bl.sdk.callback.AddDoorSensorCallback;
 import com.ttlock.bl.sdk.callback.AddFingerprintCallback;
 import com.ttlock.bl.sdk.callback.AddICCardCallback;
 import com.ttlock.bl.sdk.callback.AddRemoteCallback;
@@ -46,6 +50,7 @@ import com.ttlock.bl.sdk.callback.ClearPassageModeCallback;
 import com.ttlock.bl.sdk.callback.ClearRemoteCallback;
 import com.ttlock.bl.sdk.callback.ControlLockCallback;
 import com.ttlock.bl.sdk.callback.CreateCustomPasscodeCallback;
+import com.ttlock.bl.sdk.callback.DeleteDoorSensorCallback;
 import com.ttlock.bl.sdk.callback.DeleteFingerprintCallback;
 import com.ttlock.bl.sdk.callback.DeleteICCardCallback;
 import com.ttlock.bl.sdk.callback.DeletePasscodeCallback;
@@ -72,6 +77,7 @@ import com.ttlock.bl.sdk.callback.ResetLockCallback;
 import com.ttlock.bl.sdk.callback.ResetPasscodeCallback;
 import com.ttlock.bl.sdk.callback.ScanLockCallback;
 import com.ttlock.bl.sdk.callback.SetAutoLockingPeriodCallback;
+import com.ttlock.bl.sdk.callback.SetDoorSensorAlertTimeCallback;
 import com.ttlock.bl.sdk.callback.SetLockConfigCallback;
 import com.ttlock.bl.sdk.callback.SetLockSoundWithSoundVolumeCallback;
 import com.ttlock.bl.sdk.callback.SetLockTimeCallback;
@@ -80,6 +86,7 @@ import com.ttlock.bl.sdk.callback.SetRemoteUnlockSwitchCallback;
 import com.ttlock.bl.sdk.callback.SetUnlockDirectionCallback;
 import com.ttlock.bl.sdk.constant.LogType;
 import com.ttlock.bl.sdk.device.Remote;
+import com.ttlock.bl.sdk.device.WirelessDoorSensor;
 import com.ttlock.bl.sdk.entity.AccessoryInfo;
 import com.ttlock.bl.sdk.entity.AccessoryType;
 import com.ttlock.bl.sdk.entity.ControlLockResult;
@@ -112,6 +119,11 @@ import com.ttlock.bl.sdk.remote.model.SystemInfo;
 import com.ttlock.bl.sdk.util.FeatureValueUtil;
 import com.ttlock.bl.sdk.util.GsonUtil;
 import com.ttlock.bl.sdk.util.LogUtil;
+import com.ttlock.bl.sdk.wirelessdoorsensor.WirelessDoorSensorClient;
+import com.ttlock.bl.sdk.wirelessdoorsensor.callback.InitDoorSensorCallback;
+import com.ttlock.bl.sdk.wirelessdoorsensor.callback.ScanWirelessDoorSensorCallback;
+import com.ttlock.bl.sdk.wirelessdoorsensor.model.DoorSensorError;
+import com.ttlock.bl.sdk.wirelessdoorsensor.model.InitDoorSensorResult;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -125,10 +137,12 @@ public class TtlockModule extends ReactContextBaseJavaModule {
     public static final int TYPE_LOCK = 1;
     public static final int TYPE_PLUG = 2;
     public static final int TYPE_REMOTE = 3;
+    public static final int TYPE_DOOR_SENSOR = 4;
 //    private boolean scanGateway;
     private int scanType;
     private static HashMap<String, ExtendedBluetoothDevice> mCachedDevice = new HashMap<>();
     private static HashMap<String, Remote> mCachedRemote = new HashMap<>();
+    private HashMap<String, WirelessDoorSensor> mCachedDoorSensor = new HashMap<>();
     private String mac;
     private int totalCnt;
     private boolean flag;
@@ -136,7 +150,15 @@ public class TtlockModule extends ReactContextBaseJavaModule {
     public TtlockModule(ReactApplicationContext reactContext) {
         super(reactContext);
         this.reactContext = reactContext;
+        initSDK();
         LogUtil.setDBG(true);
+    }
+
+    private void initSDK() {
+        TTLockClient.getDefault().prepareBTService(getCurrentActivity());
+        RemoteClient.getDefault().prepareBTService(getCurrentActivity());
+        WirelessDoorSensorClient.getDefault().prepareBTService(getCurrentActivity());
+        GatewayClient.getDefault().prepareBTService(getCurrentActivity());
     }
 
     @Override
@@ -221,6 +243,54 @@ public class TtlockModule extends ReactContextBaseJavaModule {
         return newAddDevice;
     }
 
+    //-------------door sensor---------------------------
+    @ReactMethod
+    public void startScanDoorSensor() {
+        scanType = TYPE_DOOR_SENSOR;
+        PermissionUtils.doWithScanPermission(getCurrentActivity(), success -> {
+            if (success) {
+                mCachedDoorSensor.clear();
+                WirelessDoorSensorClient.getDefault().startScan(new ScanWirelessDoorSensorCallback() {
+                    @Override
+                    public void onScan(WirelessDoorSensor doorSensor) {
+                        mCachedDoorSensor.put(doorSensor.getAddress(), doorSensor);
+                        WritableMap map = Arguments.createMap();
+                        map.putString(TTDoorSensorFieldConstant.DOOR_SENSOR_NAME, doorSensor.getName());
+                        map.putString(TTDoorSensorFieldConstant.DOOR_SENSOR_MAC, doorSensor.getAddress());
+                        map.putInt(TTBaseFieldConstant.RSSI, doorSensor.getRssi());
+                        getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(TTDoorSensorEvent.ScanDoorSensor, map);
+                    }
+                });
+            } else {
+                LogUtil.d("no scan permission");
+            }
+        });
+    }
+
+
+    @ReactMethod
+    public void stopScanDoorSensor() {
+        WirelessDoorSensorClient.getDefault().stopScan();
+    }
+
+    @ReactMethod
+    public void initDoorSensor(String doorSensorMac, String lockData, Callback success, Callback fail) {
+        WirelessDoorSensorClient.getDefault().initialize(mCachedDoorSensor.get(doorSensorMac), lockData, new InitDoorSensorCallback() {
+            @Override
+            public void onInitSuccess(InitDoorSensorResult initDoorSensorResult) {
+                WritableArray writableArray = Arguments.createArray();
+                writableArray.pushInt(initDoorSensorResult.getBatteryLevel());
+                writableArray.pushString(GsonUtil.toJson(initDoorSensorResult.getFirmwareInfo()));
+                success.invoke(writableArray);
+            }
+
+            @Override
+            public void onFail(DoorSensorError doorSensorError) {
+                fail.invoke(doorSensorError.getErrorCode(), doorSensorError.getDescription());
+            }
+        });
+    }
+
     //---------------remote------------------------------
   @ReactMethod
   public void startScanRemoteKey() {
@@ -228,7 +298,6 @@ public class TtlockModule extends ReactContextBaseJavaModule {
     PermissionUtils.doWithScanPermission(getCurrentActivity(), success -> {
       if (success) {
         mCachedRemote.clear();
-        RemoteClient.getDefault().prepareBTService(getCurrentActivity());
         RemoteClient.getDefault().startScan(new ScanRemoteCallback() {
           @Override
           public void onScanRemote(Remote remote) {
@@ -762,7 +831,12 @@ public class TtlockModule extends ReactContextBaseJavaModule {
                 successCallback.invoke(status);
               }
 
-              @Override
+                @Override
+                public void onGetDoorSensorStatusSuccess(int status) {
+                    //todo:
+                }
+
+                @Override
               public void onFail(LockError error) {
                 lockErrorCallback(error, fail);
               }
@@ -1574,6 +1648,69 @@ public class TtlockModule extends ReactContextBaseJavaModule {
       }
     });
   }
+
+    @ReactMethod
+    public void addDoorSensor(String doorSensorMac, String lockData, Callback successCallback, Callback fail) {
+        PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+            if (success) {
+                TTLockClient.getDefault().addDoorSensor(doorSensorMac, lockData, new AddDoorSensorCallback() {
+                    @Override
+                    public void onAddSuccess() {
+                        successCallback.invoke();
+                    }
+
+                    @Override
+                    public void onFail(LockError lockError) {
+                        lockErrorCallback(lockError, fail);
+                    }
+                });
+            } else {
+                noPermissionCallback(fail);
+            }
+        });
+    }
+
+    @ReactMethod
+    public void deleteDoorSensor(String lockData, Callback successCallback, Callback fail) {
+        PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+            if (success) {
+                TTLockClient.getDefault().deleteDoorSensor(lockData, new DeleteDoorSensorCallback() {
+                    @Override
+                    public void onDeleteSuccess() {
+                        successCallback.invoke();
+                    }
+
+                    @Override
+                    public void onFail(LockError lockError) {
+                        lockErrorCallback(lockError, fail);
+                    }
+                });
+            } else {
+                noPermissionCallback(fail);
+            }
+        });
+    }
+
+    @ReactMethod
+    public void setDoorSensorAlertTime(String doorSensorMac, int time, String lockData, Callback successCallback, Callback fail) {
+        PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+            if (success) {
+                TTLockClient.getDefault().setDoorSensorAlertTime(doorSensorMac, time, lockData, new SetDoorSensorAlertTimeCallback() {
+                    @Override
+                    public void onSetDoorSensorAlertTimeSuccess() {
+                        successCallback.invoke();
+                    }
+
+                    @Override
+                    public void onFail(LockError lockError) {
+                        lockErrorCallback(lockError, fail);
+                    }
+                });
+            } else {
+                noPermissionCallback(fail);
+            }
+        });
+    }
 
   @ReactMethod
   public void getAccessoryElectricQuantity(int type, String mac, String lockData, Callback successCallback, Callback fail) {
