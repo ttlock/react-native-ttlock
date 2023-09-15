@@ -10,17 +10,18 @@ Pod::Spec.new do |s|
   s.license      = package["license"]
   s.authors      = package["author"]
 
-  s.platforms    = { :ios => "9.0" }
-  s.source       = { :git => "https://www.npmjs.com/package/react-native-ttlock.git", :tag => "#{s.version}" }
+  s.platforms    = { :ios => "10.0" }
+  s.source       = { :git => "https://ttlock.com.git", :tag => "#{s.version}" }
 
   
-  s.source_files = "ios/**/*.{h,m,mm}"
+  s.source_files = "ios/**/*.{h,m,mm,swift}"
+  
+  s.dependency "React-Core"
 
   #TTLock 依赖
   s.platform = :ios, '9.0'
-  s.vendored_frameworks = "ios/Frameworks/**/*.framework"
-  
-  s.dependency "React"
-
+  s.dependency 'TTLock', '3.2.4'
   s.static_framework = true
+
+
 end
