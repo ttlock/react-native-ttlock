@@ -1,11 +1,14 @@
 package com.reactnativettlock;
 
 import android.Manifest;
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -150,16 +153,20 @@ public class TtlockModule extends ReactContextBaseJavaModule {
     public TtlockModule(ReactApplicationContext reactContext) {
         super(reactContext);
         this.reactContext = reactContext;
-        initSDK();
+//        initSDK();
         LogUtil.setDBG(true);
     }
 
-    private void initSDK() {
-        TTLockClient.getDefault().prepareBTService(getCurrentActivity());
-        RemoteClient.getDefault().prepareBTService(getCurrentActivity());
-        WirelessDoorSensorClient.getDefault().prepareBTService(getCurrentActivity());
-        GatewayClient.getDefault().prepareBTService(getCurrentActivity());
-    }
+//    private void initSDK() {
+//      new Handler(Looper.getMainLooper()).postDelayed(() -> {
+//        Activity activity = getCurrentActivity();
+//        Log.e("tag", "activity:" + activity);
+//        TTLockClient.getDefault().prepareBTService(activity);
+//        RemoteClient.getDefault().prepareBTService(activity);
+//        WirelessDoorSensorClient.getDefault().prepareBTService(activity);
+//        GatewayClient.getDefault().prepareBTService(activity);
+//      }, 200);
+//    }
 
     @Override
     public String getName() {
@@ -275,9 +282,13 @@ public class TtlockModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void initDoorSensor(String doorSensorMac, String lockData, Callback success, Callback fail) {
+      LogUtil.d("init doorsensor start");
         WirelessDoorSensorClient.getDefault().initialize(mCachedDoorSensor.get(doorSensorMac), lockData, new InitDoorSensorCallback() {
             @Override
             public void onInitSuccess(InitDoorSensorResult initDoorSensorResult) {
+              Log.e("tag","init doorsensor success");
+              Log.e("tag","doorsensor battery:" + initDoorSensorResult.getBatteryLevel());
+              Log.e("tag","doorsensor info:" + GsonUtil.toJson(initDoorSensorResult.getFirmwareInfo()));
                 WritableArray writableArray = Arguments.createArray();
                 writableArray.pushInt(initDoorSensorResult.getBatteryLevel());
                 writableArray.pushString(GsonUtil.toJson(initDoorSensorResult.getFirmwareInfo()));
@@ -286,7 +297,9 @@ public class TtlockModule extends ReactContextBaseJavaModule {
 
             @Override
             public void onFail(DoorSensorError doorSensorError) {
-                fail.invoke(doorSensorError.getErrorCode(), doorSensorError.getDescription());
+              Log.e("tag","add door sensor to lock failed:" + doorSensorError.getDescription());
+                int errorCode = doorSensorError == DoorSensorError.CONNECT_FAIL ? 2 : 0;
+                fail.invoke(errorCode, doorSensorError.getDescription());
             }
         });
     }
@@ -1656,11 +1669,13 @@ public class TtlockModule extends ReactContextBaseJavaModule {
                 TTLockClient.getDefault().addDoorSensor(doorSensorMac, lockData, new AddDoorSensorCallback() {
                     @Override
                     public void onAddSuccess() {
+                      LogUtil.d("add door sensor to lock success");
                         successCallback.invoke();
                     }
 
                     @Override
                     public void onFail(LockError lockError) {
+                      LogUtil.d("add door sensor to lock failed:" + lockError.getDescription());
                         lockErrorCallback(lockError, fail);
                     }
                 });
@@ -1671,17 +1686,19 @@ public class TtlockModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void deleteDoorSensor(String lockData, Callback successCallback, Callback fail) {
+    public void clearAllDoorSensor(String lockData, Callback successCallback, Callback fail) {
         PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
             if (success) {
                 TTLockClient.getDefault().deleteDoorSensor(lockData, new DeleteDoorSensorCallback() {
                     @Override
                     public void onDeleteSuccess() {
+                      LogUtil.d("clear door sensor success");
                         successCallback.invoke();
                     }
 
                     @Override
                     public void onFail(LockError lockError) {
+                      LogUtil.d("clear door sensor failed:" + lockError.getDescription());
                         lockErrorCallback(lockError, fail);
                     }
                 });
@@ -1692,17 +1709,19 @@ public class TtlockModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void setDoorSensorAlertTime(String doorSensorMac, int time, String lockData, Callback successCallback, Callback fail) {
+    public void setDoorSensorAlertTime(int time, String lockData, Callback successCallback, Callback fail) {
         PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
             if (success) {
-                TTLockClient.getDefault().setDoorSensorAlertTime(doorSensorMac, time, lockData, new SetDoorSensorAlertTimeCallback() {
+                TTLockClient.getDefault().setDoorSensorAlertTime(null, time, lockData, new SetDoorSensorAlertTimeCallback() {
                     @Override
                     public void onSetDoorSensorAlertTimeSuccess() {
+                      LogUtil.d("set door sensor alert time success");
                         successCallback.invoke();
                     }
 
                     @Override
                     public void onFail(LockError lockError) {
+                      LogUtil.d("set door sensor failed:" + lockError.getDescription());
                         lockErrorCallback(lockError, fail);
                     }
                 });
