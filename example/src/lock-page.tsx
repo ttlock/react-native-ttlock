@@ -168,7 +168,7 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
 
   else if (lockOperation === "Reset passcode") {
     Ttlock.resetPasscode(lockData, (lockDataNew: string) => {
-      //important: upload lockDataNew to ttlock server. 
+      //important: upload lockDataNew to ttlock server.
       successCallback("reset passcode success, please upload lockDataNew to server");
       console.log(lockDataNew)
     }, failedCallback);
@@ -342,7 +342,7 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
   }
   else if (
   lockOperation === "Init remote key"
-  || lockOperation === "Add remote key to lock" 
+  || lockOperation === "Add remote key to lock"
   || lockOperation === "Modify remote key valid date"
   || lockOperation === "Delete remote key from lock") {
     navigation.navigate("ScanRemoteKeyPage", {operation: lockOperation, lockData: lockData});
@@ -353,7 +353,7 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
       successCallback(text);
     }, failedCallback)
   }
-  
+
 
   else if (
     lockOperation === "Init door sensor"
@@ -362,7 +362,7 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
     }
 
     else if (lockOperation === "Set door sensor alert time") {
-      let alertTime = 5 * 1000 //secs
+      let alertTime = 5 //secs
       Ttlock.setDoorSensorAlertTime(alertTime, lockData, () => {
         Toast.showToast("ssuccess")
         navigation.pop();
@@ -399,7 +399,7 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
   }
   else if (lockOperation === "Reset ekey") {
     Ttlock.resetEkey(lockData, (lockDataNew) => {
-      //important: upload lockDataNew to ttlock server. 
+      //important: upload lockDataNew to ttlock server.
       let text = "reset ekey success";
       successCallback(text);
       console.log(lockDataNew);

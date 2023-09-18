@@ -283,6 +283,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void initDoorSensor(String doorSensorMac, String lockData, Callback success, Callback fail) {
       LogUtil.d("init doorsensor start");
+      LogUtil.d("mCachedDoorSensor.get(doorSensorMac):" + mCachedDoorSensor.get(doorSensorMac));
         WirelessDoorSensorClient.getDefault().initialize(mCachedDoorSensor.get(doorSensorMac), lockData, new InitDoorSensorCallback() {
             @Override
             public void onInitSuccess(InitDoorSensorResult initDoorSensorResult) {
@@ -1712,7 +1713,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
     public void setDoorSensorAlertTime(int time, String lockData, Callback successCallback, Callback fail) {
         PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
             if (success) {
-                TTLockClient.getDefault().setDoorSensorAlertTime(null, time, lockData, new SetDoorSensorAlertTimeCallback() {
+                TTLockClient.getDefault().setDoorSensorAlertTime(time, lockData, new SetDoorSensorAlertTimeCallback() {
                     @Override
                     public void onSetDoorSensorAlertTimeSuccess() {
                       LogUtil.d("set door sensor alert time success");
