@@ -1,6 +1,6 @@
 
 import { makeAutoObservable, runInAction } from "mobx"
-import { Ttlock, TtGateway, TtRemoteKey, ScanLockModal, ScanGatewayModal, ScanWifiModal, ScanRemoteKeyModal } from 'react-native-ttlock';
+import { Ttlock, TtGateway, TtRemoteKey, ScanLockModal, ScanGatewayModal, ScanWifiModal, ScanRemoteKeyModal, ScanDoorSensorModal, TtDoorSensor } from 'react-native-ttlock';
 
 
 class Store {
@@ -16,6 +16,8 @@ class Store {
   wifiList: ScanWifiModal[] = []
 
   remoteKeyList: ScanRemoteKeyModal[] = []
+
+  doorSensorList: ScanDoorSensorModal[] = []
 
 
   startScanLock() {
@@ -102,7 +104,7 @@ class Store {
 
   startScanRemoteKey() {
     runInAction(() => {
-      this.gatewayList = [];
+      this.remoteKeyList = [];
     });
 
     TtRemoteKey.startScan((sancModel)=>{
@@ -122,6 +124,31 @@ class Store {
   }
 
 
+  startScanDoorSensor() {
+    runInAction(() => {
+      this.doorSensorList = [];
+    });
+
+    TtDoorSensor.startScan((sancModel)=>{
+      let isContainData = false;
+      runInAction(() => {
+        this.doorSensorList.forEach((oldData) => {
+          if (oldData.mac === sancModel.mac) {
+            isContainData = true;
+          }
+        });
+        if (isContainData === false) {
+          this.doorSensorList.push(sancModel);
+          this.doorSensorList = this.doorSensorList.slice();
+        }
+      });
+    })
+  }
+
+
 }
+
+
+
 
 export default new Store()

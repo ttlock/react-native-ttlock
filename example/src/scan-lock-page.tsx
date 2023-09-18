@@ -14,7 +14,7 @@ const initLock = (scanLockModal: ScanLockModal, navigation: any) => {
   }
   Ttlock.initLock(object, (lockData) => {
     Ttlock.stopScan();
-    navigation.navigate("LockPage", { scanLockModal: scanLockModal, lockData: lockData, lockMac: scanLockModal.lockMac});
+    navigation.navigate("LockPage", {lockData: lockData, lockMac: scanLockModal.lockMac});
     Toast.hidden();
   }, (errorCode, errorDesc) => {
     Toast.showToast("errorCode："+ errorCode + " errorDesc:"+errorDesc);

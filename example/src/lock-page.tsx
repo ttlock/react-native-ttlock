@@ -54,6 +54,13 @@ const getLockSupportOperationList = (lockData: string) => {
     {lockOperation: "Delete remote key from lock", lockFuctionValue: LockFunction.RemoteKey },
     {lockOperation: "Clear all remote key from lock", lockFuctionValue: LockFunction.RemoteKey },
 
+
+    {lockOperation: "Init door sensor", lockFuctionValue: null},
+    {lockOperation: "Add door sensor to lock", lockFuctionValue: LockFunction.DoorSensor },
+    {lockOperation: "Set door sensor alert time", lockFuctionValue: LockFunction.DoorSensorAlert },
+    {lockOperation: "Clear all door sensor from lock", lockFuctionValue: LockFunction.DoorSensor },
+
+
     {lockOperation: "Modify admin passcode to 9999", lockFuctionValue: LockFunction.Passcode },
     {lockOperation: "Reset ekey", lockFuctionValue: null },
     {lockOperation: "Rest lock", lockFuctionValue: null },
@@ -101,6 +108,7 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
   Toast.showToastLoad(lockOperation +  "...");
 
   if (lockOperation === "Unlock") {
+    console.log("lockMac:" + lockMac)
     Ttlock.controlLock(LockControlType.Unlock, lockData, (lockTime: number, electricQuantity: number, uniqueId: number) => {
       let text = "lockTime:" + lockTime + "\n" + "electricQuantity:" + electricQuantity + "\n" + "uniqueId:" + uniqueId;
       successCallback(text);
@@ -345,6 +353,31 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
       successCallback(text);
     }, failedCallback)
   }
+  
+
+  else if (
+    lockOperation === "Init door sensor"
+    || lockOperation === "Add door sensor to lock") {
+      navigation.navigate("ScanDoorSensorPage", {operation: lockOperation, lockData: lockData});
+    }
+
+    else if (lockOperation === "Set door sensor alert time") {
+      let alertTime = 5 * 1000 //secs
+      Ttlock.setDoorSensorAlertTime(alertTime, lockData, () => {
+        Toast.showToast("ssuccess")
+        navigation.pop();
+      }, (errorCode: number, description: string) => {
+        Toast.showToast("set door sensor alert time fail " + errorCode.toString())
+      })
+    }
+
+    else if (lockOperation === "Clear all door sensor from lock") {
+      Ttlock.clearAllDoorSensor(lockData, ()=>{
+        let text = "clear door sensor success";
+        successCallback(text);
+      }, failedCallback)
+    }
+
   else if (lockOperation === "Clear all passageModes") {
     Ttlock.clearAllPassageModes(lockData, () => {
       let text = "clear all passage modes success";

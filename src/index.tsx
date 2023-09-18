@@ -4,12 +4,58 @@ import {
   // EmitterSubscription,
 } from 'react-native';
 
-import type { ScanGatewayModal, ScanLockModal, InitGatewayParam, CycleDateParam, ScanWifiModal, InitGatewayModal, LockVersion, ScanRemoteKeyModal, DeviceSystemModal } from './types'
+import type { ScanGatewayModal, ScanLockModal, InitGatewayParam, CycleDateParam, ScanWifiModal, InitGatewayModal, LockVersion, ScanRemoteKeyModal, ScanDoorSensorModal, DeviceSystemModal } from './types'
 
 const ttlockModule = NativeModules.Ttlock;
 const ttlockEventEmitter = new NativeEventEmitter(ttlockModule);
 
 const subscriptionMap = new Map();
+
+
+
+class TtDoorSensor {
+
+  static defaultCallback = function () { };
+
+  static startScan(callback: ((scanModal: ScanDoorSensorModal) => void)) {
+    let subscription = subscriptionMap.get(TtDoorSensorEvent.ScanDoorSensor)
+    if (subscription !== undefined) {
+      subscription.remove()
+    }
+    subscription = ttlockEventEmitter.addListener(TtDoorSensorEvent.ScanDoorSensor, callback);
+    subscriptionMap.set(TtDoorSensorEvent.ScanDoorSensor, subscription);
+    ttlockModule.startScanDoorSensor();
+  }
+
+  static stopScan() {
+    ttlockModule.stopScanDoorSensor();
+    let subscription = subscriptionMap.get(TtDoorSensorEvent.ScanDoorSensor)
+    if (subscription !== undefined) {
+      subscription.remove();
+    }
+    subscriptionMap.delete(TtDoorSensorEvent.ScanDoorSensor);
+  }
+
+  static init(mac: string, lockData: string, success: ((electricQuantity: number, systemModel : DeviceSystemModal) => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    ttlockModule.initDoorSensor(mac, lockData, (dataArray: any[]) => {
+      success!(dataArray[0], dataArray[1]);
+    }, (errorCode: number) => {
+      let description = "Init door sensor fail.";
+      if (errorCode === 1) {
+        description += "Bluetooth is power off";
+      } else if (errorCode === 2) {
+        description += "Connect timeout";
+      } else if (errorCode === 4) {
+        description += "Wrong crc";
+      }
+      fail!(errorCode, description);
+    });
+  }
+}
+
+
 
 class TtRemoteKey {
 
@@ -688,6 +734,25 @@ class Ttlock {
   }
 
 
+  static addDoorSensor(doorSensorMac: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    ttlockModule.addDoorSensor(doorSensorMac, lockData, success, fail);
+  }
+
+  static clearAllDoorSensor(lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    ttlockModule.clearAllDoorSensor(lockData, success, fail);
+  }
+
+
+  static setDoorSensorAlertTime(time: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    ttlockModule.setDoorSensorAlertTime(time, lockData, success, fail);
+  }
+
   /**
    * Monitor phone's Bluetooth status
    * @param callback 
@@ -872,7 +937,10 @@ enum TTLockEvent {
 
 enum TtRemoteKeyEvent {
   ScanRemoteKey = "EventScanRemoteKey"
+}
 
+enum TtDoorSensorEvent {
+  ScanDoorSensor = "EventScanDoorSensor"
 }
 
 enum GatewayEvent {
@@ -899,4 +967,4 @@ enum GatewayIpSettingType {
   DHCP = 1
 }
 
-export { Ttlock, TtGateway, TtRemoteKey, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType, GatewayIpSettingType, LockSoundVolume, TtRemoteKeyEvent, LockUnlockDirection, LockAccessoryType, ScanRemoteKeyModal,  DeviceSystemModal}
+export { Ttlock, TtGateway, TtRemoteKey, TtDoorSensor, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType, GatewayIpSettingType, LockSoundVolume, TtRemoteKeyEvent, TtDoorSensorEvent, LockUnlockDirection, LockAccessoryType, ScanLockModal, ScanRemoteKeyModal, ScanDoorSensorModal, DeviceSystemModal}
