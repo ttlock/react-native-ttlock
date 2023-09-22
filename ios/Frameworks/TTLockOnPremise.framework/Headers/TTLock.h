@@ -1,5 +1,5 @@
 
-//  version:1.4.6
+//  version:1.4.8
 
 #import <Foundation/Foundation.h>
 #import <TTLockOnPremise/TTBlocks.h>
@@ -14,6 +14,7 @@
 #import <TTLockOnPremise/TTWirelessKeypadScanModel.h>
 #import <TTLockOnPremise/TTWirelessKeyFob.h>
 #import <TTLockOnPremise/TTWirelessKeyFobScanModel.h>
+#import <TTLockOnPremise/TTDoorSensor.h>
 
 @interface TTLock : NSObject
 /**
