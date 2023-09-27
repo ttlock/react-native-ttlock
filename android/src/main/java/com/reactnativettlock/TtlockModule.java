@@ -1746,6 +1746,9 @@ public class TtlockModule extends ReactContextBaseJavaModule {
           case 2:
             accessoryType = AccessoryType.REMOTE;
             break;
+          case 3:
+            accessoryType = AccessoryType.DOOR_SENSOR;
+            break;
         }
         accessoryInfo.setAccessoryType(accessoryType);
         TTLockClient.getDefault().getAccessoryBatteryLevel(accessoryInfo, lockData, new GetAccessoryBatteryLevelCallback() {
