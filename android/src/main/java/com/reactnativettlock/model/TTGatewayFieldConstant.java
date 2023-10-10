@@ -27,4 +27,8 @@ public class TTGatewayFieldConstant {
     public static final String MODEL_NUM = "modelNum";
     public static final String HARDWARE_REVISION = "hardwareRevision";
     public static final String FIRMWARE_REVISION = "firmwareRevision";
+
+    public static final String SERVER_IP = "serverIp";
+    public static final String SERVER_PORT = "serverPort";
+
 }

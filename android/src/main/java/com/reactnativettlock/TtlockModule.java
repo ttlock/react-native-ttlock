@@ -459,6 +459,14 @@ public class TtlockModule extends ReactContextBaseJavaModule {
             }
             gatewayInfo.uid = readableMap.getInt(TTGatewayFieldConstant.TTLOCK_UID);
             gatewayInfo.userPwd = readableMap.getString(TTGatewayFieldConstant.TTLOCK_LOGIN_PASSWORD);
+            String serverIp = readableMap.getString(TTGatewayFieldConstant.SERVER_IP);
+            String serverPort = readableMap.getString(TTGatewayFieldConstant.SERVER_PORT);
+            if (!TextUtils.isEmpty(serverIp)) {
+              gatewayInfo.setServer(serverIp);
+            }
+            if (!TextUtils.isEmpty(serverPort)) {
+              gatewayInfo.setPort(Integer.valueOf(serverPort));
+            }
             if (readableMap.hasKey(TTGatewayFieldConstant.IP_SETTING_TYPE)) {
               int ipSettingType = readableMap.getInt(TTGatewayFieldConstant.IP_SETTING_TYPE);
               if (ipSettingType == IpSetting.STATIC_IP) {//静态ip
