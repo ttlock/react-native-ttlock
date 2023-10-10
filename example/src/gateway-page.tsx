@@ -28,6 +28,8 @@ const GatewayPage = (props: { navigation: any; route: any; }) => {
         ttlockLoginPassword: config.ttlockLoginPassword,
         wifi: wifi,
         wifiPassword: wifiPassword,
+        serverIp: undefined,  //your gateway server ip address (The default is sciener's gateway server ip address)
+        serverPort: 2229,  //your gateway server port
 
         ipSettingType: undefined,
         ipAddress: undefined,
