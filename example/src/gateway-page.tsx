@@ -19,7 +19,7 @@ const GatewayPage = (props: { navigation: any; route: any; }) => {
         Toast.showToast("please input wifi password");
         return;
       }
-  //for static ip setting
+      //for static ip setting
 
       initGatewayParam = {
         type: type,
@@ -28,6 +28,8 @@ const GatewayPage = (props: { navigation: any; route: any; }) => {
         ttlockLoginPassword: config.ttlockLoginPassword,
         wifi: wifi,
         wifiPassword: wifiPassword,
+        serverIp: "138.201.31.247",  //your gateway server ip address (The default is sciener's gateway server ip address)
+        serverPort: "2229",  //your gateway server port
 
         ipSettingType: undefined,
         ipAddress: undefined,
@@ -37,12 +39,12 @@ const GatewayPage = (props: { navigation: any; route: any; }) => {
         alternateDns: undefined
 
         //for static ip setting (option)
-       //  ipSettingType: GatewayIpSettingType.STATIC_IP,
-       //  ipAddress: "172.16.0.199",
-       //  subnetMask: "255.255.0.0",
-       //  router: "172.16.0.1",
-       //  preferredDns: "223.6.6.6",
-       //  alternateDns: "223.5.5.5"
+        //  ipSettingType: GatewayIpSettingType.STATIC_IP,
+        //  ipAddress: "172.16.0.199",
+        //  subnetMask: "255.255.0.0",
+        //  router: "172.16.0.1",
+        //  preferredDns: "223.6.6.6",
+        //  alternateDns: "223.5.5.5"
       }
     } else {
       initGatewayParam = {
@@ -52,6 +54,8 @@ const GatewayPage = (props: { navigation: any; route: any; }) => {
         ttlockLoginPassword: config.ttlockLoginPassword,
         wifi: undefined,
         wifiPassword: undefined,
+        serverIp: "138.201.31.247",  //your gateway server ip address (The default is sciener's gateway server ip address)
+        serverPort: "2229",  //your gateway server port
 
         ipSettingType: undefined,
         ipAddress: undefined,
@@ -59,6 +63,7 @@ const GatewayPage = (props: { navigation: any; route: any; }) => {
         router: undefined,
         preferredDns: undefined,
         alternateDns: undefined
+
 
         //for static ip setting (option)
         // ipSettingType: GatewayIpSettingType.STATIC_IP,
@@ -87,7 +92,7 @@ const GatewayPage = (props: { navigation: any; route: any; }) => {
 
 
   let WifiView = <View></View>;
-  if(type === GatewayType.G2){
+  if (type === GatewayType.G2) {
     WifiView = (
       <View>
         <Text style={{ fontSize: 40 }}>Wifi: {wifi}</Text>
