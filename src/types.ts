@@ -33,6 +33,12 @@ export interface ScanDoorSensorModal {
   scanTime: number
 }
 
+export interface ScanWirelessKeypadModal {
+  name: string,
+  mac: string,
+  rssi: number
+}
+
 
 export interface LockVersion {
   protocolVersion: string,

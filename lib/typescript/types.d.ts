@@ -21,6 +21,12 @@ export interface ScanRemoteKeyModal {
     remoteKeyMac: string;
     rssi: number;
 }
+export interface ScanDoorSensorModal {
+    name: string;
+    mac: string;
+    rssi: number;
+    scanTime: number;
+}
 export interface LockVersion {
     protocolVersion: string;
     protocolType: string;

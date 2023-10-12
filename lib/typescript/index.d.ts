@@ -1,4 +1,10 @@
-import type { ScanGatewayModal, ScanLockModal, InitGatewayParam, CycleDateParam, ScanWifiModal, InitGatewayModal, LockVersion, ScanRemoteKeyModal, DeviceSystemModal } from './types';
+import type { ScanGatewayModal, ScanLockModal, InitGatewayParam, CycleDateParam, ScanWifiModal, InitGatewayModal, LockVersion, ScanRemoteKeyModal, ScanDoorSensorModal, DeviceSystemModal } from './types';
+declare class TtDoorSensor {
+    static defaultCallback: () => void;
+    static startScan(callback: ((scanModal: ScanDoorSensorModal) => void)): void;
+    static stopScan(): void;
+    static init(mac: string, lockData: string, success: ((electricQuantity: number, systemModel: DeviceSystemModal) => void), fail: null | ((errorCode: number, description: string) => void)): void;
+}
 declare class TtRemoteKey {
     static defaultCallback: () => void;
     static startScan(callback: ((scanModal: ScanRemoteKeyModal) => void)): void;
@@ -303,6 +309,9 @@ declare class Ttlock {
     static modifyRemoteKey(remoteKeyMac: string, cycleDateList: null | CycleDateParam[], startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
     static deleteRemoteKey(remoteKeyMac: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
     static clearAllRemoteKey(lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static addDoorSensor(doorSensorMac: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static clearAllDoorSensor(lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static setDoorSensorAlertTime(time: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
     /**
      * Monitor phone's Bluetooth status
      * @param callback
@@ -419,6 +428,9 @@ declare enum ConnectState {
 declare enum TtRemoteKeyEvent {
     ScanRemoteKey = "EventScanRemoteKey"
 }
+declare enum TtDoorSensorEvent {
+    ScanDoorSensor = "EventScanDoorSensor"
+}
 declare enum GatewayType {
     G2 = 2,
     G3 = 3,
@@ -433,4 +445,4 @@ declare enum GatewayIpSettingType {
     STATIC_IP = 0,
     DHCP = 1
 }
-export { Ttlock, TtGateway, TtRemoteKey, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType, GatewayIpSettingType, LockSoundVolume, TtRemoteKeyEvent, LockUnlockDirection, LockAccessoryType, ScanRemoteKeyModal, DeviceSystemModal };
+export { Ttlock, TtGateway, TtRemoteKey, TtDoorSensor, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType, GatewayIpSettingType, LockSoundVolume, TtRemoteKeyEvent, TtDoorSensorEvent, LockUnlockDirection, LockAccessoryType, ScanLockModal, ScanRemoteKeyModal, ScanDoorSensorModal, DeviceSystemModal };

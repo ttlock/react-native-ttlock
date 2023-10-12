@@ -10,6 +10,7 @@ import GatewayPage from './gateway-page'
 import ScanWifiPage from './scan-wifi-page'
 import ScanRemoteKeyPage from './scan-remote-key-page'
 import ScanDoorSensorPage from './scan-door-sensor-page'
+import ScanWirelessKeypadPage from './scan-wireless-keypad-page'
 
 const Stack = createStackNavigator();
 
@@ -23,6 +24,7 @@ export default function App() {
           <Stack.Screen name="ScanGatewayPage" component={ScanGatewayPage} options={{ title: "Gateway" }} />
           <Stack.Screen name="ScanRemoteKeyPage" component={ScanRemoteKeyPage} options={{ title: "RemoteKey" }} />
           <Stack.Screen name="ScanDoorSensorPage" component={ScanDoorSensorPage} options={{ title: "DoorSensor" }} />
+          <Stack.Screen name="ScanWirelessKeypadPage" component={ScanWirelessKeypadPage} options={{ title: "WirelessKeypad" }} />
           <Stack.Screen name="LockPage" component={LockPage} />
           <Stack.Screen name="GatewayPage" component={GatewayPage} />
           <Stack.Screen name="ScanWifiPage" component={ScanWifiPage} />

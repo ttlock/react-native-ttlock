@@ -13,6 +13,7 @@
 #define EVENT_SCAN_WIFI @"EventScanWifi"
 #define EVENT_SCAN_REMOTE_KEY @"EventScanRemoteKey"
 #define EVENT_SCAN_DOOR_SENSOR @"EventScanDoorSensor"
+#define EVENT_SCAN_WIRELESS_KEYPAD @"EventWirelessKeypad"
 
 
 //static bool isAddListenBluetoothState = false;
@@ -39,6 +40,7 @@ RCT_EXPORT_MODULE()
     return self;
 }
 
+//暴露出支持的事件
 - (NSArray<NSString *> *)supportedEvents
 {
   return @[
@@ -49,7 +51,8 @@ RCT_EXPORT_MODULE()
       EVENT_SCAN_GATEWAY,
       EVENT_SCAN_WIFI,
       EVENT_SCAN_REMOTE_KEY,
-      EVENT_SCAN_DOOR_SENSOR
+      EVENT_SCAN_DOOR_SENSOR,
+      EVENT_SCAN_WIRELESS_KEYPAD
   ];
 }
 
@@ -532,7 +535,6 @@ RCT_EXPORT_METHOD(supportFunction:(int)fuction lockData:(NSString *)lockData cal
 
 
 
-
 #pragma mark - Gateway
 RCT_EXPORT_METHOD(startScanGateway)
 {
@@ -695,6 +697,39 @@ RCT_EXPORT_METHOD(initDoorSensor:(NSString *)mac lockData:(NSString *) lockData 
     } failure:^(TTDoorSensorError error) {
         [Ttlock response:error  message:nil fail:fail];
     }];
+}
+
+
+
+
+
+#pragma mark - WirelessKeypad
+RCT_EXPORT_METHOD(startScanWirelessKeypad)
+{
+    [TTWirelessKeypad startScanKeypadWithBlock:^(TTWirelessKeypadScanModel *model) {
+        NSMutableDictionary *data = @{}.mutableCopy;
+        data[@"name"] = model.keypadName;
+        data[@"rssi"] = @(model.RSSI);
+        data[@"mac"] = model.keypadMac;
+        [self sendEventWithName:EVENT_SCAN_WIRELESS_KEYPAD body:data];
+    }];
+}
+
+RCT_EXPORT_METHOD(stopScanWirelessKeypad)
+{
+    [TTWirelessKeypad stopScanKeypad];
+}
+
+RCT_EXPORT_METHOD(initWirelessKeypad:(NSString *)mac lockMac:(NSString *) lockMac success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    [TTWirelessKeypad initializeKeypadWithKeypadMac:mac lockMac:lockMac block:^(NSString *wirelessKeypadFeatureValue, TTKeypadStatus status, int electricQuantity) {
+        if(status == TTKeypadSuccess){
+            [Ttlock response:@[@(electricQuantity),wirelessKeypadFeatureValue] success:success];
+        }else{
+            [Ttlock response:status  message:nil fail:fail];
+        }
+    }];
+    
 }
 
 
