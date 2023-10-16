@@ -16,8 +16,8 @@ const renderItem = (item: ScanWirelessKeypadModal, operation: string, lockMac: s
 
       TtWirelessKeypad.init(item.mac, lockMac, (electricQuantity: number, wirelessKeypadFeatureValue: string) => {
         Toast.showToast("init wireless keypad success")
-        console.log("electricQuantity:" + String(electricQuantity));
-        console.log("wirelessKeypadFeatureValue:" + wirelessKeypadFeatureValue);
+        console.log("electricQuantity:" + String(electricQuantity) + "    wirelessKeypadFeatureValue:" + wirelessKeypadFeatureValue);
+
         navigation.pop();
       }, (errorCode: number, description: string) => {
         Toast.showToast(description + errorCode.toString())
