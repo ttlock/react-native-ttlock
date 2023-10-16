@@ -1,20 +1,20 @@
 import { observer } from 'mobx-react';
 import React, { useEffect } from 'react';
 import { FlatList, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { TtWirelessKeypad, Ttlock, ScanWirelessKeypadModal } from 'react-native-ttlock';
+import { TtWirelessKeypad, ScanWirelessKeypadModal } from 'react-native-ttlock';
 import * as Toast from './toast-page';
 import store from './store'
 
 
 
 
-const renderItem = (item: ScanWirelessKeypadModal, operation: string, lockData: string, navigation: any) => (
+const renderItem = (item: ScanWirelessKeypadModal, operation: string, lockMac: string, navigation: any) => (
   <TouchableOpacity onPress={
     () => {
       Toast.showToastLoad(operation + "...");
       TtWirelessKeypad.stopScan();
 
-      TtWirelessKeypad.init(item.mac, lockData, (electricQuantity: number, wirelessKeypadFeatureValue: string) => {
+      TtWirelessKeypad.init(item.mac, lockMac, (electricQuantity: number, wirelessKeypadFeatureValue: string) => {
         Toast.showToast("init wireless keypad success")
         console.log("electricQuantity:" + String(electricQuantity));
         console.log("wirelessKeypadFeatureValue:" + wirelessKeypadFeatureValue);
@@ -31,7 +31,7 @@ const renderItem = (item: ScanWirelessKeypadModal, operation: string, lockData: 
 
 const ScanWirelessKeypadPage = (props: any) => {
   const { navigation, route } = props;
-  let { lockData, operation } = route.params;
+  let { lockMac, operation } = route.params;
 
   useEffect(() => {
     if (store.wirelessKeypadList.length === 0) {
@@ -45,7 +45,7 @@ const ScanWirelessKeypadPage = (props: any) => {
   return (
     <FlatList
       data={store.wirelessKeypadList}
-      renderItem={({ item }) => renderItem(item, operation, lockData, navigation)}
+      renderItem={({ item }) => renderItem(item, operation, lockMac, navigation)}
       keyExtractor={item => item.mac}
     />
   );

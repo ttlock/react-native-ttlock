@@ -380,7 +380,7 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
 
   else if (
     lockOperation === "Init wireless keypad") {
-    navigation.navigate("ScanWirelessKeypadPage", { operation: lockOperation, lockData: lockData });
+    navigation.navigate("ScanWirelessKeypadPage", { operation: lockOperation, lockMac: lockMac });
   }
 
   else if (lockOperation === "Clear all passageModes") {
