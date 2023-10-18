@@ -4,12 +4,98 @@ import {
   // EmitterSubscription,
 } from 'react-native';
 
-import type { ScanGatewayModal, ScanLockModal, InitGatewayParam, CycleDateParam, ScanWifiModal, InitGatewayModal, LockVersion, ScanRemoteKeyModal, DeviceSystemModal } from './types'
+import type { ScanGatewayModal, ScanLockModal, InitGatewayParam, CycleDateParam, ScanWifiModal, InitGatewayModal, LockVersion, ScanRemoteKeyModal, ScanDoorSensorModal, DeviceSystemModal , ScanWirelessKeypadModal} from './types'
 
 const ttlockModule = NativeModules.Ttlock;
 const ttlockEventEmitter = new NativeEventEmitter(ttlockModule);
 
 const subscriptionMap = new Map();
+
+class TtWirelessKeypad {
+
+  static defaultCallback = function () { };
+  static startScan(callback: ((scanModal: ScanWirelessKeypadModal) => void)) {
+
+    let subscription = subscriptionMap.get(WirelessKeypadEvent.ScanWirelessKeypad)
+    if (subscription !== undefined) {
+      subscription.remove()
+    }
+    subscription = ttlockEventEmitter.addListener(WirelessKeypadEvent.ScanWirelessKeypad, callback);
+    subscriptionMap.set(WirelessKeypadEvent.ScanWirelessKeypad, subscription);
+    ttlockModule.startScanWirelessKeypad();
+  }
+
+  static stopScan() {
+    ttlockModule.stopScanWirelessKeypad();
+    let subscription = subscriptionMap.get(WirelessKeypadEvent.ScanWirelessKeypad)
+    if (subscription !== undefined) {
+      subscription.remove();
+    }
+    subscriptionMap.delete(WirelessKeypadEvent.ScanWirelessKeypad);
+  }
+
+  static init(mac: string, lockMac: string, success: ((electricQuantity: number, wirelessKeypadFeatureValue : string) => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    ttlockModule.initWirelessKeypad(mac, lockMac, (dataArray: any[]) => {
+      success!(dataArray[0], dataArray[1]);
+    }, (errorCode: number) => {
+      let description = "Init wireless keypad fail.";
+      if (errorCode === -1) {
+        description += "Wrong crc";
+      }else if (errorCode === -2) {
+        description += "Connect timeout";
+      }else if (errorCode === -3) {
+        description += "Wrong factoryd date";
+      }
+      fail!(errorCode, description);
+    });
+  }
+}
+
+class TtDoorSensor {
+
+  static defaultCallback = function () { };
+
+  static startScan(callback: ((scanModal: ScanDoorSensorModal) => void)) {
+    let subscription = subscriptionMap.get(TtDoorSensorEvent.ScanDoorSensor)
+    if (subscription !== undefined) {
+      subscription.remove()
+    }
+    subscription = ttlockEventEmitter.addListener(TtDoorSensorEvent.ScanDoorSensor, callback);
+    subscriptionMap.set(TtDoorSensorEvent.ScanDoorSensor, subscription);
+    ttlockModule.startScanDoorSensor();
+  }
+
+  static stopScan() {
+    ttlockModule.stopScanDoorSensor();
+    let subscription = subscriptionMap.get(TtDoorSensorEvent.ScanDoorSensor)
+    if (subscription !== undefined) {
+      subscription.remove();
+    }
+    subscriptionMap.delete(TtDoorSensorEvent.ScanDoorSensor);
+  }
+
+  static init(mac: string, lockData: string, success: ((electricQuantity: number, systemModel : DeviceSystemModal) => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    ttlockModule.initDoorSensor(mac, lockData, (dataArray: any[]) => {
+      success!(dataArray[0], dataArray[1]);
+    }, (errorCode: number) => {
+      let description = "Init door sensor fail.";
+      if (errorCode === 1) {
+        description += "Bluetooth is power off";
+      } else if (errorCode === 2) {
+        description += "Connect timeout";
+      } else if (errorCode === 4) {
+        description += "Wrong crc";
+      }
+      fail!(errorCode, description);
+    });
+  }
+}
+
+
 
 class TtRemoteKey {
 
@@ -463,7 +549,7 @@ class Ttlock {
    * @param success 
    * @param fail 
    */
-  static modifyAdminPasscode(adminPasscode: string, lockData: string, success: null | ((lockData: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
+  static modifyAdminPasscode(adminPasscode: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
     ttlockModule.modifyAdminPasscode(adminPasscode, lockData, success, fail);
@@ -688,6 +774,25 @@ class Ttlock {
   }
 
 
+  static addDoorSensor(doorSensorMac: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    ttlockModule.addDoorSensor(doorSensorMac, lockData, success, fail);
+  }
+
+  static clearAllDoorSensor(lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    ttlockModule.clearAllDoorSensor(lockData, success, fail);
+  }
+
+
+  static setDoorSensorAlertTime(time: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    ttlockModule.setDoorSensorAlertTime(time, lockData, success, fail);
+  }
+
   /**
    * Monitor phone's Bluetooth status
    * @param callback 
@@ -780,7 +885,7 @@ enum LockFunction {
   NoBroadcastInNormal = 21,
   PassageMode = 22,
   TurnOffAutoLock = 23,
-  RemoteKeypad = 24,
+  WirelessKeypad = 24,
   Light = 25,
   HotelCardBlacklist = 26,
   IdentityCard = 27,
@@ -872,12 +977,20 @@ enum TTLockEvent {
 
 enum TtRemoteKeyEvent {
   ScanRemoteKey = "EventScanRemoteKey"
+}
 
+enum TtDoorSensorEvent {
+  ScanDoorSensor = "EventScanDoorSensor"
 }
 
 enum GatewayEvent {
   ScanGateway = "EventScanGateway",
   ScanWifi = "EventScanWifi"
+}
+
+
+enum WirelessKeypadEvent {
+  ScanWirelessKeypad = "EventWirelessKeypad"
 }
 
 
@@ -899,4 +1012,4 @@ enum GatewayIpSettingType {
   DHCP = 1
 }
 
-export { Ttlock, TtGateway, TtRemoteKey, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType, GatewayIpSettingType, LockSoundVolume, TtRemoteKeyEvent, LockUnlockDirection, LockAccessoryType, ScanRemoteKeyModal,  DeviceSystemModal}
+export { Ttlock, TtGateway, TtRemoteKey, TtDoorSensor, TtWirelessKeypad, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType, GatewayIpSettingType, LockSoundVolume, TtRemoteKeyEvent, TtDoorSensorEvent, LockUnlockDirection, LockAccessoryType, ScanLockModal, ScanRemoteKeyModal, ScanDoorSensorModal, DeviceSystemModal, WirelessKeypadEvent, ScanWirelessKeypadModal}

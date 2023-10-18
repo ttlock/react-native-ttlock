@@ -1,6 +1,6 @@
 
 import { makeAutoObservable, runInAction } from "mobx"
-import { Ttlock, TtGateway, TtRemoteKey, ScanLockModal, ScanGatewayModal, ScanWifiModal, ScanRemoteKeyModal } from 'react-native-ttlock';
+import { Ttlock, TtGateway, TtRemoteKey, ScanLockModal, ScanGatewayModal, ScanWifiModal, ScanRemoteKeyModal, ScanDoorSensorModal, TtDoorSensor, TtWirelessKeypad, ScanWirelessKeypadModal } from 'react-native-ttlock';
 
 
 class Store {
@@ -16,6 +16,10 @@ class Store {
   wifiList: ScanWifiModal[] = []
 
   remoteKeyList: ScanRemoteKeyModal[] = []
+
+  doorSensorList: ScanDoorSensorModal[] = []
+
+  wirelessKeypadList: ScanWirelessKeypadModal[] = []
 
 
   startScanLock() {
@@ -102,7 +106,7 @@ class Store {
 
   startScanRemoteKey() {
     runInAction(() => {
-      this.gatewayList = [];
+      this.remoteKeyList = [];
     });
 
     TtRemoteKey.startScan((sancModel)=>{
@@ -122,6 +126,54 @@ class Store {
   }
 
 
+  startScanDoorSensor() {
+    runInAction(() => {
+      this.doorSensorList = [];
+    });
+
+    TtDoorSensor.startScan((sancModel)=>{
+      let isContainData = false;
+      runInAction(() => {
+        this.doorSensorList.forEach((oldData) => {
+          if (oldData.mac === sancModel.mac) {
+            isContainData = true;
+          }
+        });
+        if (isContainData === false) {
+          this.doorSensorList.push(sancModel);
+          this.doorSensorList = this.doorSensorList.slice();
+        }
+      });
+    })
+  }
+
+
+
+  startWirelessKeypad() {
+    runInAction(() => {
+      this.wirelessKeypadList = [];
+    });
+
+    TtWirelessKeypad.startScan((sancModel)=>{
+      let isContainData = false;
+      runInAction(() => {
+        this.wirelessKeypadList.forEach((oldData) => {
+          if (oldData.mac === sancModel.mac) {
+            isContainData = true;
+          }
+        });
+        if (isContainData === false) {
+          this.wirelessKeypadList.push(sancModel);
+          this.wirelessKeypadList = this.wirelessKeypadList.slice();
+        }
+      });
+    })
+  }
+
+
 }
+
+
+
 
 export default new Store()

@@ -12,6 +12,8 @@
 #define EVENT_SCAN_GATEWAY @"EventScanGateway"
 #define EVENT_SCAN_WIFI @"EventScanWifi"
 #define EVENT_SCAN_REMOTE_KEY @"EventScanRemoteKey"
+#define EVENT_SCAN_DOOR_SENSOR @"EventScanDoorSensor"
+#define EVENT_SCAN_WIRELESS_KEYPAD @"EventWirelessKeypad"
 
 
 //static bool isAddListenBluetoothState = false;
@@ -38,6 +40,7 @@ RCT_EXPORT_MODULE()
     return self;
 }
 
+//暴露出支持的事件
 - (NSArray<NSString *> *)supportedEvents
 {
   return @[
@@ -47,7 +50,10 @@ RCT_EXPORT_MODULE()
 //      EVENT_BLUETOOTH_STATE,
       EVENT_SCAN_GATEWAY,
       EVENT_SCAN_WIFI,
-      EVENT_SCAN_REMOTE_KEY];
+      EVENT_SCAN_REMOTE_KEY,
+      EVENT_SCAN_DOOR_SENSOR,
+      EVENT_SCAN_WIRELESS_KEYPAD
+  ];
 }
 
 - (void)addListener:(NSString *)eventName
@@ -323,11 +329,10 @@ RCT_EXPORT_METHOD(clearAllFingerprints:(NSString *)lockData success:(RCTResponse
 RCT_EXPORT_METHOD(modifyAdminPasscode:(NSString *)adminPasscode  lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock modifyAdminPasscode:adminPasscode lockData:lockData success:^(NSString *newLockData) {
-        [Ttlock response:newLockData success:success];
-        } failure:^(TTError errorCode, NSString *errorMsg) {
-            [Ttlock response:errorCode message:errorMsg fail:fail];
-        }];
-    
+            [Ttlock response:newLockData success:success];
+            } failure:^(TTError errorCode, NSString *errorMsg) {
+                [Ttlock response:errorCode message:errorMsg fail:fail];
+            }];
 }
 
 
@@ -493,13 +498,40 @@ RCT_EXPORT_METHOD(clearAllRemoteKey:(NSString *)lockData success:(RCTResponseSen
 }
 
 
+RCT_EXPORT_METHOD(addDoorSensor:(NSString *)doorSensorMac lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    [TTLock addDoorSensorWithDoorSensorMac:doorSensorMac lockData:lockData success:^{
+        [Ttlock response:nil success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock response:errorCode message:errorMsg fail:fail];
+    }];
+}
+
+RCT_EXPORT_METHOD(clearAllDoorSensor:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    [TTLock clearDoorSensorWithLockData:lockData success:^{
+        [Ttlock response:nil success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock response:errorCode message:errorMsg fail:fail];
+    }];
+}
+
+
+RCT_EXPORT_METHOD(setDoorSensorAlertTime:(int) time lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    [TTLock setDoorSensorAlertTime:time lockData:lockData success:^{
+        [Ttlock response:nil success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock response:errorCode message:errorMsg fail:fail];
+    }];
+}
+
 
 RCT_EXPORT_METHOD(supportFunction:(int)fuction lockData:(NSString *)lockData callback:(RCTResponseSenderBlock)callback)
 {
     BOOL isSupport = [TTUtil lockFeatureValue:lockData suportFunction:fuction];
     [Ttlock response:@(isSupport) success:callback];
 }
-
 
 
 
@@ -632,6 +664,75 @@ RCT_EXPORT_METHOD(getAccessoryElectricQuantity:(int)type mac:(NSString *)mac loc
         [Ttlock response:errorCode  message:nil fail:fail];
     }];
 }
+
+
+
+
+#pragma mark - DoorSensor
+RCT_EXPORT_METHOD(startScanDoorSensor)
+{
+    
+    [TTDoorSensor startScanWithSuccess:^(TTDoorSensorScanModel * _Nonnull model) {
+        NSMutableDictionary *data = @{}.mutableCopy;
+        data[@"name"] = model.name;
+        data[@"rssi"] = @(model.RSSI);
+        data[@"mac"] = model.mac;
+        data[@"scanTime"] = @(model.scanTime);
+        [self sendEventWithName:EVENT_SCAN_DOOR_SENSOR body:data];
+    } failure:^(TTDoorSensorError error) {
+        
+    }];
+}
+
+RCT_EXPORT_METHOD(stopScanDoorSensor)
+{
+    [TTDoorSensor stopScan];
+}
+
+RCT_EXPORT_METHOD(initDoorSensor:(NSString *)mac lockData:(NSString *) lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    
+    [TTDoorSensor initializeWithDoorSensorMac:mac lockData:lockData success:^(int electricQuantity, TTSystemInfoModel * _Nonnull systemModel) {
+        [Ttlock response:@[@(electricQuantity),[Ttlock dictionaryFromModel:systemModel]] success:success];
+    } failure:^(TTDoorSensorError error) {
+        [Ttlock response:error  message:nil fail:fail];
+    }];
+}
+
+
+
+
+
+#pragma mark - WirelessKeypad
+RCT_EXPORT_METHOD(startScanWirelessKeypad)
+{
+    [TTWirelessKeypad startScanKeypadWithBlock:^(TTWirelessKeypadScanModel *model) {
+        NSMutableDictionary *data = @{}.mutableCopy;
+        data[@"name"] = model.keypadName;
+        data[@"rssi"] = @(model.RSSI);
+        data[@"mac"] = model.keypadMac;
+        [self sendEventWithName:EVENT_SCAN_WIRELESS_KEYPAD body:data];
+    }];
+}
+
+RCT_EXPORT_METHOD(stopScanWirelessKeypad)
+{
+    [TTWirelessKeypad stopScanKeypad];
+}
+
+RCT_EXPORT_METHOD(initWirelessKeypad:(NSString *)mac lockMac:(NSString *) lockMac success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    [TTWirelessKeypad initializeKeypadWithKeypadMac:mac lockMac:lockMac block:^(NSString *wirelessKeypadFeatureValue, TTKeypadStatus status, int electricQuantity) {
+        if(status == TTKeypadSuccess){
+            [Ttlock response:@[@(electricQuantity),wirelessKeypadFeatureValue] success:success];
+        }else{
+            [Ttlock response:status  message:nil fail:fail];
+        }
+    }];
+    
+}
+
+
 
 #pragma mark - private method
 + (void)response:(NSObject *)data success:(RCTResponseSenderBlock)success{
