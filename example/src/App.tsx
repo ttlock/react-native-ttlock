@@ -9,6 +9,7 @@ import ScanGatewayPage from './scan-gateway-page'
 import GatewayPage from './gateway-page'
 import ScanWifiPage from './scan-wifi-page'
 import ScanRemoteKeyPage from './scan-remote-key-page'
+import ScanWirelessKeypadPage from './scan-wireless-keypad-page'
 
 const Stack = createStackNavigator();
 
@@ -24,6 +25,7 @@ export default function App() {
           <Stack.Screen name="LockPage" component={LockPage} />
           <Stack.Screen name="GatewayPage" component={GatewayPage} />
           <Stack.Screen name="ScanWifiPage" component={ScanWifiPage} />
+          <Stack.Screen name="ScanWirelessKeypadPage" component={ScanWirelessKeypadPage} />
         </Stack.Navigator>
       </NavigationContainer>
 
