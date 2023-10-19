@@ -1,17 +1,9 @@
 package com.reactnativettlock;
 
 import android.Manifest;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothManager;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.text.TextUtils;
-import android.util.Log;
-
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
+import com.reactnativettlock.util.Utils;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -24,17 +16,16 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.reactnativettlock.model.RNControlAction;
-import com.reactnativettlock.model.ScanRemoteModal;
+import com.reactnativettlock.model.TTBaseFieldConstant;
 import com.reactnativettlock.model.TTGatewayEvent;
-import com.reactnativettlock.model.TTGatewayFieldConstant;
+import com.reactnativettlock.model.TTKeypadConstant;
+import com.reactnativettlock.model.TTKeypadEvent;
 import com.reactnativettlock.model.TTLockConfigConverter;
 import com.reactnativettlock.model.TTLockErrorConverter;
 import com.reactnativettlock.model.TTLockEvent;
 import com.reactnativettlock.model.TTLockFieldConstant;
 import com.reactnativettlock.model.TTRemoteEvent;
-import com.reactnativettlock.model.TTRemoteFieldConstant;
 import com.reactnativettlock.util.PermissionUtils;
-import com.reactnativettlock.util.Utils;
 import com.ttlock.bl.sdk.api.ExtendedBluetoothDevice;
 import com.ttlock.bl.sdk.api.TTLockClient;
 import com.ttlock.bl.sdk.callback.AddFingerprintCallback;
@@ -80,6 +71,8 @@ import com.ttlock.bl.sdk.callback.SetRemoteUnlockSwitchCallback;
 import com.ttlock.bl.sdk.callback.SetUnlockDirectionCallback;
 import com.ttlock.bl.sdk.constant.LogType;
 import com.ttlock.bl.sdk.device.Remote;
+import com.ttlock.bl.sdk.device.WirelessDoorSensor;
+import com.ttlock.bl.sdk.device.WirelessKeypad;
 import com.ttlock.bl.sdk.entity.AccessoryInfo;
 import com.ttlock.bl.sdk.entity.AccessoryType;
 import com.ttlock.bl.sdk.entity.ControlLockResult;
@@ -102,6 +95,11 @@ import com.ttlock.bl.sdk.gateway.model.DeviceInfo;
 import com.ttlock.bl.sdk.gateway.model.GatewayError;
 import com.ttlock.bl.sdk.gateway.model.GatewayType;
 import com.ttlock.bl.sdk.gateway.model.WiFi;
+import com.ttlock.bl.sdk.keypad.InitKeypadCallback;
+import com.ttlock.bl.sdk.keypad.ScanKeypadCallback;
+import com.ttlock.bl.sdk.keypad.WirelessKeypadClient;
+import com.ttlock.bl.sdk.keypad.model.InitKeypadResult;
+import com.ttlock.bl.sdk.keypad.model.KeypadError;
 import com.ttlock.bl.sdk.remote.api.RemoteClient;
 import com.ttlock.bl.sdk.remote.callback.GetRemoteSystemInfoCallback;
 import com.ttlock.bl.sdk.remote.callback.InitRemoteCallback;
@@ -112,8 +110,9 @@ import com.ttlock.bl.sdk.remote.model.SystemInfo;
 import com.ttlock.bl.sdk.util.FeatureValueUtil;
 import com.ttlock.bl.sdk.util.GsonUtil;
 import com.ttlock.bl.sdk.util.LogUtil;
+import com.reactnativettlock.model.TTRemoteFieldConstant;
+import com.reactnativettlock.model.TTGatewayFieldConstant;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -125,10 +124,14 @@ public class TtlockModule extends ReactContextBaseJavaModule {
     public static final int TYPE_LOCK = 1;
     public static final int TYPE_PLUG = 2;
     public static final int TYPE_REMOTE = 3;
+    public static final int TYPE_DOOR_SENSOR = 4;
+    public static final int TYPE_WIRELESS_KEYPAD = 5;
 //    private boolean scanGateway;
     private int scanType;
     private static HashMap<String, ExtendedBluetoothDevice> mCachedDevice = new HashMap<>();
     private static HashMap<String, Remote> mCachedRemote = new HashMap<>();
+    private HashMap<String, WirelessDoorSensor> mCachedDoorSensor = new HashMap<>();
+    private HashMap<String, WirelessKeypad> mCachedKeypad = new HashMap<>();
     private String mac;
     private int totalCnt;
     private boolean flag;
@@ -221,7 +224,61 @@ public class TtlockModule extends ReactContextBaseJavaModule {
         return newAddDevice;
     }
 
-    //---------------remote------------------------------
+
+  //-------------wireless keypad---------------------------
+  @ReactMethod
+  public void startScanWirelessKeypad() {
+    scanType = TYPE_WIRELESS_KEYPAD;
+    PermissionUtils.doWithScanPermission(getCurrentActivity(), success -> {
+      if (success) {
+        mCachedKeypad.clear();
+        WirelessKeypadClient.getDefault().startScanKeyboard(new ScanKeypadCallback() {
+          @Override
+          public void onScanKeyboardSuccess(WirelessKeypad wirelessKeypad) {
+            mCachedKeypad.put(wirelessKeypad.getAddress(), wirelessKeypad);
+            WritableMap map = Arguments.createMap();
+            map.putString(TTKeypadConstant.KEYPAD_NAME, wirelessKeypad.getName());
+            map.putString(TTKeypadConstant.KEYPAD_MAC, wirelessKeypad.getAddress());
+            map.putInt(TTBaseFieldConstant.RSSI, wirelessKeypad.getRssi());
+            getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(TTKeypadEvent.ScanKeypad, map);
+          }
+
+          @Override
+          public void onScanFailed(int error) {
+
+          }
+        });
+      } else {
+        LogUtil.d("no scan permission");
+      }
+    });
+  }
+
+  @ReactMethod
+  public void stopScanWirelessKeypad() {
+    WirelessKeypadClient.getDefault().stopScanKeyboard();
+  }
+
+  @ReactMethod
+  public void initWirelessKeypad(String keypadMac, String lockMac, Callback success, Callback fail) {
+    WirelessKeypadClient.getDefault().initializeKeypad(mCachedKeypad.get(keypadMac), lockMac,  new InitKeypadCallback() {
+      @Override
+      public void onInitKeypadSuccess(InitKeypadResult initKeypadResult) {
+        WritableArray writableArray = Arguments.createArray();
+        writableArray.pushInt(initKeypadResult.getBatteryLevel());
+        writableArray.pushString(initKeypadResult.getFeatureValue());
+        success.invoke(writableArray);
+      }
+
+      @Override
+      public void onFail(KeypadError error) {
+        fail.invoke(error.getErrorCode(), error.getDescription());
+      }
+    });
+  }
+
+
+  //---------------remote------------------------------
   @ReactMethod
   public void startScanRemoteKey() {
     scanType = TYPE_REMOTE;
@@ -768,6 +825,11 @@ public class TtlockModule extends ReactContextBaseJavaModule {
               @Override
               public void onGetLockStatusSuccess(int status) {
                 successCallback.invoke(status);
+              }
+
+              @Override
+              public void onGetDoorSensorStatusSuccess(int status) {
+                //todo:
               }
 
               @Override
