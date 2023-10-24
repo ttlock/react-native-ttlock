@@ -1,4 +1,10 @@
-import type { ScanGatewayModal, ScanLockModal, InitGatewayParam, CycleDateParam, ScanWifiModal, InitGatewayModal, LockVersion, ScanRemoteKeyModal, ScanDoorSensorModal, DeviceSystemModal } from './types';
+import type { ScanGatewayModal, ScanLockModal, InitGatewayParam, CycleDateParam, ScanWifiModal, InitGatewayModal, LockVersion, ScanRemoteKeyModal, ScanDoorSensorModal, DeviceSystemModal, ScanWirelessKeypadModal } from './types';
+declare class TtWirelessKeypad {
+    static defaultCallback: () => void;
+    static startScan(callback: ((scanModal: ScanWirelessKeypadModal) => void)): void;
+    static stopScan(): void;
+    static init(mac: string, lockMac: string, success: ((electricQuantity: number, wirelessKeypadFeatureValue: string) => void), fail: null | ((errorCode: number, description: string) => void)): void;
+}
 declare class TtDoorSensor {
     static defaultCallback: () => void;
     static startScan(callback: ((scanModal: ScanDoorSensorModal) => void)): void;
@@ -353,7 +359,7 @@ declare enum LockFunction {
     NoBroadcastInNormal = 21,
     PassageMode = 22,
     TurnOffAutoLock = 23,
-    RemoteKeypad = 24,
+    WirelessKeypad = 24,
     Light = 25,
     HotelCardBlacklist = 26,
     IdentityCard = 27,
@@ -431,6 +437,9 @@ declare enum TtRemoteKeyEvent {
 declare enum TtDoorSensorEvent {
     ScanDoorSensor = "EventScanDoorSensor"
 }
+declare enum WirelessKeypadEvent {
+    ScanWirelessKeypad = "EventWirelessKeypad"
+}
 declare enum GatewayType {
     G2 = 2,
     G3 = 3,
@@ -445,4 +454,4 @@ declare enum GatewayIpSettingType {
     STATIC_IP = 0,
     DHCP = 1
 }
-export { Ttlock, TtGateway, TtRemoteKey, TtDoorSensor, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType, GatewayIpSettingType, LockSoundVolume, TtRemoteKeyEvent, TtDoorSensorEvent, LockUnlockDirection, LockAccessoryType, ScanLockModal, ScanRemoteKeyModal, ScanDoorSensorModal, DeviceSystemModal };
+export { Ttlock, TtGateway, TtRemoteKey, TtDoorSensor, TtWirelessKeypad, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType, GatewayIpSettingType, LockSoundVolume, TtRemoteKeyEvent, TtDoorSensorEvent, LockUnlockDirection, LockAccessoryType, ScanLockModal, ScanRemoteKeyModal, ScanDoorSensorModal, DeviceSystemModal, WirelessKeypadEvent, ScanWirelessKeypadModal };
