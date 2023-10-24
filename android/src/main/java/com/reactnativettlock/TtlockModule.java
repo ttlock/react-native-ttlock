@@ -980,7 +980,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
     }
 
   @ReactMethod
-  public void recoveryCard(String cardNumber, ReadableArray cycleList, double startDate, double endDate, String lockData, Callback successCallback, Callback fail) {
+  public void recoverCard(String cardNumber, ReadableArray cycleList, double startDate, double endDate, String lockData, Callback successCallback, Callback fail) {
     RecoveryData recoveryData = new RecoveryData();
     LogUtil.d("cycleList:" + cycleList);
     recoveryData.cardType = cycleList == null || cycleList.size() == 0 ? 1 : 4;

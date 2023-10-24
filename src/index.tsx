@@ -807,7 +807,7 @@ class Ttlock {
       success = success || this.defaultCallback;
       fail = fail || this.defaultCallback;
       cycleList = cycleList || [];
-      ttlockModule.recoveryCard(cardNumber, cycleList, startDate, endDate, lockData, success, fail);
+      ttlockModule.recoverCard(cardNumber, cycleList, startDate, endDate, lockData, success, fail);
     }
 
     static recoverPasscode(passcode: string, passcodeType: number, cycleType : number, startDate: number, endDate: number, lockData: string, success: null | ((cardNumber: string) => void), fail: null | ((errorCode: number, description: string) => void)) {

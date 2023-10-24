@@ -15,6 +15,7 @@ const getLockSupportOperationList = (lockData: string) => {
     { lockOperation: "Create custom passcode 1122", lockFuctionValue: LockFunction.ManagePasscode },
     { lockOperation: "Modify passcode 1122 -> 2233", lockFuctionValue: LockFunction.ManagePasscode },
     { lockOperation: "Delete passcode 2233", lockFuctionValue: LockFunction.Passcode },
+    { lockOperation: "Recover passcode 2233", lockFuctionValue: LockFunction.Passcode },
     { lockOperation: "Reset passcode", lockFuctionValue: LockFunction.Passcode },
     { lockOperation: "Get lock switch state", lockFuctionValue: null },
 
@@ -22,6 +23,7 @@ const getLockSupportOperationList = (lockData: string) => {
     { lockOperation: "Modify IC card validity period", lockFuctionValue: LockFunction.IcCard },
     { lockOperation: "Delete IC card", lockFuctionValue: LockFunction.IcCard },
     { lockOperation: "Clear all IC cards", lockFuctionValue: LockFunction.IcCard },
+    { lockOperation: "Recover card", lockFuctionValue: LockFunction.IcCard },
 
     { lockOperation: "Add fingerprint", lockFuctionValue: LockFunction.Fingerprint },
     { lockOperation: "Modify fingerprint validity period", lockFuctionValue: LockFunction.Fingerprint },
@@ -166,6 +168,14 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
     }, failedCallback);
   }
 
+  else if(lockOperation == "Recover passcode 2233" ) {
+      let startDate = new Date().getTime();
+      let endDate = startDate + 24 * 3600 * 1000;
+    Ttlock.recoverPasscode("2233", 1, 1, startDate, endDate, lockData, () => {
+        successCallback("recover passcode success");
+      }, failedCallback);
+  }
+
   else if (lockOperation === "Reset passcode") {
     Ttlock.resetPasscode(lockData, (lockDataNew: string) => {
       //important: upload lockDataNew to ttlock server.
@@ -223,6 +233,14 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
       successCallback(text);
       cardNumber = undefined;
     }, failedCallback);
+  }
+  else if(lockOperation == "Recover card") {
+      let startDate = new Date().getTime();
+      let endDate = startDate + 24 * 3600 * 1000;
+      Ttlock.recoverCard("1234567889", null, startDate, endDate, lockData, () => {
+        let text = "recover card success";
+        successCallback(text);
+      }, failedCallback);
   }
   else if (lockOperation === "Add fingerprint") {
     // fingerprint valid one day
