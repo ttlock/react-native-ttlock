@@ -950,8 +950,8 @@ enum LockConfigType {
   TamperAlert = 3,
   ResetButton = 4,
   PrivacyLock = 5,
-  PassageModeAutoUnlock,
-  WifiPowerSavingMode
+  PassageModeAutoUnlock = 6,
+  WifiPowerSavingMode = 7
 }
 
 enum LockSoundVolume {
