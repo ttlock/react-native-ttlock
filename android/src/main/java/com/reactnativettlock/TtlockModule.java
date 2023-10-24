@@ -77,6 +77,7 @@ import com.ttlock.bl.sdk.callback.ModifyFingerprintPeriodCallback;
 import com.ttlock.bl.sdk.callback.ModifyICCardPeriodCallback;
 import com.ttlock.bl.sdk.callback.ModifyPasscodeCallback;
 import com.ttlock.bl.sdk.callback.ModifyRemoteValidityPeriodCallback;
+import com.ttlock.bl.sdk.callback.RecoverLockDataCallback;
 import com.ttlock.bl.sdk.callback.ResetKeyCallback;
 import com.ttlock.bl.sdk.callback.ResetLockCallback;
 import com.ttlock.bl.sdk.callback.ResetPasscodeCallback;
@@ -90,6 +91,7 @@ import com.ttlock.bl.sdk.callback.SetPassageModeCallback;
 import com.ttlock.bl.sdk.callback.SetRemoteUnlockSwitchCallback;
 import com.ttlock.bl.sdk.callback.SetUnlockDirectionCallback;
 import com.ttlock.bl.sdk.constant.LogType;
+import com.ttlock.bl.sdk.constant.RecoveryData;
 import com.ttlock.bl.sdk.device.Remote;
 import com.ttlock.bl.sdk.device.WirelessDoorSensor;
 import com.ttlock.bl.sdk.device.WirelessKeypad;
@@ -100,6 +102,7 @@ import com.ttlock.bl.sdk.entity.IpSetting;
 import com.ttlock.bl.sdk.entity.LockError;
 import com.ttlock.bl.sdk.entity.PassageModeConfig;
 import com.ttlock.bl.sdk.entity.PassageModeType;
+import com.ttlock.bl.sdk.entity.RecoveryDataType;
 import com.ttlock.bl.sdk.entity.SoundVolume;
 import com.ttlock.bl.sdk.entity.TTLockConfigType;
 import com.ttlock.bl.sdk.entity.UnlockDirection;
@@ -819,6 +822,23 @@ public class TtlockModule extends ReactContextBaseJavaModule {
         });
     }
 
+  @ReactMethod
+  public void recoverPasscode(String passcode, int passcodeType, int cycleType, double startDate, double endDate, String lockData, Callback successCallback, Callback fail) {
+    if (TextUtils.isEmpty(passcode) || TextUtils.isEmpty(lockData)) {
+      lockErrorCallback(LockError.DATA_FORMAT_ERROR, fail);
+      return;
+    }
+    RecoveryData recoveryData = new RecoveryData();
+    recoveryData.keyboardPwd = passcode;
+    recoveryData.startDate = (long) startDate;
+    recoveryData.endDate = (long) endDate;
+    recoveryData.cycleType = cycleType;
+    recoveryData.keyboardPwdType = passcodeType;
+    List<RecoveryData> recoveryDataList = new ArrayList<>();
+    recoveryDataList.add(recoveryData);
+    recoverLockData(GsonUtil.toJson(recoveryDataList), RecoveryDataType.PASSCODE, lockData, successCallback, fail);
+  }
+
     @ReactMethod
     public void modifyPasscode(String passcodeOrigin, String passcodeNew, double startDate, double endDate, String lockData, Callback successCallback, Callback fail) {
         if (TextUtils.isEmpty(passcodeOrigin) || TextUtils.isEmpty(lockData)) {
@@ -958,6 +978,42 @@ public class TtlockModule extends ReactContextBaseJavaModule {
           }
         });
     }
+
+  @ReactMethod
+  public void recoveryCard(String cardNumber, ReadableArray cycleList, double startDate, double endDate, String lockData, Callback successCallback, Callback fail) {
+    RecoveryData recoveryData = new RecoveryData();
+    LogUtil.d("cycleList:" + cycleList);
+    recoveryData.cardType = cycleList == null || cycleList.size() == 0 ? 1 : 4;
+    if (cycleList != null && cycleList.size() > 0) {
+      recoveryData.cyclicConfig = Utils.readableArray2CyclicList(cycleList);
+    }
+    recoveryData.cardNumber = cardNumber;
+    recoveryData.startDate = (long) startDate;
+    recoveryData.endDate = (long) endDate;
+    List<RecoveryData> recoveryDataList = new ArrayList<>();
+    recoveryDataList.add(recoveryData);
+    recoverLockData(GsonUtil.toJson(recoveryDataList), RecoveryDataType.IC, lockData, successCallback, fail);
+  }
+
+  private void recoverLockData(String recoveryDataJson, int recoveryType, String lockData, Callback successCallback, Callback fail) {
+    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+      if (success) {
+        TTLockClient.getDefault().recoverLockData(recoveryDataJson, recoveryType, lockData, null, new RecoverLockDataCallback() {
+          @Override
+          public void onRecoveryDataSuccess(int type) {
+            successCallback.invoke();
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            lockErrorCallback(lockError, fail);
+          }
+        });
+      } else {
+        noPermissionCallback(fail);
+      }
+    });
+  }
 
     @ReactMethod
     public void modifyCardValidityPeriod(String cardNumber, ReadableArray cycleList, double startDate, double endDate, String lockData, Callback successCallback, Callback fail) {

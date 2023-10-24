@@ -12,7 +12,9 @@ public enum TTLockConfigConverter {
     freeze,
     tamperAlert,
     resetButton,
-    privacyLock;
+    privacyLock,
+    passageModeAutoUnlock,
+    wifiPowerSavingMode;
 
     public static TTLockConfigType RN2Native(int index) {
         if (index < TTLockConfigConverter.class.getEnumConstants().length) {
@@ -35,6 +37,10 @@ public enum TTLockConfigConverter {
                 return TTLockConfigType.RESET_BUTTON;
             case tamperAlert:
                 return TTLockConfigType.TAMPER_ALERT;
+          case passageModeAutoUnlock:
+                return TTLockConfigType.PASSAGE_MODE_AUTO_UNLOCK_SETTING;
+          case wifiPowerSavingMode:
+                return TTLockConfigType.WIFI_LOCK_POWER_SAVING_MODE;
         }
         return null;
     }
