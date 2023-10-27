@@ -794,7 +794,7 @@ class Ttlock {
   }
 
   /**
-     * Recovery card data to the lock
+     * Recover card data to the lock
      * @param cardNumber
      * @param cycleList Periodic unlocking. You can set it to null if you don't need it
      * @param startDate Timestamp millisecond. The start valid time of the card.
@@ -810,7 +810,7 @@ class Ttlock {
       ttlockModule.recoverCard(cardNumber, cycleList, startDate, endDate, lockData, success, fail);
     }
 
-    static recoverPasscode(passcode: string, passcodeType: number, cycleType : number, startDate: number, endDate: number, lockData: string, success: null | ((cardNumber: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
+    static recoverPasscode(passcode: string, passcodeType: number, cycleType : number, startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
           success = success || this.defaultCallback;
           fail = fail || this.defaultCallback;
           ttlockModule.recoverPasscode(passcode, passcodeType, cycleType, startDate, endDate, lockData, success, fail);
