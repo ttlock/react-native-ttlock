@@ -319,6 +319,18 @@ declare class Ttlock {
     static clearAllDoorSensor(lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
     static setDoorSensorAlertTime(time: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
     /**
+       * Recovery card data to the lock
+       * @param cardNumber
+       * @param cycleList Periodic unlocking. You can set it to null if you don't need it
+       * @param startDate Timestamp millisecond. The start valid time of the card.
+       * @param endDate Timestamp millisecond. The expiration time of the card
+       * @param lockData
+       * @param success
+       * @param fail
+       */
+    static recoverCard(cardNumber: string, cycleList: null | CycleDateParam[], startDate: number, endDate: number, lockData: string, success: null | ((cardNumber: string) => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static recoverPasscode(passcode: string, passcodeType: number, cycleType: number, startDate: number, endDate: number, lockData: string, success: null | ((cardNumber: string) => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    /**
      * Monitor phone's Bluetooth status
      * @param callback
      */
@@ -397,7 +409,9 @@ declare enum LockConfigType {
     Freeze = 2,
     TamperAlert = 3,
     ResetButton = 4,
-    PrivacyLock = 5
+    PrivacyLock = 5,
+    PassageModeAutoUnlock = 6,
+    WifiPowerSavingMode = 7
 }
 declare enum LockSoundVolume {
     On = -1,

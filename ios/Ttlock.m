@@ -527,6 +527,28 @@ RCT_EXPORT_METHOD(setDoorSensorAlertTime:(int) time lockData:(NSString *)lockDat
 }
 
 
+RCT_EXPORT_METHOD(recoveryCard:(NSString *) cardNumber cycleList: (NSArray *) cycleList  startDate:(nonnull NSNumber *)startDate endDate:(nonnull NSNumber *)endDate lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    [TTLock recoverICCardWithCyclicConfig:cycleList cardNumber:cardNumber startDate:startDate.longLongValue endDate:endDate.longLongValue lockData:lockData success:^(NSString *cardNumber2) {
+        [Ttlock response:cardNumber2 success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock response:errorCode message:errorMsg fail:fail];
+    }];
+}
+
+
+RCT_EXPORT_METHOD(recoverPasscode:(NSString *) passcode passcodeType:(int)passcodeType cycleType: (int) cycleType  startDate:(nonnull NSNumber *)startDate endDate:(nonnull NSNumber *)endDate lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    
+    [TTLock recoverPasscode:passcode newPasscode:nil passcodeType:passcodeType startDate:startDate.longLongValue endDate:endDate.longLongValue cycleType:cycleType lockData:lockData success:^{
+        [Ttlock response:nil success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock response:errorCode message:errorMsg fail:fail];
+    }];
+}
+
+
+
 RCT_EXPORT_METHOD(supportFunction:(int)fuction lockData:(NSString *)lockData callback:(RCTResponseSenderBlock)callback)
 {
     BOOL isSupport = [TTUtil lockFeatureValue:lockData suportFunction:fuction];
