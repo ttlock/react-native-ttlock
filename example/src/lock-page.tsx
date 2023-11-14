@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { Ttlock, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, LockSoundVolume, LockUnlockDirection } from 'react-native-ttlock';
+import { Ttlock, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, LockSoundVolume, LockUnlockDirection, WifiLockServerInfo } from 'react-native-ttlock';
 import * as Toast from './toast-page';
 
 const getLockSupportOperationList = (lockData: string) => {
@@ -62,12 +62,25 @@ const getLockSupportOperationList = (lockData: string) => {
     { lockOperation: "Set door sensor alert time", lockFuctionValue: LockFunction.DoorSensorAlert },
     { lockOperation: "Clear all door sensor from lock", lockFuctionValue: LockFunction.DoorSensor },
 
-    { lockOperation: "Init wireless keypad", lockFuctionValue: LockFunction.WirelessKeypad},
+    { lockOperation: "Init wireless keypad", lockFuctionValue: LockFunction.WirelessKeypad },
 
     { lockOperation: "Modify admin passcode to 9999", lockFuctionValue: LockFunction.Passcode },
     { lockOperation: "Reset ekey", lockFuctionValue: null },
     { lockOperation: "Rest lock", lockFuctionValue: null },
     { lockOperation: "Get lock version", lockFuctionValue: null },
+
+
+    { lockOperation: "scan wifi", lockFuctionValue: LockFunction.Wifi },
+    { lockOperation: "Get lock version", lockFuctionValue: null },
+    { lockOperation: "Get lock version", lockFuctionValue: null },
+    { lockOperation: "Get lock version", lockFuctionValue: null },
+    { lockOperation: "Get lock version", lockFuctionValue: null },
+
+    { lockOperation: "Wifi lock scan nearby wifi", lockFuctionValue: LockFunction.Wifi },
+    { lockOperation: "Wifi lock config wifi", lockFuctionValue: LockFunction.Wifi },
+    { lockOperation: "Wifi lock config server", lockFuctionValue: LockFunction.Wifi },
+    { lockOperation: "Wifi lock get wifi info", lockFuctionValue: LockFunction.Wifi },
+    { lockOperation: "Wifi lock config ip", lockFuctionValue: LockFunction.Wifi }
   ]
 
   let supportOperationList: string[] = []
@@ -168,12 +181,12 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
     }, failedCallback);
   }
 
-  else if(lockOperation == "Recover passcode 2233" ) {
-      let startDate = new Date().getTime();
-      let endDate = startDate + 24 * 3600 * 1000;
+  else if (lockOperation == "Recover passcode 2233") {
+    let startDate = new Date().getTime();
+    let endDate = startDate + 24 * 3600 * 1000;
     Ttlock.recoverPasscode("2233", 1, 1, startDate, endDate, lockData, () => {
-        successCallback("recover passcode success");
-      }, failedCallback);
+      successCallback("recover passcode success");
+    }, failedCallback);
   }
 
   else if (lockOperation === "Reset passcode") {
@@ -234,13 +247,13 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
       cardNumber = undefined;
     }, failedCallback);
   }
-  else if(lockOperation == "Recover card") {
-      let startDate = new Date().getTime();
-      let endDate = startDate + 24 * 3600 * 1000;
-      Ttlock.recoverCard("1234567889", null, startDate, endDate, lockData, () => {
-        let text = "recover card success";
-        successCallback(text);
-      }, failedCallback);
+  else if (lockOperation == "Recover card") {
+    let startDate = new Date().getTime();
+    let endDate = startDate + 24 * 3600 * 1000;
+    Ttlock.recoverCard("1234567889", null, startDate, endDate, lockData, () => {
+      let text = "recover card success";
+      successCallback(text);
+    }, failedCallback);
   }
   else if (lockOperation === "Add fingerprint") {
     // fingerprint valid one day
@@ -435,6 +448,60 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
       console.log(lockVersion);
     }, failedCallback)
   }
+
+  // {"Wifi lock scan nearby wifi": Command.scanWifi},
+  // {"Wifi lock config wifi": Command.configWifi},
+  // {"Wifi lock config server": Command.configServer},
+  // {"Wifi lock get wifi info": Command.getWifiInfo},
+  // {"Wifi lock config ip": Command.configIp}
+
+  else if (lockOperation === "Wifi lock scan nearby wifi") {
+    Ttlock.scanWifi(lockData, (isFinished: boolean, wifiList: []) => {
+      let text = `isFinished:${isFinished}  wifiList:${JSON.stringify(wifiList)}`;
+      successCallback(text);
+    }, failedCallback);
+  }
+  else if (lockOperation === "Wifi lock config wifi") {
+    Ttlock.configWifi("sciener", "sciener.com", lockData, () => {
+      let text = "config lock wifi success";
+      successCallback(text);
+    }, failedCallback)
+  }
+  else if (lockOperation === "Wifi lock config server") {
+    Ttlock.configServer("121.196.45.100", "4999", lockData, () => {
+      let text = "config lock wifi ip address success";
+      successCallback(text);
+    }, failedCallback)
+  }
+  else if (lockOperation === "Wifi lock get wifi info") {
+    Ttlock.getWifiInfo(lockData, (wifiMac: string, wifiRssi: number) => {
+      let text = `get wifiMac:${wifiMac}  wifiRssi:${wifiRssi}`;
+      successCallback(text);
+    }, failedCallback);
+  }
+  else if (lockOperation === "Wifi lock config ip") {
+    const info: WifiLockServerInfo = {
+      type: 0,
+      ipAddress: undefined,
+      subnetMask: undefined,
+      router: undefined,
+      preferredDns: undefined,
+      alternateDns: undefined,
+
+      //config static ip
+      // type: 1,
+      // ipAddress: "192.168.1.100",
+      // subnetMask: "255.255.255.0",
+      // router: "192.168.1.1",
+      // preferredDns: "xxx.xxx.xxx.xxx",
+      // alternateDns: "xxx.xxx.xxx.xxx"
+    }
+    Ttlock.configIp(info,lockData, () => {
+      let text = "config ip success";
+      successCallback(text);
+    }, failedCallback);
+  }
+
 }
 
 

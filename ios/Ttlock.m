@@ -14,6 +14,7 @@
 #define EVENT_SCAN_REMOTE_KEY @"EventScanRemoteKey"
 #define EVENT_SCAN_DOOR_SENSOR @"EventScanDoorSensor"
 #define EVENT_SCAN_WIRELESS_KEYPAD @"EventWirelessKeypad"
+#define EVENT_SCAN_LOCK_WIFI @"EventScanLockWifi"
 
 
 //static bool isAddListenBluetoothState = false;
@@ -52,7 +53,8 @@ RCT_EXPORT_MODULE()
       EVENT_SCAN_WIFI,
       EVENT_SCAN_REMOTE_KEY,
       EVENT_SCAN_DOOR_SENSOR,
-      EVENT_SCAN_WIRELESS_KEYPAD
+      EVENT_SCAN_WIRELESS_KEYPAD,
+      EVENT_SCAN_LOCK_WIFI
   ];
 }
 
@@ -539,8 +541,56 @@ RCT_EXPORT_METHOD(recoverCard:(NSString *) cardNumber cycleList: (NSArray *) cyc
 
 RCT_EXPORT_METHOD(recoverPasscode:(NSString *) passcode passcodeType:(int)passcodeType cycleType: (int) cycleType  startDate:(nonnull NSNumber *)startDate endDate:(nonnull NSNumber *)endDate lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
-    
     [TTLock recoverPasscode:passcode newPasscode:passcode passcodeType:passcodeType startDate:startDate.longLongValue endDate:endDate.longLongValue cycleType:cycleType lockData:lockData success:^{
+        [Ttlock response:nil success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock response:errorCode message:errorMsg fail:fail];
+    }];
+}
+
+RCT_EXPORT_METHOD(scanWifi:(NSString *) lockData fail:(RCTResponseSenderBlock)fail)
+{
+    [TTLock scanWifiWithLockData:lockData success:^(BOOL isFinished, NSArray *wifiArr) {
+        [self sendEventWithName:EVENT_SCAN_LOCK_WIFI body:@[@(isFinished), wifiArr]];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock response:errorCode message:errorMsg fail:fail];
+    }];
+}
+
+
+RCT_EXPORT_METHOD(configWifi:(NSString *) wifiName wifiPassword:(NSString *) wifiPassword lockData:(NSString *) lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    [TTLock configWifiWithSSID:wifiName wifiPassword:wifiPassword lockData:lockData success:^{
+        [Ttlock response:nil success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock response:errorCode message:errorMsg fail:fail];
+    }];
+}
+
+
+RCT_EXPORT_METHOD(configServer:(NSString *) ip port:(NSString *) port lockData:(NSString *) lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    [TTLock configServerWithServerAddress:ip portNumber:port lockData:lockData success:^{
+        [Ttlock response:nil success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock response:errorCode message:errorMsg fail:fail];
+    }];
+}
+
+
+RCT_EXPORT_METHOD(getWifiInfo:(NSString *) lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    [TTLock getWifiInfoWithLockData:lockData success:^(NSString *wifiMac, NSInteger wifiRssi) {
+        [Ttlock response:@[wifiMac, @(wifiRssi)] success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock response:errorCode message:errorMsg fail:fail];
+    }];
+}
+
+
+RCT_EXPORT_METHOD(configIp:(NSDictionary *) info lockData:(NSString *) lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    [TTLock configIpWithInfo:info lockData:lockData success:^{
         [Ttlock response:nil success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
         [Ttlock response:errorCode message:errorMsg fail:fail];

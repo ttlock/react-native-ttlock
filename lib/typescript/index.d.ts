@@ -319,7 +319,7 @@ declare class Ttlock {
     static clearAllDoorSensor(lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
     static setDoorSensorAlertTime(time: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
     /**
-       * Recovery card data to the lock
+       * Recover card data to the lock
        * @param cardNumber
        * @param cycleList Periodic unlocking. You can set it to null if you don't need it
        * @param startDate Timestamp millisecond. The start valid time of the card.
@@ -329,7 +329,7 @@ declare class Ttlock {
        * @param fail
        */
     static recoverCard(cardNumber: string, cycleList: null | CycleDateParam[], startDate: number, endDate: number, lockData: string, success: null | ((cardNumber: string) => void), fail: null | ((errorCode: number, description: string) => void)): void;
-    static recoverPasscode(passcode: string, passcodeType: number, cycleType: number, startDate: number, endDate: number, lockData: string, success: null | ((cardNumber: string) => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static recoverPasscode(passcode: string, passcodeType: number, cycleType: number, startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
     /**
      * Monitor phone's Bluetooth status
      * @param callback

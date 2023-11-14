@@ -18,7 +18,14 @@ export interface ScanGatewayModal {
   type: number
 }
 
-
+export interface WifiLockServerInfo {
+  type: number,  // staticIp: 0, dhcp: 1
+  ipAddress: string|undefined,
+  subnetMask: string|undefined,
+  router: string|undefined,
+  preferredDns: string|undefined,
+  alternateDns: string|undefined,
+}
 
 export interface ScanRemoteKeyModal {
   remoteKeyName: string,
