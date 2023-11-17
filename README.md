@@ -1,10 +1,9 @@
 new update
 bd7bc4b
+
 # react-native-ttlock
 ##### Developers Email && Quick Response
 ttlock-developers-email-list@googlegroups.com
-## Note
-`react-native-ttlock` version `2.x.x` is not compatible with version `1.x.x`  please upgrade carefully.
 ## Installation
 `yarn add react-native-ttlock`
 ## Add configuration to project
@@ -42,7 +41,7 @@ android 12 needs below permission.
          devices.
     -->
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
-``` 
+```
 2. In order to get the permission request result in ttlock plugin, in MainActivity extends ReactActivity, you need override the onRequestPermissionsResult method and add below code:   
 (1) java code:
 ``` 
@@ -53,7 +52,7 @@ android 12 needs below permission.
     TtlockModule ttlockModule = mReactInstanceManager.getCurrentReactContext().getNativeModule(TtlockModule.class);
     ttlockModule.onRequestPermissionsResult(requestCode, permissions, grantResults);
   }
-``` 
+```
 3. When you release the apk, you need disable proguard in release builds.Config buildTypes in build.gradle like this:
 ``` 
 repositories {
@@ -63,13 +62,13 @@ repositories {
             shrinkResources false
         }
     }
-``` 
+```
 4. Support min sdk version is 18
 ``` 
 defaultConfig {
         minSdkVersion 18
     }
- ``` 
+```
 ## Usage Lock
 ### 1 Lock basic operation
 1.0 Get bluetooth state
@@ -77,7 +76,7 @@ defaultConfig {
 Ttlock.getBluetoothState((state: BluetoothState)=>{
     console.log("bluetooth:",state);
 });
-``` 
+```
 1.1 Scan lock
 ``` js
 //Start scan lock
@@ -368,6 +367,7 @@ Ttlock.clearAllFingerprints(lockData, () => {
 ```
 ### 6. Passage mode
 6.1 Add passage mode
+
 ``` js
 //valid time 8:00 am ---   17:00 pm
 let startTime = 8 * 60;
@@ -379,10 +379,47 @@ Ttlock.addPassageMode(LockPassageMode.Weekly, [1, 2, 7], startTime, endTime, loc
 });  
 ```
 6.2 Clear all passageModes
+
 ``` js
 Ttlock.clearAllPassageModes(lockData, () => {
     let text = "clear all passage modes success";
 }, (errorCode, errorDesc) => {
+    //...    
+});  
+```
+
+### 7. WIFI
+7.1 Wifi lock scan nearby wifi
+
+``` js
+Ttlock.scanWifi(lockData, (isFinished: boolean, wifiList: []) => {
+     
+    }, (errorCode, errorDesc) => {
+    //...    
+});
+```
+7.2 Wifi lock config wifi
+
+``` js
+const wifiName = 'sciener'
+const wifiPassword = 'sciener.com'
+Ttlock.configWifi(wifiName, wifiPassword, lockData, () => {
+      let text = "config lock wifi success";
+
+    }, (errorCode, errorDesc) => {
+    //...    
+});  
+```
+
+7.3 Wifi lock config server
+
+``` js
+const serverIp = "121.196.45.110"
+const serverPort = "4999"
+Ttlock.configServer(serverIp, serverPort, lockData, () => {
+      let text = "config lock wifi ip address success";
+
+    }, (errorCode, errorDesc) => {
     //...    
 });  
 ```
