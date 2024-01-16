@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
+import android.text.style.UnderlineSpan;
 import android.util.Log;
 
 import androidx.core.app.ActivityCompat;
@@ -26,6 +27,7 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.reactnativettlock.model.IpSettingConverter;
 import com.reactnativettlock.model.RNControlAction;
 import com.reactnativettlock.model.ScanRemoteModal;
 import com.reactnativettlock.model.TTBaseFieldConstant;
@@ -53,6 +55,8 @@ import com.ttlock.bl.sdk.callback.ClearAllFingerprintCallback;
 import com.ttlock.bl.sdk.callback.ClearAllICCardCallback;
 import com.ttlock.bl.sdk.callback.ClearPassageModeCallback;
 import com.ttlock.bl.sdk.callback.ClearRemoteCallback;
+import com.ttlock.bl.sdk.callback.ConfigServerCallback;
+import com.ttlock.bl.sdk.callback.ConfigWifiCallback;
 import com.ttlock.bl.sdk.callback.ControlLockCallback;
 import com.ttlock.bl.sdk.callback.CreateCustomPasscodeCallback;
 import com.ttlock.bl.sdk.callback.DeleteDoorSensorCallback;
@@ -71,6 +75,7 @@ import com.ttlock.bl.sdk.callback.GetLockVersionCallback;
 import com.ttlock.bl.sdk.callback.GetOperationLogCallback;
 import com.ttlock.bl.sdk.callback.GetRemoteUnlockStateCallback;
 import com.ttlock.bl.sdk.callback.GetUnlockDirectionCallback;
+import com.ttlock.bl.sdk.callback.GetWifiInfoCallback;
 import com.ttlock.bl.sdk.callback.InitLockCallback;
 import com.ttlock.bl.sdk.callback.ModifyAdminPasscodeCallback;
 import com.ttlock.bl.sdk.callback.ModifyFingerprintPeriodCallback;
@@ -82,6 +87,7 @@ import com.ttlock.bl.sdk.callback.ResetKeyCallback;
 import com.ttlock.bl.sdk.callback.ResetLockCallback;
 import com.ttlock.bl.sdk.callback.ResetPasscodeCallback;
 import com.ttlock.bl.sdk.callback.ScanLockCallback;
+import com.ttlock.bl.sdk.callback.ScanWifiCallback;
 import com.ttlock.bl.sdk.callback.SetAutoLockingPeriodCallback;
 import com.ttlock.bl.sdk.callback.SetDoorSensorAlertTimeCallback;
 import com.ttlock.bl.sdk.callback.SetLockConfigCallback;
@@ -107,6 +113,7 @@ import com.ttlock.bl.sdk.entity.SoundVolume;
 import com.ttlock.bl.sdk.entity.TTLockConfigType;
 import com.ttlock.bl.sdk.entity.UnlockDirection;
 import com.ttlock.bl.sdk.entity.ValidityInfo;
+import com.ttlock.bl.sdk.entity.WifiLockInfo;
 import com.ttlock.bl.sdk.gateway.api.GatewayClient;
 import com.ttlock.bl.sdk.gateway.callback.ConfigIpCallback;
 import com.ttlock.bl.sdk.gateway.callback.ConnectCallback;
@@ -1890,6 +1897,134 @@ public class TtlockModule extends ReactContextBaseJavaModule {
     });
   }
 
+  @ReactMethod
+  public void scanWifi(String lockData, Callback fail) {
+    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+      if (success) {
+        TTLockClient.getDefault().scanWifi(lockData, new ScanWifiCallback() {
+          @Override
+          public void onScanWifi(List<WiFi> wiFis, int status) {
+            if (wiFis != null) {
+              WritableArray writableArray = Arguments.createArray();
+              writableArray.pushBoolean(status == 1);
+
+              WritableArray readableArray = Arguments.createArray();
+              for (WiFi wiFi : wiFis) {
+                WritableMap map = Arguments.createMap();
+                map.putString(TTGatewayFieldConstant.WIFI, wiFi.getSsid());
+                map.putInt(TTGatewayFieldConstant.RSSI, wiFi.getRssi());
+                readableArray.pushMap(map);
+              }
+              writableArray.pushArray(readableArray);
+              //锁开关状态跟oneMeterRSSI android不需要
+              getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(TTLockEvent.scanWifi, writableArray);
+            }
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            lockErrorCallback(lockError, fail);
+          }
+        });
+      } else {
+        noPermissionCallback(fail);
+      }
+    });
+  }
+
+  @ReactMethod
+  public void configWifi(String wifiName, String wifiPassword, String lockData, Callback successCallback, Callback fail) {
+    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+      if (success) {
+        TTLockClient.getDefault().configWifi(wifiName, wifiPassword, lockData, new ConfigWifiCallback() {
+          @Override
+          public void onConfigWifiSuccess() {
+            successCallback.invoke();
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            lockErrorCallback(lockError, fail);
+          }
+        });
+      } else {
+        noPermissionCallback(fail);
+      }
+    });
+  }
+
+  @ReactMethod
+  public void configServer(String ip, String port, String lockData, Callback successCallback, Callback fail) {
+    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+      if (success) {
+        try {
+          int portNumber = Integer.valueOf(port);
+          TTLockClient.getDefault().configServer(ip, portNumber, lockData, new ConfigServerCallback() {
+            @Override
+            public void onConfigServerSuccess() {
+              successCallback.invoke();
+            }
+
+            @Override
+            public void onFail(LockError lockError) {
+              lockErrorCallback(lockError, fail);
+            }
+          });
+        } catch (Exception e) {
+          e.printStackTrace();
+          lockErrorCallback(LockError.DATA_FORMAT_ERROR, fail);
+        }
+      } else {
+        noPermissionCallback(fail);
+      }
+    });
+  }
+
+  @ReactMethod
+  public void getWifiInfo(String lockData, Callback successCallback, Callback fail) {
+    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+      if (success) {
+        TTLockClient.getDefault().getWifiInfo(lockData, new GetWifiInfoCallback() {
+          @Override
+          public void onGetWiFiInfoSuccess(WifiLockInfo wifiLockInfo) {
+            WritableArray writableArray = Arguments.createArray();
+            writableArray.pushString(wifiLockInfo.getWifiMac());
+            writableArray.pushInt(wifiLockInfo.getWifiRssi());
+            successCallback.invoke(writableArray);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            lockErrorCallback(lockError, fail);
+          }
+        });
+      } else {
+        noPermissionCallback(fail);
+      }
+    });
+  }
+
+  @ReactMethod
+  public void configIp(ReadableMap readableMap, String lockData, Callback successCallback, Callback fail) {
+    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+      if (success) {
+        TTLockClient.getDefault().configIp(IpSettingConverter.toObject(readableMap), lockData, new com.ttlock.bl.sdk.callback.ConfigIpCallback() {
+          @Override
+          public void onConfigIpSuccess() {
+            successCallback.invoke();
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            lockErrorCallback(lockError, fail);
+          }
+        });
+      } else {
+        noPermissionCallback(fail);
+      }
+    });
+  }
+
     @ReactMethod
     public void getBluetoothState(Callback callback) {
         boolean enable = TTLockClient.getDefault().isBLEEnabled(getCurrentActivity());
@@ -1912,7 +2047,5 @@ public class TtlockModule extends ReactContextBaseJavaModule {
     private void noPermissionCallback(Callback fail) {
       lockErrorCallback(LockError.LOCK_NO_PERMISSION, fail);
     }
-
-
 
 }
