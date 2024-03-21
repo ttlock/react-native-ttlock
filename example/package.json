@@ -21,7 +21,8 @@
     "react-native-reanimated": "^1.13.1",
     "react-native-root-toast": "^3.2.1",
     "react-native-safe-area-context": "^3.1.8",
-    "react-native-screens": "^2.14.0"
+    "react-native-screens": "^2.14.0",
+    "react-native-ttlock-upgrade": "/Users/sciener/Desktop/react-native-ttlock-upgrade"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",

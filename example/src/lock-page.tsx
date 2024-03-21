@@ -80,7 +80,9 @@ const getLockSupportOperationList = (lockData: string) => {
     { lockOperation: "Wifi lock config wifi", lockFuctionValue: LockFunction.Wifi },
     { lockOperation: "Wifi lock config server", lockFuctionValue: LockFunction.Wifi },
     { lockOperation: "Wifi lock get wifi info", lockFuctionValue: LockFunction.Wifi },
-    { lockOperation: "Wifi lock config ip", lockFuctionValue: LockFunction.Wifi }
+    { lockOperation: "Wifi lock config ip", lockFuctionValue: LockFunction.Wifi },
+
+    { lockOperation: "Lock enter upgrade mode", lockFuctionValue: null }
   ]
 
   let supportOperationList: string[] = []
@@ -294,7 +296,6 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
     }, failedCallback);
   }
   else if (lockOperation === "Clear all fingerprints") {
-
     Ttlock.clearAllFingerprints(lockData, () => {
       let text = "clear all fingerprints success";
       successCallback(text);
@@ -499,6 +500,13 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
     Ttlock.configIp(info,lockData, () => {
       let text = "config ip success";
       successCallback(text);
+    }, failedCallback);
+  }
+
+  else if (lockOperation === "Lock enter upgrade mode") {
+    Ttlock.enterUpgradeMode(lockData, () => {
+      successCallback("锁进入升级模式成功，跳转升级页面");
+      navigation.navigate("LockUpgradePage", {lockData: lockData, lockMac: lockMac});
     }, failedCallback);
   }
 

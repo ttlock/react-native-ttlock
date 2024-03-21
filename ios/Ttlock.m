@@ -597,6 +597,15 @@ RCT_EXPORT_METHOD(configIp:(NSDictionary *) info lockData:(NSString *) lockData 
     }];
 }
 
+RCT_EXPORT_METHOD(enterUpgradeMode:(NSString *) lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    [TTLock enterUpgradeModeWithLockData:lockData success:^{
+        [Ttlock response:nil success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock response:errorCode message:errorMsg fail:fail];
+    }];
+}
+
 
 
 RCT_EXPORT_METHOD(supportFunction:(int)fuction lockData:(NSString *)lockData callback:(RCTResponseSenderBlock)callback)
