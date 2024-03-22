@@ -82,22 +82,22 @@ const getLockSupportOperationList = (lockData: string) => {
     { lockOperation: "Wifi lock get wifi info", lockFuctionValue: LockFunction.Wifi },
     { lockOperation: "Wifi lock config ip", lockFuctionValue: LockFunction.Wifi },
 
-    { lockOperation: "Lock enter upgrade mode", lockFuctionValue: null }
+    { lockOperation: "Lock upgrade", lockFuctionValue: null }
   ]
 
   let supportOperationList: string[] = []
   functionAllList.map((item: LockFunctionItemData) => {
-    if (item.lockFuctionValue) {
-      Ttlock.supportFunction(item.lockFuctionValue!, lockData, (isSupport: boolean) => {
-        if (!isSupport) {
-          console.log("The lock not support function " + item.lockOperation);
-        } else {
-          supportOperationList.push(item.lockOperation);
-        }
-      })
-    } else {
+    // if (item.lockFuctionValue) {
+    //   Ttlock.supportFunction(item.lockFuctionValue!, lockData, (isSupport: boolean) => {
+    //     if (!isSupport) {
+    //       console.log("The lock not support function " + item.lockOperation);
+    //     } else {
+    //       supportOperationList.push(item.lockOperation);
+    //     }
+    //   })
+    // } else {
       supportOperationList.push(item.lockOperation);
-    }
+    // }
   });
 
   return supportOperationList;
@@ -503,11 +503,8 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
     }, failedCallback);
   }
 
-  else if (lockOperation === "Lock enter upgrade mode") {
-    Ttlock.enterUpgradeMode(lockData, () => {
-      successCallback("锁进入升级模式成功，跳转升级页面");
-      navigation.navigate("LockUpgradePage", {lockData: lockData, lockMac: lockMac});
-    }, failedCallback);
+  else if (lockOperation === "Lock upgrade") {
+    navigation.navigate("LockUpgradePage", {lockData: lockData, lockMac: lockMac});
   }
 
 }
