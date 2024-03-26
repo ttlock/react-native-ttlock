@@ -16,6 +16,14 @@ export interface ScanGatewayModal {
     rssi: number;
     type: number;
 }
+export interface WifiLockServerInfo {
+    type: number;
+    ipAddress: string | undefined;
+    subnetMask: string | undefined;
+    router: string | undefined;
+    preferredDns: string | undefined;
+    alternateDns: string | undefined;
+}
 export interface ScanRemoteKeyModal {
     remoteKeyName: string;
     remoteKeyMac: string;

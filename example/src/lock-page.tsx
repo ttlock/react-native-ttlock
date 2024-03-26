@@ -504,6 +504,7 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
   }
 
   else if (lockOperation === "Lock upgrade") {
+    Toast.hidden()
     navigation.navigate("LockUpgradePage", {lockData: lockData, lockMac: lockMac});
   }
 

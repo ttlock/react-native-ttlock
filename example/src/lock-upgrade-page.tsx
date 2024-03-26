@@ -7,8 +7,7 @@ const getLockSupportOperationList = (lockData: string) => {
   return [
     "Start upgrade by client",
     "Start upgrade by firmware package",
-    "Stop upgrade",
-    "Retry upgrade"
+    "Stop upgrade"
     ]
 }
 
@@ -29,7 +28,7 @@ const failedCallback = function (errorCode: number, errorMessage: string) {
 
 
 const operationClick = (lockOperation: string, lockData: string, lockMac: string, navigation: any) => {
-  Toast.showToastLoad(lockOperation + "...");
+  // Toast.showToastLoad(lockOperation + "...");
 
   if (lockOperation === "Start upgrade by client") {
     TtlockDFU.startUpgradeByClient("clientId", "accessToken", 1, "lockData", (progress: TtUpgradeProgress, percentage: number) => {
@@ -52,10 +51,6 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
 
   else if (lockOperation === "Stop upgrade") {
     TtlockDFU.stopUpgrade()
-  }
-
-  else if (lockOperation === "Retry upgrade") {
-    TtlockDFU.restartUpgrade()
   }
 
 }
