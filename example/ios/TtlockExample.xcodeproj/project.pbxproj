@@ -139,6 +139,7 @@
 					13B07F861A680F5B00A75B9A = {
 						DevelopmentTeam = 2J6L933YUX;
 						LastSwiftMigration = 1120;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -267,6 +268,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 2J6L933YUX;
 				ENABLE_BITCODE = NO;
@@ -280,6 +283,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.reactnativettlock;
 				PRODUCT_NAME = TtlockExample;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -296,6 +300,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 2J6L933YUX;
 				INFOPLIST_FILE = TtlockExample/Info.plist;
@@ -308,6 +314,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.reactnativettlock;
 				PRODUCT_NAME = TtlockExample;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;

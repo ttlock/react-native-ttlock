@@ -69,13 +69,7 @@ const getLockSupportOperationList = (lockData: string) => {
     { lockOperation: "Rest lock", lockFuctionValue: null },
     { lockOperation: "Get lock version", lockFuctionValue: null },
 
-
     { lockOperation: "scan wifi", lockFuctionValue: LockFunction.Wifi },
-    { lockOperation: "Get lock version", lockFuctionValue: null },
-    { lockOperation: "Get lock version", lockFuctionValue: null },
-    { lockOperation: "Get lock version", lockFuctionValue: null },
-    { lockOperation: "Get lock version", lockFuctionValue: null },
-
     { lockOperation: "Wifi lock scan nearby wifi", lockFuctionValue: LockFunction.Wifi },
     { lockOperation: "Wifi lock config wifi", lockFuctionValue: LockFunction.Wifi },
     { lockOperation: "Wifi lock config server", lockFuctionValue: LockFunction.Wifi },

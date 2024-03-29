@@ -31,7 +31,7 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
   // Toast.showToastLoad(lockOperation + "...");
 
   if (lockOperation === "Start upgrade by client") {
-    TtlockDFU.startUpgradeByClient("clientId", "accessToken", 1, "lockData", (progress: TtUpgradeProgress, percentage: number) => {
+    TtlockDFU.startUpgradeByClient("clientId", "accessToken", 1, lockData, (progress: TtUpgradeProgress, percentage: number) => {
       console.log("升级状态：" + progress + "    进度：" + percentage)
     }, (error: TtUpgradeError) => {
       console.log("升级失败: " + error)
@@ -42,7 +42,7 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
   // ""
 
   else if (lockOperation === "Start upgrade by firmware package") {
-    TtlockDFU.startUpgradeByFirmwarePackage("packageUrl", "lockData", (progress: TtUpgradeProgress, percentage: number) => {
+    TtlockDFU.startUpgradeByFirmwarePackage("packageUrl", lockData, (progress: TtUpgradeProgress, percentage: number) => {
         console.log("升级状态：" + progress + "    进度：" + percentage)
     }, (error: TtUpgradeError) => {
       console.log("升级失败: " + error)
@@ -56,7 +56,7 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
 }
 
 
-const LockPage = (props: any) => {
+const LockUpgradePage = (props: any) => {
   const { route, navigation } = props;
   const { lockData, lockMac } = route.params;
   console.log("参数：" + JSON.stringify(route.params))
@@ -93,4 +93,4 @@ const styles = StyleSheet.create({
 
 
 
-export default LockPage;
+export default LockUpgradePage;
