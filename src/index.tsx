@@ -712,6 +712,15 @@ class Ttlock {
   }
 
 
+  static setUnlockDirectionAutomatic(lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    ttlockModule.setUnlockDirectionAutomatic(lockData, success, fail);
+  }
+
+  
+
+
   /**
    * Set the lock always unlock.
    * @param mode LockPassageMode
@@ -982,6 +991,7 @@ enum LockFunction {
   Wifi = 56,
   WifiStaticIP = 58,
   PasscodeKeyNumber = 60,
+  AutoSetUnlockDirection = 81
 }
 
 enum LockRecordType {
