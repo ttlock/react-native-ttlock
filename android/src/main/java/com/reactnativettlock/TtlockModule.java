@@ -51,6 +51,7 @@ import com.ttlock.bl.sdk.callback.AddDoorSensorCallback;
 import com.ttlock.bl.sdk.callback.AddFingerprintCallback;
 import com.ttlock.bl.sdk.callback.AddICCardCallback;
 import com.ttlock.bl.sdk.callback.AddRemoteCallback;
+import com.ttlock.bl.sdk.callback.AutoSetUnlockDirectionCallback;
 import com.ttlock.bl.sdk.callback.ClearAllFingerprintCallback;
 import com.ttlock.bl.sdk.callback.ClearAllICCardCallback;
 import com.ttlock.bl.sdk.callback.ClearPassageModeCallback;
@@ -1644,6 +1645,27 @@ public class TtlockModule extends ReactContextBaseJavaModule {
             lockErrorCallback(lockError, fail);
           }
         });
+      } else {
+        noPermissionCallback(fail);
+      }
+    });
+  }
+
+  @ReactMethod
+  public void setUnlockDirectionAutomatic(String lockData, Callback successCallback, Callback fail) {
+    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+      if (success) {
+          TTLockClient.getDefault().autoSetUnlockDirection(lockData, new AutoSetUnlockDirectionCallback() {
+            @Override
+            public void onSetSuccess() {
+              successCallback.invoke();
+            }
+
+            @Override
+            public void onFail(LockError lockError) {
+              lockErrorCallback(lockError, fail);
+            }
+          });
       } else {
         noPermissionCallback(fail);
       }
