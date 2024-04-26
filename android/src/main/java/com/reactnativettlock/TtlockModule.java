@@ -104,6 +104,7 @@ import com.ttlock.bl.sdk.device.WirelessDoorSensor;
 import com.ttlock.bl.sdk.device.WirelessKeypad;
 import com.ttlock.bl.sdk.entity.AccessoryInfo;
 import com.ttlock.bl.sdk.entity.AccessoryType;
+import com.ttlock.bl.sdk.entity.AutoUnlockDirection;
 import com.ttlock.bl.sdk.entity.ControlLockResult;
 import com.ttlock.bl.sdk.entity.IpSetting;
 import com.ttlock.bl.sdk.entity.LockError;
@@ -1657,8 +1658,17 @@ public class TtlockModule extends ReactContextBaseJavaModule {
       if (success) {
           TTLockClient.getDefault().autoSetUnlockDirection(lockData, new AutoSetUnlockDirectionCallback() {
             @Override
-            public void onSetSuccess() {
-              successCallback.invoke();
+            public void onSetSuccess(AutoUnlockDirection autoUnlockDirection) {
+              int direction = 0;
+              switch (autoUnlockDirection) {
+                case LEFT:
+                  direction = 1;
+                  break;
+                case RIGHT:
+                  direction = 2;
+                  break;
+              }
+              successCallback.invoke(direction);
             }
 
             @Override
