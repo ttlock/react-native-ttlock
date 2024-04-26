@@ -687,21 +687,17 @@ class Ttlock {
     ttlockModule.setLockSoundVolume(soundVolume, lockData, success, fail);
   }
 
-  static getLockSoundVolume(lockData: string, success: ((lockSoundVolume: LockSoundVolume) => void), fail: null | ((errorCode: number, description: string) => void)) {
+  static getLockSoundVolume(lockData: string, success: null | ((lockSoundVolume: LockSoundVolume) => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttlockModule.getLockSoundVolume(lockData, (soundVolume: number) => {
-      success(soundVolume);
-    }, fail);
+    ttlockModule.getLockSoundVolume(lockData, success, fail);
   }
 
 
-  static getUnlockDirection(lockData: string, success: ((direction: LockUnlockDirection) => void), fail: null | ((errorCode: number, description: string) => void)) {
+  static getUnlockDirection(lockData: string, success: null | ((direction: LockUnlockDirection) => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttlockModule.getUnlockDirection(lockData, (unlockDirection: number) => {
-      success(unlockDirection === 1 ? LockUnlockDirection.Left : LockUnlockDirection.Right);
-    }, fail);
+    ttlockModule.getUnlockDirection(lockData, success, fail);
   }
 
 
@@ -712,7 +708,7 @@ class Ttlock {
   }
 
 
-  static setUnlockDirectionAutomatic(lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+  static setUnlockDirectionAutomatic(lockData: string, success: null | ((direction: LockUnlockDirection) => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
     ttlockModule.setUnlockDirectionAutomatic(lockData, success, fail);
@@ -1023,6 +1019,7 @@ enum LockSoundVolume {
 
 
 enum LockUnlockDirection {
+  Unknow = 0,
   Left = 1,
   Right = 2
 }

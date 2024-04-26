@@ -441,8 +441,8 @@ RCT_EXPORT_METHOD(setUnlockDirection:(int)unlockDirection lockData:(NSString *)l
 
 RCT_EXPORT_METHOD(setUnlockDirectionAutomatic:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
-    [TTLock autoSetUnlockDirectionWithLockData:lockData success:^{
-        [Ttlock response:nil success:success];
+    [TTLock autoSetUnlockDirectionWithLockData:lockData success:^(TTAutoUnlockDirection state) {
+        [Ttlock response:@(state) success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
         [Ttlock response:errorCode message:errorMsg fail:fail];
     }];

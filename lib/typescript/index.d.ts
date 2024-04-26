@@ -291,6 +291,7 @@ declare class Ttlock {
     static getLockSoundVolume(lockData: string, success: ((lockSoundVolume: LockSoundVolume) => void), fail: null | ((errorCode: number, description: string) => void)): void;
     static getUnlockDirection(lockData: string, success: ((direction: LockUnlockDirection) => void), fail: null | ((errorCode: number, description: string) => void)): void;
     static setUnlockDirection(direction: LockUnlockDirection, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static setUnlockDirectionAutomatic(lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
     /**
      * Set the lock always unlock.
      * @param mode LockPassageMode
@@ -403,7 +404,8 @@ declare enum LockFunction {
     CpuCard = 55,
     Wifi = 56,
     WifiStaticIP = 58,
-    PasscodeKeyNumber = 60
+    PasscodeKeyNumber = 60,
+    AutoSetUnlockDirection = 81
 }
 declare enum LockRecordType {
     Latest = 0,
