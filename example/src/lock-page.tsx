@@ -44,8 +44,8 @@ const getLockSupportOperationList = (lockData: string) => {
 
     { lockOperation: "Get lock unlock direction", lockFuctionValue: null },
     { lockOperation: "Set lock unlock direction", lockFuctionValue: null },
-
-
+    { lockOperation: "Set lock unlock direction automatic", lockFuctionValue: null },
+    
     { lockOperation: "Add passage mode", lockFuctionValue: LockFunction.PassageMode },
     { lockOperation: "Clear all passageModes", lockFuctionValue: LockFunction.PassageMode },
 
@@ -352,6 +352,13 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
   else if (lockOperation === "Set lock unlock direction") {
     Ttlock.setUnlockDirection(LockUnlockDirection.Left, lockData, () => {
       let text = "set lock unlock direction success";
+      successCallback(text);
+    }, failedCallback);
+  }
+
+  else if (lockOperation === "Set lock unlock direction automatic") {
+    Ttlock.setUnlockDirectionAutomatic(lockData, (direction: LockUnlockDirection) => {
+      let text = "set lock unlock direction automatic success: " + direction.toString();
       successCallback(text);
     }, failedCallback);
   }
