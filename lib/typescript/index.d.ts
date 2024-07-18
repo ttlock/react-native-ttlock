@@ -288,10 +288,10 @@ declare class Ttlock {
      */
     static setLockConfig(config: LockConfigType, isOn: boolean, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
     static setLockSoundVolume(soundVolume: LockSoundVolume, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
-    static getLockSoundVolume(lockData: string, success: ((lockSoundVolume: LockSoundVolume) => void), fail: null | ((errorCode: number, description: string) => void)): void;
-    static getUnlockDirection(lockData: string, success: ((direction: LockUnlockDirection) => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static getLockSoundVolume(lockData: string, success: null | ((lockSoundVolume: LockSoundVolume) => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static getUnlockDirection(lockData: string, success: null | ((direction: LockUnlockDirection) => void), fail: null | ((errorCode: number, description: string) => void)): void;
     static setUnlockDirection(direction: LockUnlockDirection, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
-    static setUnlockDirectionAutomatic(lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static setUnlockDirectionAutomatic(lockData: string, success: null | ((direction: LockUnlockDirection) => void), fail: null | ((errorCode: number, description: string) => void)): void;
     /**
      * Set the lock always unlock.
      * @param mode LockPassageMode
@@ -419,7 +419,8 @@ declare enum LockConfigType {
     ResetButton = 4,
     PrivacyLock = 5,
     PassageModeAutoUnlock = 6,
-    WifiPowerSavingMode = 7
+    WifiPowerSavingMode = 7,
+    DoubleAuth = 8
 }
 declare enum LockSoundVolume {
     On = -1,
@@ -431,6 +432,7 @@ declare enum LockSoundVolume {
     Livel_5 = 5
 }
 declare enum LockUnlockDirection {
+    Unknow = 0,
     Left = 1,
     Right = 2
 }
