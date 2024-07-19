@@ -14,7 +14,8 @@ public enum TTLockConfigConverter {
   resetButton,
   privacyLock,
   passageModeAutoUnlock,
-  wifiPowerSavingMode;
+  wifiPowerSavingMode,
+  doubleAuth;
 
   public static TTLockConfigType RN2Native(int index) {
     if (index < TTLockConfigConverter.class.getEnumConstants().length) {
@@ -41,6 +42,8 @@ public enum TTLockConfigConverter {
         return TTLockConfigType.PASSAGE_MODE_AUTO_UNLOCK_SETTING;
       case wifiPowerSavingMode:
         return TTLockConfigType.WIFI_LOCK_POWER_SAVING_MODE;
+      case doubleAuth:
+        return TTLockConfigType.DOUBLE_CHECK;
     }
     return null;
   }
@@ -63,6 +66,8 @@ public enum TTLockConfigConverter {
         return passageModeAutoUnlock.ordinal();
       case WIFI_LOCK_POWER_SAVING_MODE:
         return wifiPowerSavingMode.ordinal();
+      case DOUBLE_CHECK:
+        return doubleAuth.ordinal();
     }
     return -1;//未知
   }
