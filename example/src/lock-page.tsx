@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { Ttlock, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, LockSoundVolume, LockUnlockDirection, WifiLockServerInfo } from 'react-native-ttlock';
+import { Ttlock, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, LockSoundVolume, LockUnlockDirection, WifiLockServerInfo, FaceState, FaceErrorCode } from 'react-native-ttlock';
 import * as Toast from './toast-page';
 
 const getLockSupportOperationList = (lockData: string) => {
@@ -29,6 +29,11 @@ const getLockSupportOperationList = (lockData: string) => {
     { lockOperation: "Modify fingerprint validity period", lockFuctionValue: LockFunction.Fingerprint },
     { lockOperation: "Delete fingerprint", lockFuctionValue: LockFunction.Fingerprint },
     { lockOperation: "Clear all fingerprints", lockFuctionValue: LockFunction.Fingerprint },
+
+    { lockOperation: "Add face", lockFuctionValue: LockFunction.Face },
+    { lockOperation: "Modify face validity period", lockFuctionValue: LockFunction.Face },
+    { lockOperation: "Delete face", lockFuctionValue: LockFunction.Face },
+    { lockOperation: "Clear all face", lockFuctionValue: LockFunction.Face },
 
 
     { lockOperation: "Get lock automatic locking periodic time", lockFuctionValue: LockFunction.AutoLock },
@@ -115,6 +120,7 @@ const failedCallback = function (errorCode: number, errorMessage: string) {
 
 var cardNumber: undefined | string;
 var fingerprintNumber: undefined | string;
+var faceNumber: undefined | string;
 
 const operationClick = (lockOperation: string, lockData: string, lockMac: string, navigation: any) => {
   Toast.showToastLoad(lockOperation + "...");
@@ -296,6 +302,56 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
       fingerprintNumber = undefined;
     }, failedCallback);
   }
+
+  else if (lockOperation === "Add face") {
+    // card valid one day
+    let startDate = new Date().getTime();
+    let endDate = startDate + 24 * 3600 * 1000;
+    Ttlock.addFace(null, startDate, endDate, lockData, (faceState: FaceState, faceErrorCode :FaceErrorCode) => {
+      let text = "faceState:" + faceState + "      faceErrorCode:" + faceErrorCode;
+      progressCallback(text)
+    } ,(fNumber: string) => {
+      faceNumber = fNumber;
+      let text = "faceNumber:" + faceNumber;
+      successCallback(text);
+    }, failedCallback);
+  }
+
+
+
+  else if (lockOperation === "Modify face validity period") {
+    if (faceNumber === undefined) {
+      Toast.showToast("Please add a faceNumber first");
+      return;
+    }
+    // face valid one minute
+    let startDate = new Date().getTime();
+    let endDate = startDate + 1 * 60 * 1000;
+    Ttlock.modifyFaceValidityPeriod(null, startDate, endDate, faceNumber, lockData, () => {
+      let text = "Modify face validity period success";
+      successCallback(text);
+    }, failedCallback);
+  }
+  else if (lockOperation === "Delete face") {
+    if (faceNumber === undefined) {
+      Toast.showToast("Please add a face first");
+      return;
+    }
+    Ttlock.deleteFace(faceNumber, lockData, () => {
+      let text = "Delete face success";
+      successCallback(text);
+      faceNumber = undefined;
+    }, failedCallback);
+  }
+  else if (lockOperation === "Clear all face") {
+    Ttlock.clearAllFace(lockData, () => {
+      let text = "Clear all face success";
+      successCallback(text);
+      faceNumber = undefined;
+    }, failedCallback);
+  }
+
+
   else if (lockOperation === "Get lock automatic locking periodic time") {
     Ttlock.getLockAutomaticLockingPeriodicTime(lockData, (currentTime: number, maxTime: number, minTime: number) => {
       let text = "currentTime:" + currentTime + "\n" + "maxTime:" + maxTime + "\n" + "minTime:" + minTime;

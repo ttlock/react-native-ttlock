@@ -8,6 +8,7 @@
 #define EVENT_SCAN_LOCK @"EventScanLock"
 #define EVENT_ADD_CARD_PROGRESS @"EventAddCardProgrress"
 #define EVENT_ADD_FINGERPRINT_PROGRESS @"EventAddFingerprintProgrress"
+#define EVENT_ADD_FACE_PROGRESS @"EventAddFaceProgrress"
 #define EVENT_BLUETOOTH_STATE @"EventBluetoothState"
 #define EVENT_SCAN_GATEWAY @"EventScanGateway"
 #define EVENT_SCAN_WIFI @"EventScanWifi"
@@ -48,6 +49,7 @@ RCT_EXPORT_MODULE()
       EVENT_SCAN_LOCK,
       EVENT_ADD_CARD_PROGRESS,
       EVENT_ADD_FINGERPRINT_PROGRESS,
+      EVENT_ADD_FACE_PROGRESS,
 //      EVENT_BLUETOOTH_STATE,
       EVENT_SCAN_GATEWAY,
       EVENT_SCAN_WIFI,
@@ -606,6 +608,60 @@ RCT_EXPORT_METHOD(configIp:(NSDictionary *) info lockData:(NSString *) lockData 
         [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
+
+
+RCT_EXPORT_METHOD(addFace:(NSArray *)cycleList startDate:(nonnull NSNumber *)startDate endDate:(nonnull NSNumber *)endDate lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    __weak Ttlock *weakSelf = self;
+    [TTLock addFaceWithCyclicConfig:cycleList startDate:startDate.longLongValue endDate:endDate.longLongValue lockData:lockData progress:^(TTAddFaceState state, TTFaceErrorCode faceErrorCode) {
+        if(state == TTAddFaceStateCanStartAdd || state == TTAddFaceStateError){
+            NSNumber * stateValue = @(state - 2);
+            [weakSelf sendEventWithName:EVENT_ADD_FACE_PROGRESS body:@[stateValue, @(faceErrorCode)]];
+        }
+    } success:^(NSString *faceNumber) {
+        [Ttlock response:faceNumber success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock response:errorCode message:errorMsg fail:fail];
+    }];
+}
+
+RCT_EXPORT_METHOD(addFaceFeatureData:(NSString *)faceFeatureData cycleList:(NSArray *) cycleList startDate:(nonnull NSNumber *)startDate endDate:(nonnull NSNumber *)endDate lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    [TTLock addFaceFeatureData:faceFeatureData cyclicConfig:cycleList startDate:startDate.longLongValue endDate:endDate.longLongValue lockData:lockData success:^(NSString *faceNumber) {
+        [Ttlock response:faceNumber success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock response:errorCode message:errorMsg fail:fail];
+    }];
+}
+
+
+RCT_EXPORT_METHOD(modifyFaceValidityPeriod:(NSArray *)cycleList startDate:(nonnull NSNumber *)startDate endDate:(nonnull NSNumber *)endDate faceNumber:(NSString *)faceNumber lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    [TTLock modifyFaceValidityWithCyclicConfig:cycleList faceNumber:faceNumber startDate:startDate.longLongValue endDate:endDate.longLongValue lockData:lockData success:^{
+        [Ttlock response:nil success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock response:errorCode message:errorMsg fail:fail];
+    }];
+}
+
+RCT_EXPORT_METHOD(deleteFace:(NSString *)faceNumber lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    [TTLock deleteFaceNumber:faceNumber lockData:lockData success:^{
+        [Ttlock response:nil success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock response:errorCode message:errorMsg fail:fail];
+    }];
+}
+
+RCT_EXPORT_METHOD(clearFace:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    [TTLock clearFaceWithLockData:lockData success:^{
+        [Ttlock response:nil success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock response:errorCode message:errorMsg fail:fail];
+    }];
+}
+
 
 RCT_EXPORT_METHOD(enterUpgradeMode:(NSString *) lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {

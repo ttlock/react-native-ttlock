@@ -861,6 +861,59 @@ class Ttlock {
     ttlockModule.configIp(info,lockData, success, fail);
   }
 
+
+
+
+
+  static addFace(cycleList: null | CycleDateParam[], startDate: number, endDate: number, lockData: string, progress: ((state: FaceState, FaceErrorCode: FaceErrorCode) => void), success: null | ((faceNumber: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
+    progress = progress || this.defaultCallback;
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    cycleList = cycleList || [];
+
+    let subscription = ttlockEventEmitter.addListener(TTLockEvent.AddFaceProgrress, (dataArray: number[]) => {
+      progress(dataArray[0], dataArray[1]);
+    });
+    ttlockModule.addFace(cycleList, startDate, endDate, lockData, (cardNumber: string) => {
+      subscription.remove();
+      success!(cardNumber);
+    }, (errorCode: number, errorDesc: string) => {
+      subscription.remove();
+      fail!(errorCode, errorDesc);
+    });
+  }
+
+  static addFaceFeatureData(faceFeatureData: string, cycleList: null | CycleDateParam[], startDate: number, endDate: number, lockData: string, success: null | ((faceNumber: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    cycleList = cycleList || [];
+    ttlockModule.addFaceFeatureData(faceFeatureData, cycleList, startDate, endDate, lockData, (faceNumber: string) => {
+      success!(faceNumber);
+    }, (errorCode: number, errorDesc: string) => {
+      fail!(errorCode, errorDesc);
+    });
+  }
+
+  static modifyFaceValidityPeriod(cycleList: null | CycleDateParam[], startDate: number, endDate: number, faceNumber:string, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    cycleList = cycleList || [];
+    ttlockModule.modifyFaceValidityPeriod(cycleList, startDate, endDate, faceNumber, lockData, success, fail);
+  }
+
+  static deleteFace(faceNumber:string, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    ttlockModule.deleteFace(faceNumber, lockData, success, fail);
+  }
+
+  static clearAllFace(lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    ttlockModule.clearFace(lockData, success, fail);
+  }
+
+
   static enterUpgradeMode(lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
@@ -1042,6 +1095,36 @@ enum LockState {
   CarOnLock
 }
 
+enum FaceState {
+  canAddFace = 0,
+  addFail = 1
+}
+
+enum FaceErrorCode {
+  normal = 0,
+  noFaceDetected = 1,
+  tooCloseToTheTop = 2,
+  tooCloseToTheBottom = 3,
+  tooCloseToTheLeft = 4,
+  tooCloseToTheRight = 5,
+  tooFarAway = 6,
+  tooClose = 7,
+  eyebrowsCovered = 8,
+  eyesCovered = 9,
+  faceCovered = 10,
+  wrongFaceDirection = 11,
+  eyeOpeningDetected = 12,
+  eyesClosedStatus = 13,
+  failedToDetectEye = 14,
+  needTurnHeadToLeft = 15,
+  needTurnHeadToRight = 16,
+  needRaiseHead = 17,
+  needLowerHead = 18,
+  needTiltHeadToLeft = 19,
+  needTiltHeadToRight = 20,
+};
+
+
 enum ConnectState {
   Timeout = 0,
   Success = 1,
@@ -1052,6 +1135,7 @@ enum TTLockEvent {
   ScanLock = "EventScanLock",
   AddCardProgrress = "EventAddCardProgrress",
   AddFingerprintProgress = "EventAddFingerprintProgrress",
+  AddFaceProgrress = "EventAddFaceProgrress",
   ListenBluetoothState = "EventBluetoothState",
   ScanLockWifi = "EventScanLockWifi",
 }
@@ -1093,4 +1177,4 @@ enum GatewayIpSettingType {
   DHCP = 1
 }
 
-export { Ttlock, TtGateway, TtRemoteKey, TtDoorSensor, TtWirelessKeypad, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType, GatewayIpSettingType, LockSoundVolume, TtRemoteKeyEvent, TtDoorSensorEvent, LockUnlockDirection, LockAccessoryType, ScanLockModal, ScanRemoteKeyModal, ScanDoorSensorModal, DeviceSystemModal, WirelessKeypadEvent, ScanWirelessKeypadModal, WifiLockServerInfo }
+export { Ttlock, TtGateway, TtRemoteKey, TtDoorSensor, TtWirelessKeypad, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType, GatewayIpSettingType, LockSoundVolume, TtRemoteKeyEvent, TtDoorSensorEvent, LockUnlockDirection, LockAccessoryType, ScanLockModal, ScanRemoteKeyModal, ScanDoorSensorModal, DeviceSystemModal, WirelessKeypadEvent, ScanWirelessKeypadModal, WifiLockServerInfo, FaceState, FaceErrorCode }
