@@ -48,12 +48,14 @@ import com.reactnativettlock.util.Utils;
 import com.ttlock.bl.sdk.api.ExtendedBluetoothDevice;
 import com.ttlock.bl.sdk.api.TTLockClient;
 import com.ttlock.bl.sdk.callback.AddDoorSensorCallback;
+import com.ttlock.bl.sdk.callback.AddFaceCallback;
 import com.ttlock.bl.sdk.callback.AddFingerprintCallback;
 import com.ttlock.bl.sdk.callback.AddICCardCallback;
 import com.ttlock.bl.sdk.callback.AddRemoteCallback;
 import com.ttlock.bl.sdk.callback.AutoSetUnlockDirectionCallback;
 import com.ttlock.bl.sdk.callback.ClearAllFingerprintCallback;
 import com.ttlock.bl.sdk.callback.ClearAllICCardCallback;
+import com.ttlock.bl.sdk.callback.ClearFaceCallback;
 import com.ttlock.bl.sdk.callback.ClearPassageModeCallback;
 import com.ttlock.bl.sdk.callback.ClearRemoteCallback;
 import com.ttlock.bl.sdk.callback.ConfigServerCallback;
@@ -61,6 +63,7 @@ import com.ttlock.bl.sdk.callback.ConfigWifiCallback;
 import com.ttlock.bl.sdk.callback.ControlLockCallback;
 import com.ttlock.bl.sdk.callback.CreateCustomPasscodeCallback;
 import com.ttlock.bl.sdk.callback.DeleteDoorSensorCallback;
+import com.ttlock.bl.sdk.callback.DeleteFaceCallback;
 import com.ttlock.bl.sdk.callback.DeleteFingerprintCallback;
 import com.ttlock.bl.sdk.callback.DeleteICCardCallback;
 import com.ttlock.bl.sdk.callback.DeletePasscodeCallback;
@@ -79,6 +82,7 @@ import com.ttlock.bl.sdk.callback.GetUnlockDirectionCallback;
 import com.ttlock.bl.sdk.callback.GetWifiInfoCallback;
 import com.ttlock.bl.sdk.callback.InitLockCallback;
 import com.ttlock.bl.sdk.callback.ModifyAdminPasscodeCallback;
+import com.ttlock.bl.sdk.callback.ModifyFacePeriodCallback;
 import com.ttlock.bl.sdk.callback.ModifyFingerprintPeriodCallback;
 import com.ttlock.bl.sdk.callback.ModifyICCardPeriodCallback;
 import com.ttlock.bl.sdk.callback.ModifyPasscodeCallback;
@@ -106,6 +110,7 @@ import com.ttlock.bl.sdk.entity.AccessoryInfo;
 import com.ttlock.bl.sdk.entity.AccessoryType;
 import com.ttlock.bl.sdk.entity.AutoUnlockDirection;
 import com.ttlock.bl.sdk.entity.ControlLockResult;
+import com.ttlock.bl.sdk.entity.FaceCollectionStatus;
 import com.ttlock.bl.sdk.entity.IpSetting;
 import com.ttlock.bl.sdk.entity.LockError;
 import com.ttlock.bl.sdk.entity.PassageModeConfig;
@@ -2043,6 +2048,169 @@ public class TtlockModule extends ReactContextBaseJavaModule {
         TTLockClient.getDefault().configIp(IpSettingConverter.toObject(readableMap), lockData, new com.ttlock.bl.sdk.callback.ConfigIpCallback() {
           @Override
           public void onConfigIpSuccess() {
+            successCallback.invoke();
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            lockErrorCallback(lockError, fail);
+          }
+        });
+      } else {
+        noPermissionCallback(fail);
+      }
+    });
+  }
+
+  @ReactMethod
+  public void addFace(ReadableArray cycleList, double startDate, double endDate, String lockData, Callback successCallback, Callback fail) {
+
+    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+      if (success) {
+        ValidityInfo validityInfo = new ValidityInfo();
+        validityInfo.setModeType(cycleList == null || cycleList.size() == 0 ? ValidityInfo.TIMED : ValidityInfo.CYCLIC);
+        validityInfo.setStartDate((long) startDate);
+        validityInfo.setEndDate((long) endDate);
+        validityInfo.setCyclicConfigs(Utils.readableArray2CyclicList(cycleList));
+
+        TTLockClient.getDefault().addFace(lockData, validityInfo, new AddFaceCallback() {
+          @Override
+          public void onEnterAddMode() {
+            WritableArray writableArray = Arguments.createArray();
+            writableArray.pushInt(0);
+            writableArray.pushInt(0);
+            getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(TTLockEvent.addFaceProgrress, writableArray);
+          }
+
+          @Override
+          public void onCollectionStatus(FaceCollectionStatus faceCollectionStatus) {
+            WritableArray writableArray = Arguments.createArray();
+            writableArray.pushInt(0);
+            writableArray.pushInt(faceCollectionStatus.getValue());
+            getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(TTLockEvent.addFaceProgrress, writableArray);
+          }
+
+          @Override
+          public void onAddFinished(long faceNumber) {
+            successCallback.invoke(String.valueOf(faceNumber));
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            lockErrorCallback(lockError, fail);
+          }
+        });
+      } else {
+        noPermissionCallback(fail);
+      }
+    });
+  }
+
+  @ReactMethod
+  public void addFaceFeatureData(String faceFeatureData, ReadableArray cycleList, double startDate, double endDate, String lockData, Callback successCallback, Callback fail) {
+
+    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+      if (success) {
+        ValidityInfo validityInfo = new ValidityInfo();
+        validityInfo.setModeType(cycleList == null || cycleList.size() == 0 ? ValidityInfo.TIMED : ValidityInfo.CYCLIC);
+        validityInfo.setStartDate((long) startDate);
+        validityInfo.setEndDate((long) endDate);
+        validityInfo.setCyclicConfigs(Utils.readableArray2CyclicList(cycleList));
+
+        TTLockClient.getDefault().addFaceFeatureData(lockData, faceFeatureData, validityInfo, new AddFaceCallback() {
+          @Override
+          public void onEnterAddMode() {
+
+          }
+
+          @Override
+          public void onCollectionStatus(FaceCollectionStatus faceCollectionStatus) {
+
+          }
+
+          @Override
+          public void onAddFinished(long faceNumber) {
+            successCallback.invoke(String.valueOf(faceNumber));
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            lockErrorCallback(lockError, fail);
+          }
+        });
+
+      } else {
+        noPermissionCallback(fail);
+      }
+    });
+  }
+
+  @ReactMethod
+  public void modifyFaceValidityPeriod(ReadableArray cycleList, double startDate, double endDate, String faceNumber, String lockData, Callback successCallback, Callback fail) {
+    if (TextUtils.isEmpty(faceNumber)) {
+      lockErrorCallback(LockError.DATA_FORMAT_ERROR, fail);
+      return;
+    }
+
+    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+      if (success) {
+        ValidityInfo validityInfo = new ValidityInfo();
+        validityInfo.setModeType(cycleList == null || cycleList.size() == 0 ? ValidityInfo.TIMED : ValidityInfo.CYCLIC);
+        validityInfo.setStartDate((long) startDate);
+        validityInfo.setEndDate((long) endDate);
+        validityInfo.setCyclicConfigs(Utils.readableArray2CyclicList(cycleList));
+
+        TTLockClient.getDefault().modifyFaceValidityPeriod(lockData, Long.valueOf(faceNumber), validityInfo, new ModifyFacePeriodCallback() {
+          @Override
+          public void onModifySuccess() {
+            successCallback.invoke();
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            lockErrorCallback(lockError, fail);
+          }
+        });
+
+      } else {
+        noPermissionCallback(fail);
+      }
+    });
+  }
+
+  @ReactMethod
+  public void deleteFace(String faceNumber, String lockData, Callback successCallback, Callback fail) {
+    if (TextUtils.isEmpty(faceNumber)) {
+      lockErrorCallback(LockError.DATA_FORMAT_ERROR, fail);
+      return;
+    }
+    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+      if (success) {
+
+        TTLockClient.getDefault().deleteFace(lockData, Long.valueOf(faceNumber), new DeleteFaceCallback() {
+          @Override
+          public void onDeleteSuccess() {
+            successCallback.invoke();
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            lockErrorCallback(lockError, fail);
+          }
+        });
+      } else {
+        noPermissionCallback(fail);
+      }
+    });
+  }
+
+  @ReactMethod
+  public void clearAllFace(String lockData, Callback successCallback, Callback fail) {
+    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+      if (success) {
+        TTLockClient.getDefault().clearFace(lockData, new ClearFaceCallback() {
+          @Override
+          public void onClearSuccess() {
             successCallback.invoke();
           }
 
