@@ -2205,7 +2205,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void clearAllFace(String lockData, Callback successCallback, Callback fail) {
+  public void clearFace(String lockData, Callback successCallback, Callback fail) {
     PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
       if (success) {
         TTLockClient.getDefault().clearFace(lockData, new ClearFaceCallback() {
