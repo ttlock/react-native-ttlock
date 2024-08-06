@@ -1,7 +1,7 @@
 {
   "name": "react-native-ttlock",
-  "version": "2.1.4",
-  "description": "ttlock",
+  "version": "2.2.2",
+  "description": "ttlock react native sdk",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
   "types": "lib/typescript/index.d.ts",
