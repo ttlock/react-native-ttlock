@@ -18,9 +18,7 @@ Pod::Spec.new do |s|
 
   #TTLock 依赖
   s.platform = :ios, '9.0'
-  s.vendored_frameworks = "ios/Frameworks/**/*.framework"
-  
-  s.dependency "React"
-
+  s.dependency 'TTLockOnPremise', '2.1.2'
   s.static_framework = true
+
 end
