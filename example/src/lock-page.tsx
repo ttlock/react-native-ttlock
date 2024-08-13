@@ -480,8 +480,9 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
   }
   else if (lockOperation === "Modify admin passcode to 9999") {
     let adminPasscode = "9999";
-    Ttlock.modifyAdminPasscode(adminPasscode, lockData, () => {
+    Ttlock.modifyAdminPasscode(adminPasscode, lockData, (newLockData: string) => {
       let text = "modify admin passcode success";
+      console.log("newLockData: " + newLockData);
       successCallback(text);
     }, failedCallback);
   }

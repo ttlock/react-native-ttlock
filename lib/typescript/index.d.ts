@@ -336,6 +336,11 @@ declare class Ttlock {
     static configServer(ip: string, port: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
     static getWifiInfo(lockData: string, success: null | ((wifiMac: string, wifiRssi: number) => void), fail: null | ((errorCode: number, description: string) => void)): void;
     static configIp(info: WifiLockServerInfo, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static addFace(cycleList: null | CycleDateParam[], startDate: number, endDate: number, lockData: string, progress: ((state: FaceState, FaceErrorCode: FaceErrorCode) => void), success: null | ((faceNumber: string) => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static addFaceFeatureData(faceFeatureData: string, cycleList: null | CycleDateParam[], startDate: number, endDate: number, lockData: string, success: null | ((faceNumber: string) => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static modifyFaceValidityPeriod(cycleList: null | CycleDateParam[], startDate: number, endDate: number, faceNumber: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static deleteFace(faceNumber: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static clearAllFace(lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
     static enterUpgradeMode(lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
     /**
      * Monitor phone's Bluetooth status
@@ -450,6 +455,33 @@ declare enum LockState {
     Unknow = 2,
     CarOnLock = 3
 }
+declare enum FaceState {
+    canAddFace = 0,
+    addFail = 1
+}
+declare enum FaceErrorCode {
+    normal = 0,
+    noFaceDetected = 1,
+    tooCloseToTheTop = 2,
+    tooCloseToTheBottom = 3,
+    tooCloseToTheLeft = 4,
+    tooCloseToTheRight = 5,
+    tooFarAway = 6,
+    tooClose = 7,
+    eyebrowsCovered = 8,
+    eyesCovered = 9,
+    faceCovered = 10,
+    wrongFaceDirection = 11,
+    eyeOpeningDetected = 12,
+    eyesClosedStatus = 13,
+    failedToDetectEye = 14,
+    needTurnHeadToLeft = 15,
+    needTurnHeadToRight = 16,
+    needRaiseHead = 17,
+    needLowerHead = 18,
+    needTiltHeadToLeft = 19,
+    needTiltHeadToRight = 20
+}
 declare enum ConnectState {
     Timeout = 0,
     Success = 1,
@@ -478,4 +510,4 @@ declare enum GatewayIpSettingType {
     STATIC_IP = 0,
     DHCP = 1
 }
-export { Ttlock, TtGateway, TtRemoteKey, TtDoorSensor, TtWirelessKeypad, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType, GatewayIpSettingType, LockSoundVolume, TtRemoteKeyEvent, TtDoorSensorEvent, LockUnlockDirection, LockAccessoryType, ScanLockModal, ScanRemoteKeyModal, ScanDoorSensorModal, DeviceSystemModal, WirelessKeypadEvent, ScanWirelessKeypadModal, WifiLockServerInfo };
+export { Ttlock, TtGateway, TtRemoteKey, TtDoorSensor, TtWirelessKeypad, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType, GatewayIpSettingType, LockSoundVolume, TtRemoteKeyEvent, TtDoorSensorEvent, LockUnlockDirection, LockAccessoryType, ScanLockModal, ScanRemoteKeyModal, ScanDoorSensorModal, DeviceSystemModal, WirelessKeypadEvent, ScanWirelessKeypadModal, WifiLockServerInfo, FaceState, FaceErrorCode };
