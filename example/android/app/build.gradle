@@ -180,6 +180,19 @@ android {
         }
     }
 
+  sourceSets {
+    main {
+      jniLibs.srcDirs = ['libs']
+    }
+  }
+
+  //添加本地仓库，并把libs目录作为仓库地址
+  repositories {
+    flatDir {
+      dirs 'libs'
+    }
+  }
+
 //    packagingOptions {
 ////        exclude "lib/arm64-v8a/librealm-jni.so"
 //        pickFirst "lib/armeabi-v7a/libc++_shared.so"
@@ -189,11 +202,6 @@ android {
 //    }
 }
 
-repositories {
-    flatDir {
-        dirs "$rootDir/../../android/libs"
-    }
-}
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])

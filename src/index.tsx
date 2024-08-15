@@ -4,7 +4,7 @@ import {
   // EmitterSubscription,
 } from 'react-native';
 
-import type { ScanGatewayModal, ScanLockModal, InitGatewayParam, CycleDateParam, ScanWifiModal, InitGatewayModal, LockVersion, ScanRemoteKeyModal, ScanDoorSensorModal, DeviceSystemModal , ScanWirelessKeypadModal} from './types'
+import type { ScanGatewayModal, ScanLockModal, InitGatewayParam, CycleDateParam, ScanWifiModal, InitGatewayModal, LockVersion, ScanRemoteKeyModal, ScanDoorSensorModal, DeviceSystemModal, ScanWirelessKeypadModal, WifiLockServerInfo } from './types'
 
 const ttlockModule = NativeModules.Ttlock;
 const ttlockEventEmitter = new NativeEventEmitter(ttlockModule);
@@ -34,7 +34,7 @@ class TtWirelessKeypad {
     subscriptionMap.delete(WirelessKeypadEvent.ScanWirelessKeypad);
   }
 
-  static init(mac: string, lockMac: string, success: ((electricQuantity: number, wirelessKeypadFeatureValue : string) => void), fail: null | ((errorCode: number, description: string) => void)) {
+  static init(mac: string, lockMac: string, success: ((electricQuantity: number, wirelessKeypadFeatureValue: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
     ttlockModule.initWirelessKeypad(mac, lockMac, (dataArray: any[]) => {
@@ -43,9 +43,9 @@ class TtWirelessKeypad {
       let description = "Init wireless keypad fail.";
       if (errorCode === -1) {
         description += "Wrong crc";
-      }else if (errorCode === -2) {
+      } else if (errorCode === -2) {
         description += "Connect timeout";
-      }else if (errorCode === -3) {
+      } else if (errorCode === -3) {
         description += "Wrong factoryd date";
       }
       fail!(errorCode, description);
@@ -76,7 +76,7 @@ class TtDoorSensor {
     subscriptionMap.delete(TtDoorSensorEvent.ScanDoorSensor);
   }
 
-  static init(mac: string, lockData: string, success: ((electricQuantity: number, systemModel : DeviceSystemModal) => void), fail: null | ((errorCode: number, description: string) => void)) {
+  static init(mac: string, lockData: string, success: ((electricQuantity: number, systemModel: DeviceSystemModal) => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
     ttlockModule.initDoorSensor(mac, lockData, (dataArray: any[]) => {
@@ -120,7 +120,7 @@ class TtRemoteKey {
     subscriptionMap.delete(TtRemoteKeyEvent.ScanRemoteKey);
   }
 
-  static init(mac: string, lockData: string, success: ((electricQuantity: number, systemModel : DeviceSystemModal) => void), fail: null | ((errorCode: number, description: string) => void)) {
+  static init(mac: string, lockData: string, success: ((electricQuantity: number, systemModel: DeviceSystemModal) => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
     ttlockModule.initRemoteKey(mac, lockData, (dataArray: any[]) => {
@@ -168,8 +168,8 @@ class TtGateway {
 
   /**
    * Connected to the gateway Only newly powered gateways can be connected）
-   * @param mac 
-   * @param callback 
+   * @param mac
+   * @param callback
    */
   static connect(mac: string, callback: ((state: ConnectState) => void)) {
     callback = callback || this.defaultCallback;
@@ -181,9 +181,9 @@ class TtGateway {
 
   /**
    * Read wifi near the gateway
-   * @param progress 
-   * @param finish 
-   * @param fail 
+   * @param progress
+   * @param finish
+   * @param fail
    */
   static getNearbyWifi(progress: ((scanWifiModalList: ScanWifiModal[]) => void), finish: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
     progress = progress || this.defaultCallback;
@@ -206,9 +206,9 @@ class TtGateway {
 
   /**
    * Initialize gateway
-   * @param object 
-   * @param success 
-   * @param fail 
+   * @param object
+   * @param success
+   * @param fail
    */
   static initGateway(object: InitGatewayParam, success: ((initGatewayModal: InitGatewayModal) => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
@@ -261,8 +261,8 @@ class Ttlock {
   /**
    * Initialize lock
    * @param object {lockMac:"ea:09:e2:99:33", lockVersion:"{\"protocolType\":5,\"protocolVersion\":3,\"scene\":2,\"groupId\":1,\"orgId\":1}"}
-   * @param success 
-   * @param fail 
+   * @param success
+   * @param fail
    */
   static initLock(object: object, success: null | ((lockData: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
@@ -277,20 +277,20 @@ class Ttlock {
     ttlockModule.getLockVersionWithLockMac(lockMac, success, fail);
   }
 
-  static getAccessoryElectricQuantity(accessoryType : LockAccessoryType, accessoryMac: string, lockData: string, success: ((electricQuantity : number, updateDate: number) => void), fail: null | ((errorCode: number, description: string) => void)) {
+  static getAccessoryElectricQuantity(accessoryType: LockAccessoryType, accessoryMac: string, lockData: string, success: ((electricQuantity: number, updateDate: number) => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttlockModule.getAccessoryElectricQuantity(accessoryType, accessoryMac,lockData,(dataArray: number[]) => {
+    ttlockModule.getAccessoryElectricQuantity(accessoryType, accessoryMac, lockData, (dataArray: number[]) => {
       success!(dataArray[0], dataArray[1]);
-    },fail);
+    }, fail);
   }
 
 
   /**
    * Reset the lock.
-   * @param lockData 
-   * @param success 
-   * @param fail 
+   * @param lockData
+   * @param success
+   * @param fail
    */
   static resetLock(lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
@@ -300,9 +300,9 @@ class Ttlock {
 
   /**
    * Reset the all keys.
-   * @param lockData 
-   * @param success 
-   * @param fail 
+   * @param lockData
+   * @param success
+   * @param fail
    */
   static resetEkey(lockData: string, success: null | ((lockData: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
@@ -326,13 +326,13 @@ class Ttlock {
   }
 
   /**
-   * Create a custom passcode. 
+   * Create a custom passcode.
    * @param passcode The password must be 4-9 digits
    * @param startDate Timestamp millisecond. The start valid time of the password.
    * @param endDate Timestamp millisecond. The expiration time of the password
-   * @param lockData 
-   * @param success 
-   * @param fail 
+   * @param lockData
+   * @param success
+   * @param fail
    */
   static createCustomPasscode(passcode: string, startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
@@ -346,9 +346,9 @@ class Ttlock {
    * @param passcodeNew new password must be 4-9 digits
    * @param startDate Timestamp millisecond. The start valid time of the password.
    * @param endDate Timestamp millisecond. The expiration time of the password
-   * @param lockData 
-   * @param success 
-   * @param fail 
+   * @param lockData
+   * @param success
+   * @param fail
    */
   static modifyPasscode(passcodeOrigin: string, passcodeNew: string, startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
@@ -358,10 +358,10 @@ class Ttlock {
 
   /**
    * Delete the passcode.
-   * @param passcode 
-   * @param lockData 
-   * @param success 
-   * @param fail 
+   * @param passcode
+   * @param lockData
+   * @param success
+   * @param fail
    */
   static deletePasscode(passcode: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
@@ -371,9 +371,9 @@ class Ttlock {
 
   /**
    * All passcode will be invalid after reset （Custom passcode and Admin passcode is still valid）
-   * @param lockData 
-   * @param success 
-   * @param fail 
+   * @param lockData
+   * @param success
+   * @param fail
    */
   static resetPasscode(lockData: string, success: null | ((lockData: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
@@ -383,9 +383,9 @@ class Ttlock {
 
   /**
    * Get the lock state (unlock or lock)
-   * @param lockData 
-   * @param success 
-   * @param fail 
+   * @param lockData
+   * @param success
+   * @param fail
    */
   static getLockSwitchState(lockData: string, success: null | ((state: LockState) => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
@@ -407,10 +407,10 @@ class Ttlock {
    * @param cycleList Periodic unlocking. You can set it to null if you don't need it
    * @param startDate Timestamp millisecond. The start valid time of the card.
    * @param endDate Timestamp millisecond. The expiration time of the card
-   * @param lockData 
-   * @param progress 
-   * @param success 
-   * @param fail 
+   * @param lockData
+   * @param progress
+   * @param success
+   * @param fail
    */
   static addCard(cycleList: null | CycleDateParam[], startDate: number, endDate: number, lockData: string, progress: (() => void), success: null | ((cardNumber: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
     progress = progress || this.defaultCallback;
@@ -432,13 +432,13 @@ class Ttlock {
 
   /**
    * Modify the validity period of the card
-   * @param cardNumber 
+   * @param cardNumber
    * @param cycleList Periodic unlocking. You can set it to null if you don't need it
    * @param startDate Timestamp millisecond. The start valid time of the card.
    * @param endDate Timestamp millisecond. The expiration time of the card
-   * @param lockData 
-   * @param success 
-   * @param fail 
+   * @param lockData
+   * @param success
+   * @param fail
    */
   static modifyCardValidityPeriod(cardNumber: string, cycleList: null | CycleDateParam[], startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
@@ -449,10 +449,10 @@ class Ttlock {
 
   /**
    * Delete the card
-   * @param cardNumber 
-   * @param lockData 
-   * @param success 
-   * @param fail 
+   * @param cardNumber
+   * @param lockData
+   * @param success
+   * @param fail
    */
   static deleteCard(cardNumber: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
@@ -462,9 +462,9 @@ class Ttlock {
 
   /**
    * Clear all cards
-   * @param lockData 
-   * @param success 
-   * @param fail 
+   * @param lockData
+   * @param success
+   * @param fail
    */
   static clearAllCards(lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
@@ -477,10 +477,10 @@ class Ttlock {
    * @param cycleList Periodic unlocking. You can set it to null if you don't need it
    * @param startDate Timestamp millisecond. The start valid time of the fingerprint.
    * @param endDate Timestamp millisecond. The expiration time of the fingerprint
-   * @param lockData 
-   * @param progress 
-   * @param success 
-   * @param fail 
+   * @param lockData
+   * @param progress
+   * @param success
+   * @param fail
    */
   static addFingerprint(cycleList: null | CycleDateParam[], startDate: number, endDate: number, lockData: string, progress: null | ((currentCount: number, totalCount: number) => void), success: null | ((fingerprintNumber: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
     progress = progress || this.defaultCallback;
@@ -502,13 +502,13 @@ class Ttlock {
 
   /**
    * Modify the validity period of the fingerprint
-   * @param fingerprintNumber 
+   * @param fingerprintNumber
    * @param cycleList Periodic unlocking. You can set it to null if you don't need it
    * @param startDate Timestamp millisecond. The start valid time of the fingerprint.
    * @param endDate Timestamp millisecond. The expiration time of the fingerprint
-   * @param lockData 
-   * @param success 
-   * @param fail 
+   * @param lockData
+   * @param success
+   * @param fail
    */
   static modifyFingerprintValidityPeriod(fingerprintNumber: string, cycleList: null | CycleDateParam[], startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
@@ -519,10 +519,10 @@ class Ttlock {
 
   /**
    * Delete the fingerprint
-   * @param fingerprintNumber 
-   * @param lockData 
-   * @param success 
-   * @param fail 
+   * @param fingerprintNumber
+   * @param lockData
+   * @param success
+   * @param fail
    */
   static deleteFingerprint(fingerprintNumber: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
@@ -532,9 +532,9 @@ class Ttlock {
 
   /**
    * Clear all fingerprints
-   * @param lockData 
-   * @param success 
-   * @param fail 
+   * @param lockData
+   * @param success
+   * @param fail
    */
   static clearAllFingerprints(lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
@@ -545,11 +545,11 @@ class Ttlock {
   /**
    * Modify admin passcode
    * @param adminPasscode  adminPasscode must be 4-9 digits
-   * @param lockData 
-   * @param success 
-   * @param fail 
+   * @param lockData
+   * @param success
+   * @param fail
    */
-  static modifyAdminPasscode(adminPasscode: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+  static modifyAdminPasscode(adminPasscode: string, lockData: string, success: null | ((newLockData: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
     ttlockModule.modifyAdminPasscode(adminPasscode, lockData, success, fail);
@@ -558,9 +558,9 @@ class Ttlock {
   /**
    * Set the lock time
    * @param timestamp  Millisecond.
-   * @param lockData 
-   * @param success 
-   * @param fail 
+   * @param lockData
+   * @param success
+   * @param fail
    */
   static setLockTime(timestamp: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
@@ -570,9 +570,9 @@ class Ttlock {
 
   /**
    * Get the lock time
-   * @param lockData 
-   * @param success 
-   * @param fail 
+   * @param lockData
+   * @param success
+   * @param fail
    */
   static getLockTime(lockData: string, success: null | ((lockTimestamp: number) => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
@@ -587,11 +587,11 @@ class Ttlock {
   }
 
   /**
-   * Read the operation record of the lock. 
+   * Read the operation record of the lock.
    * @param type LockRecordType
-   * @param lockData 
-   * @param success 
-   * @param fail 
+   * @param lockData
+   * @param success
+   * @param fail
    */
   static getLockOperationRecord(type: LockRecordType, lockData: string, success: null | ((records: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
@@ -601,9 +601,9 @@ class Ttlock {
 
   /**
    * Get the lock automatic locking periodic time
-   * @param lockData 
-   * @param success 
-   * @param fail 
+   * @param lockData
+   * @param success
+   * @param fail
    */
   static getLockAutomaticLockingPeriodicTime(lockData: string, success: null | ((currentTime: number, maxTime: number, minTime: number) => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
@@ -615,10 +615,10 @@ class Ttlock {
 
   /**
    * Set the lock automatic locking periodic time
-   * @param seconds 
-   * @param lockData 
-   * @param success 
-   * @param fail 
+   * @param seconds
+   * @param lockData
+   * @param success
+   * @param fail
    */
   static setLockAutomaticLockingPeriodicTime(seconds: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
@@ -628,9 +628,9 @@ class Ttlock {
 
   /**
    * Get the lock remote unlock switch state
-   * @param lockData 
-   * @param success 
-   * @param fail 
+   * @param lockData
+   * @param success
+   * @param fail
    */
   static getLockRemoteUnlockSwitchState(lockData: string, success: null | ((isOn: boolean) => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
@@ -640,10 +640,10 @@ class Ttlock {
 
   /**
    * Set the lock remote unlock switch state
-   * @param isOn 
-   * @param lockData 
-   * @param success 
-   * @param fail 
+   * @param isOn
+   * @param lockData
+   * @param success
+   * @param fail
    */
   static setLockRemoteUnlockSwitchState(isOn: boolean, lockData: string, success: null | ((lockData: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
@@ -653,10 +653,10 @@ class Ttlock {
 
   /**
    * Get config of the lock
-   * @param config 
-   * @param lockData 
-   * @param success 
-   * @param fail 
+   * @param config
+   * @param lockData
+   * @param success
+   * @param fail
    */
   static getLockConfig(config: LockConfigType, lockData: string, success: null | ((type: number, isOn: boolean) => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
@@ -668,11 +668,11 @@ class Ttlock {
 
   /**
    * Set config of the lock
-   * @param config 
-   * @param isOn 
-   * @param lockData 
-   * @param success 
-   * @param fail 
+   * @param config
+   * @param isOn
+   * @param lockData
+   * @param success
+   * @param fail
    */
   static setLockConfig(config: LockConfigType, isOn: boolean, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
@@ -687,21 +687,17 @@ class Ttlock {
     ttlockModule.setLockSoundVolume(soundVolume, lockData, success, fail);
   }
 
-  static getLockSoundVolume(lockData: string, success: ((lockSoundVolume: LockSoundVolume) => void), fail: null | ((errorCode: number, description: string) => void)) {
+  static getLockSoundVolume(lockData: string, success: null | ((lockSoundVolume: LockSoundVolume) => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttlockModule.getLockSoundVolume(lockData, (soundVolume: number) => {
-      success(soundVolume);
-    }, fail);
+    ttlockModule.getLockSoundVolume(lockData, success, fail);
   }
 
 
-  static getUnlockDirection(lockData: string, success: ((direction: LockUnlockDirection) => void), fail: null | ((errorCode: number, description: string) => void)) {
+  static getUnlockDirection(lockData: string, success: null | ((direction: LockUnlockDirection) => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttlockModule.getUnlockDirection(lockData, (unlockDirection: number) => {
-      success(unlockDirection === 1 ? LockUnlockDirection.Left : LockUnlockDirection.Right);
-    }, fail);
+    ttlockModule.getUnlockDirection(lockData, success, fail);
   }
 
 
@@ -712,17 +708,26 @@ class Ttlock {
   }
 
 
+  static setUnlockDirectionAutomatic(lockData: string, success: null | ((direction: LockUnlockDirection) => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    ttlockModule.setUnlockDirectionAutomatic(lockData, success, fail);
+  }
+
+  
+
+
   /**
    * Set the lock always unlock.
    * @param mode LockPassageMode
-   * @param days 
-   * type = LockPassageMode.Weekly then days should be 1~7 Monday ~ Sunday, [1,3,6] 
+   * @param days
+   * type = LockPassageMode.Weekly then days should be 1~7 Monday ~ Sunday, [1,3,6]
    * type = LockPassageMode.Monthly then days should be 1~31, [1,7,29,31]
    * @param startDate The valid time of the passage mode
    * @param endDate The invalid time of the passage mode
-   * @param lockData 
-   * @param success 
-   * @param fail 
+   * @param lockData
+   * @param success
+   * @param fail
    */
   static addPassageMode(mode: LockPassageMode, days: number[], startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
@@ -737,9 +742,9 @@ class Ttlock {
 
   /**
    * Clear all passage mode
-   * @param lockData 
-   * @param success 
-   * @param fail 
+   * @param lockData
+   * @param success
+   * @param fail
    */
   static clearAllPassageModes(lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
     success = success || this.defaultCallback;
@@ -794,8 +799,131 @@ class Ttlock {
   }
 
   /**
+     * Recover card data to the lock
+     * @param cardNumber
+     * @param cycleList Periodic unlocking. You can set it to null if you don't need it
+     * @param startDate Timestamp millisecond. The start valid time of the card.
+     * @param endDate Timestamp millisecond. The expiration time of the card
+     * @param lockData
+     * @param success
+     * @param fail
+     */
+  static recoverCard(cardNumber: string, cycleList: null | CycleDateParam[], startDate: number, endDate: number, lockData: string, success: null | ((cardNumber: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    cycleList = cycleList || [];
+    ttlockModule.recoverCard(cardNumber, cycleList, startDate, endDate, lockData, success, fail);
+  }
+
+  static recoverPasscode(passcode: string, passcodeType: number, cycleType: number, startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    ttlockModule.recoverPasscode(passcode, passcodeType, cycleType, startDate, endDate, lockData, success, fail);
+  }
+
+  static scanWifi(lockData: string, callback: ((isFinihed: boolean, wifiList: []) => void), fail: null | ((errorCode: number, description: string) => void)) {
+    let subscription = subscriptionMap.get(TTLockEvent.ScanLockWifi)
+    if (subscription !== undefined) {
+      subscription.remove()
+    }
+    subscription = ttlockEventEmitter.addListener(TTLockEvent.ScanLockWifi, (data: any[]) => {
+      callback!(data[0], data[1]);
+    });
+    subscriptionMap.set(TTLockEvent.ScanLockWifi, subscription);
+    ttlockModule.scanWifi(lockData, fail);
+  }
+
+  static configWifi(wifiName: string, wifiPassword: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    ttlockModule.configWifi(wifiName, wifiPassword, lockData, success, fail);
+  }
+
+
+  static configServer(ip: string, port: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    ttlockModule.configServer(ip, port, lockData, success, fail);
+  }
+
+  static getWifiInfo(lockData: string, success: null | ((wifiMac: string, wifiRssi: number) => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    ttlockModule.getWifiInfo(lockData, (data: any[]) => {
+      success!(data[0], data[1]);
+    }, fail);
+  }
+
+
+  static configIp(info:WifiLockServerInfo, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    ttlockModule.configIp(info,lockData, success, fail);
+  }
+
+
+
+
+
+  static addFace(cycleList: null | CycleDateParam[], startDate: number, endDate: number, lockData: string, progress: ((state: FaceState, FaceErrorCode: FaceErrorCode) => void), success: null | ((faceNumber: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
+    progress = progress || this.defaultCallback;
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    cycleList = cycleList || [];
+
+    let subscription = ttlockEventEmitter.addListener(TTLockEvent.AddFaceProgrress, (dataArray: number[]) => {
+      progress(dataArray[0], dataArray[1]);
+    });
+    ttlockModule.addFace(cycleList, startDate, endDate, lockData, (cardNumber: string) => {
+      subscription.remove();
+      success!(cardNumber);
+    }, (errorCode: number, errorDesc: string) => {
+      subscription.remove();
+      fail!(errorCode, errorDesc);
+    });
+  }
+
+  static addFaceFeatureData(faceFeatureData: string, cycleList: null | CycleDateParam[], startDate: number, endDate: number, lockData: string, success: null | ((faceNumber: string) => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    cycleList = cycleList || [];
+    ttlockModule.addFaceFeatureData(faceFeatureData, cycleList, startDate, endDate, lockData, (faceNumber: string) => {
+      success!(faceNumber);
+    }, (errorCode: number, errorDesc: string) => {
+      fail!(errorCode, errorDesc);
+    });
+  }
+
+  static modifyFaceValidityPeriod(cycleList: null | CycleDateParam[], startDate: number, endDate: number, faceNumber:string, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    cycleList = cycleList || [];
+    ttlockModule.modifyFaceValidityPeriod(cycleList, startDate, endDate, faceNumber, lockData, success, fail);
+  }
+
+  static deleteFace(faceNumber:string, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    ttlockModule.deleteFace(faceNumber, lockData, success, fail);
+  }
+
+  static clearAllFace(lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    ttlockModule.clearFace(lockData, success, fail);
+  }
+
+
+  static enterUpgradeMode(lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    ttlockModule.enterUpgradeMode(lockData, success, fail);
+  }
+
+
+  /**
    * Monitor phone's Bluetooth status
-   * @param callback 
+   * @param callback
    */
   /*
   static addBluetoothStateListener(callback: (state: number, description: string) => void) {
@@ -830,8 +958,8 @@ class Ttlock {
 
 
   /**
-   * 
-   * @param callback 
+   *
+   * @param callback
    */
   static getBluetoothState(callback: (state: BluetoothState) => void) {
     callback = callback || this.defaultCallback;
@@ -912,6 +1040,7 @@ enum LockFunction {
   Wifi = 56,
   WifiStaticIP = 58,
   PasscodeKeyNumber = 60,
+  AutoSetUnlockDirection = 81
 }
 
 enum LockRecordType {
@@ -926,7 +1055,10 @@ enum LockConfigType {
   Freeze = 2,
   TamperAlert = 3,
   ResetButton = 4,
-  PrivacyLock = 5
+  PrivacyLock = 5,
+  PassageModeAutoUnlock = 6,
+  WifiPowerSavingMode = 7,
+  DoubleAuth = 8
 }
 
 enum LockSoundVolume {
@@ -941,6 +1073,7 @@ enum LockSoundVolume {
 
 
 enum LockUnlockDirection {
+  Unknow = 0,
   Left = 1,
   Right = 2
 }
@@ -962,6 +1095,36 @@ enum LockState {
   CarOnLock
 }
 
+enum FaceState {
+  canAddFace = 0,
+  addFail = 1
+}
+
+enum FaceErrorCode {
+  normal = 0,
+  noFaceDetected = 1,
+  tooCloseToTheTop = 2,
+  tooCloseToTheBottom = 3,
+  tooCloseToTheLeft = 4,
+  tooCloseToTheRight = 5,
+  tooFarAway = 6,
+  tooClose = 7,
+  eyebrowsCovered = 8,
+  eyesCovered = 9,
+  faceCovered = 10,
+  wrongFaceDirection = 11,
+  eyeOpeningDetected = 12,
+  eyesClosedStatus = 13,
+  failedToDetectEye = 14,
+  needTurnHeadToLeft = 15,
+  needTurnHeadToRight = 16,
+  needRaiseHead = 17,
+  needLowerHead = 18,
+  needTiltHeadToLeft = 19,
+  needTiltHeadToRight = 20,
+};
+
+
 enum ConnectState {
   Timeout = 0,
   Success = 1,
@@ -972,7 +1135,9 @@ enum TTLockEvent {
   ScanLock = "EventScanLock",
   AddCardProgrress = "EventAddCardProgrress",
   AddFingerprintProgress = "EventAddFingerprintProgrress",
+  AddFaceProgrress = "EventAddFaceProgrress",
   ListenBluetoothState = "EventBluetoothState",
+  ScanLockWifi = "EventScanLockWifi",
 }
 
 enum TtRemoteKeyEvent {
@@ -1012,4 +1177,4 @@ enum GatewayIpSettingType {
   DHCP = 1
 }
 
-export { Ttlock, TtGateway, TtRemoteKey, TtDoorSensor, TtWirelessKeypad, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType, GatewayIpSettingType, LockSoundVolume, TtRemoteKeyEvent, TtDoorSensorEvent, LockUnlockDirection, LockAccessoryType, ScanLockModal, ScanRemoteKeyModal, ScanDoorSensorModal, DeviceSystemModal, WirelessKeypadEvent, ScanWirelessKeypadModal}
+export { Ttlock, TtGateway, TtRemoteKey, TtDoorSensor, TtWirelessKeypad, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType, GatewayIpSettingType, LockSoundVolume, TtRemoteKeyEvent, TtDoorSensorEvent, LockUnlockDirection, LockAccessoryType, ScanLockModal, ScanRemoteKeyModal, ScanDoorSensorModal, DeviceSystemModal, WirelessKeypadEvent, ScanWirelessKeypadModal, WifiLockServerInfo, FaceState, FaceErrorCode }

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { Ttlock, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, LockSoundVolume, LockUnlockDirection } from 'react-native-ttlock';
+import { Ttlock, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, LockSoundVolume, LockUnlockDirection, WifiLockServerInfo, FaceState, FaceErrorCode } from 'react-native-ttlock';
 import * as Toast from './toast-page';
 
 const getLockSupportOperationList = (lockData: string) => {
@@ -15,6 +15,7 @@ const getLockSupportOperationList = (lockData: string) => {
     { lockOperation: "Create custom passcode 1122", lockFuctionValue: LockFunction.ManagePasscode },
     { lockOperation: "Modify passcode 1122 -> 2233", lockFuctionValue: LockFunction.ManagePasscode },
     { lockOperation: "Delete passcode 2233", lockFuctionValue: LockFunction.Passcode },
+    { lockOperation: "Recover passcode 2233", lockFuctionValue: LockFunction.Passcode },
     { lockOperation: "Reset passcode", lockFuctionValue: LockFunction.Passcode },
     { lockOperation: "Get lock switch state", lockFuctionValue: null },
 
@@ -22,11 +23,17 @@ const getLockSupportOperationList = (lockData: string) => {
     { lockOperation: "Modify IC card validity period", lockFuctionValue: LockFunction.IcCard },
     { lockOperation: "Delete IC card", lockFuctionValue: LockFunction.IcCard },
     { lockOperation: "Clear all IC cards", lockFuctionValue: LockFunction.IcCard },
+    { lockOperation: "Recover card", lockFuctionValue: LockFunction.IcCard },
 
     { lockOperation: "Add fingerprint", lockFuctionValue: LockFunction.Fingerprint },
     { lockOperation: "Modify fingerprint validity period", lockFuctionValue: LockFunction.Fingerprint },
     { lockOperation: "Delete fingerprint", lockFuctionValue: LockFunction.Fingerprint },
     { lockOperation: "Clear all fingerprints", lockFuctionValue: LockFunction.Fingerprint },
+
+    { lockOperation: "Add face", lockFuctionValue: LockFunction.Face },
+    { lockOperation: "Modify face validity period", lockFuctionValue: LockFunction.Face },
+    { lockOperation: "Delete face", lockFuctionValue: LockFunction.Face },
+    { lockOperation: "Clear all face", lockFuctionValue: LockFunction.Face },
 
 
     { lockOperation: "Get lock automatic locking periodic time", lockFuctionValue: LockFunction.AutoLock },
@@ -42,8 +49,8 @@ const getLockSupportOperationList = (lockData: string) => {
 
     { lockOperation: "Get lock unlock direction", lockFuctionValue: null },
     { lockOperation: "Set lock unlock direction", lockFuctionValue: null },
-
-
+    { lockOperation: "Set lock unlock direction automatic", lockFuctionValue: null },
+    
     { lockOperation: "Add passage mode", lockFuctionValue: LockFunction.PassageMode },
     { lockOperation: "Clear all passageModes", lockFuctionValue: LockFunction.PassageMode },
 
@@ -60,27 +67,36 @@ const getLockSupportOperationList = (lockData: string) => {
     { lockOperation: "Set door sensor alert time", lockFuctionValue: LockFunction.DoorSensorAlert },
     { lockOperation: "Clear all door sensor from lock", lockFuctionValue: LockFunction.DoorSensor },
 
-    { lockOperation: "Init wireless keypad", lockFuctionValue: LockFunction.WirelessKeypad},
+    { lockOperation: "Init wireless keypad", lockFuctionValue: LockFunction.WirelessKeypad },
 
     { lockOperation: "Modify admin passcode to 9999", lockFuctionValue: LockFunction.Passcode },
     { lockOperation: "Reset ekey", lockFuctionValue: null },
     { lockOperation: "Rest lock", lockFuctionValue: null },
     { lockOperation: "Get lock version", lockFuctionValue: null },
+
+    { lockOperation: "scan wifi", lockFuctionValue: LockFunction.Wifi },
+    { lockOperation: "Wifi lock scan nearby wifi", lockFuctionValue: LockFunction.Wifi },
+    { lockOperation: "Wifi lock config wifi", lockFuctionValue: LockFunction.Wifi },
+    { lockOperation: "Wifi lock config server", lockFuctionValue: LockFunction.Wifi },
+    { lockOperation: "Wifi lock get wifi info", lockFuctionValue: LockFunction.Wifi },
+    { lockOperation: "Wifi lock config ip", lockFuctionValue: LockFunction.Wifi },
+
+    { lockOperation: "Lock upgrade", lockFuctionValue: null }
   ]
 
   let supportOperationList: string[] = []
   functionAllList.map((item: LockFunctionItemData) => {
-    if (item.lockFuctionValue) {
-      Ttlock.supportFunction(item.lockFuctionValue!, lockData, (isSupport: boolean) => {
-        if (!isSupport) {
-          console.log("The lock not support function " + item.lockOperation);
-        } else {
-          supportOperationList.push(item.lockOperation);
-        }
-      })
-    } else {
+    // if (item.lockFuctionValue) {
+    //   Ttlock.supportFunction(item.lockFuctionValue!, lockData, (isSupport: boolean) => {
+    //     if (!isSupport) {
+    //       console.log("The lock not support function " + item.lockOperation);
+    //     } else {
+    //       supportOperationList.push(item.lockOperation);
+    //     }
+    //   })
+    // } else {
       supportOperationList.push(item.lockOperation);
-    }
+    // }
   });
 
   return supportOperationList;
@@ -104,6 +120,7 @@ const failedCallback = function (errorCode: number, errorMessage: string) {
 
 var cardNumber: undefined | string;
 var fingerprintNumber: undefined | string;
+var faceNumber: undefined | string;
 
 const operationClick = (lockOperation: string, lockData: string, lockMac: string, navigation: any) => {
   Toast.showToastLoad(lockOperation + "...");
@@ -166,6 +183,14 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
     }, failedCallback);
   }
 
+  else if (lockOperation == "Recover passcode 2233") {
+    let startDate = new Date().getTime();
+    let endDate = startDate + 24 * 3600 * 1000;
+    Ttlock.recoverPasscode("2233", 1, 1, startDate, endDate, lockData, () => {
+      successCallback("recover passcode success");
+    }, failedCallback);
+  }
+
   else if (lockOperation === "Reset passcode") {
     Ttlock.resetPasscode(lockData, (lockDataNew: string) => {
       //important: upload lockDataNew to ttlock server.
@@ -224,6 +249,14 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
       cardNumber = undefined;
     }, failedCallback);
   }
+  else if (lockOperation == "Recover card") {
+    let startDate = new Date().getTime();
+    let endDate = startDate + 24 * 3600 * 1000;
+    Ttlock.recoverCard("1234567889", null, startDate, endDate, lockData, () => {
+      let text = "recover card success";
+      successCallback(text);
+    }, failedCallback);
+  }
   else if (lockOperation === "Add fingerprint") {
     // fingerprint valid one day
     let startDate = new Date().getTime();
@@ -263,13 +296,62 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
     }, failedCallback);
   }
   else if (lockOperation === "Clear all fingerprints") {
-
     Ttlock.clearAllFingerprints(lockData, () => {
       let text = "clear all fingerprints success";
       successCallback(text);
       fingerprintNumber = undefined;
     }, failedCallback);
   }
+
+  else if (lockOperation === "Add face") {
+    // card valid one day
+    let startDate = new Date().getTime();
+    let endDate = startDate + 24 * 3600 * 1000;
+    Ttlock.addFace(null, startDate, endDate, lockData, (faceState: FaceState, faceErrorCode :FaceErrorCode) => {
+      let text = "faceState:" + faceState + "      faceErrorCode:" + faceErrorCode;
+      progressCallback(text)
+    } ,(fNumber: string) => {
+      faceNumber = fNumber;
+      let text = "faceNumber:" + faceNumber;
+      successCallback(text);
+    }, failedCallback);
+  }
+
+
+
+  else if (lockOperation === "Modify face validity period") {
+    if (faceNumber === undefined) {
+      Toast.showToast("Please add a faceNumber first");
+      return;
+    }
+    // face valid one minute
+    let startDate = new Date().getTime();
+    let endDate = startDate + 1 * 60 * 1000;
+    Ttlock.modifyFaceValidityPeriod(null, startDate, endDate, faceNumber, lockData, () => {
+      let text = "Modify face validity period success";
+      successCallback(text);
+    }, failedCallback);
+  }
+  else if (lockOperation === "Delete face") {
+    if (faceNumber === undefined) {
+      Toast.showToast("Please add a face first");
+      return;
+    }
+    Ttlock.deleteFace(faceNumber, lockData, () => {
+      let text = "Delete face success";
+      successCallback(text);
+      faceNumber = undefined;
+    }, failedCallback);
+  }
+  else if (lockOperation === "Clear all face") {
+    Ttlock.clearAllFace(lockData, () => {
+      let text = "Clear all face success";
+      successCallback(text);
+      faceNumber = undefined;
+    }, failedCallback);
+  }
+
+
   else if (lockOperation === "Get lock automatic locking periodic time") {
     Ttlock.getLockAutomaticLockingPeriodicTime(lockData, (currentTime: number, maxTime: number, minTime: number) => {
       let text = "currentTime:" + currentTime + "\n" + "maxTime:" + maxTime + "\n" + "minTime:" + minTime;
@@ -326,6 +408,13 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
   else if (lockOperation === "Set lock unlock direction") {
     Ttlock.setUnlockDirection(LockUnlockDirection.Left, lockData, () => {
       let text = "set lock unlock direction success";
+      successCallback(text);
+    }, failedCallback);
+  }
+
+  else if (lockOperation === "Set lock unlock direction automatic") {
+    Ttlock.setUnlockDirectionAutomatic(lockData, (direction: LockUnlockDirection) => {
+      let text = "set lock unlock direction automatic success: " + direction.toString();
       successCallback(text);
     }, failedCallback);
   }
@@ -391,8 +480,9 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
   }
   else if (lockOperation === "Modify admin passcode to 9999") {
     let adminPasscode = "9999";
-    Ttlock.modifyAdminPasscode(adminPasscode, lockData, () => {
+    Ttlock.modifyAdminPasscode(adminPasscode, lockData, (newLockData: string) => {
       let text = "modify admin passcode success";
+      console.log("newLockData: " + newLockData);
       successCallback(text);
     }, failedCallback);
   }
@@ -417,6 +507,65 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
       console.log(lockVersion);
     }, failedCallback)
   }
+
+  // {"Wifi lock scan nearby wifi": Command.scanWifi},
+  // {"Wifi lock config wifi": Command.configWifi},
+  // {"Wifi lock config server": Command.configServer},
+  // {"Wifi lock get wifi info": Command.getWifiInfo},
+  // {"Wifi lock config ip": Command.configIp}
+
+  else if (lockOperation === "Wifi lock scan nearby wifi") {
+    Ttlock.scanWifi(lockData, (isFinished: boolean, wifiList: []) => {
+      let text = `isFinished:${isFinished}  wifiList:${JSON.stringify(wifiList)}`;
+      successCallback(text);
+    }, failedCallback);
+  }
+  else if (lockOperation === "Wifi lock config wifi") {
+    Ttlock.configWifi("sciener", "sciener.com", lockData, () => {
+      let text = "config lock wifi success";
+      successCallback(text);
+    }, failedCallback)
+  }
+  else if (lockOperation === "Wifi lock config server") {
+    Ttlock.configServer("121.196.45.100", "4999", lockData, () => {
+      let text = "config lock wifi ip address success";
+      successCallback(text);
+    }, failedCallback)
+  }
+  else if (lockOperation === "Wifi lock get wifi info") {
+    Ttlock.getWifiInfo(lockData, (wifiMac: string, wifiRssi: number) => {
+      let text = `get wifiMac:${wifiMac}  wifiRssi:${wifiRssi}`;
+      successCallback(text);
+    }, failedCallback);
+  }
+  else if (lockOperation === "Wifi lock config ip") {
+    const info: WifiLockServerInfo = {
+      type: 0,
+      ipAddress: undefined,
+      subnetMask: undefined,
+      router: undefined,
+      preferredDns: undefined,
+      alternateDns: undefined,
+
+      //config static ip
+      // type: 1,
+      // ipAddress: "192.168.1.100",
+      // subnetMask: "255.255.255.0",
+      // router: "192.168.1.1",
+      // preferredDns: "xxx.xxx.xxx.xxx",
+      // alternateDns: "xxx.xxx.xxx.xxx"
+    }
+    Ttlock.configIp(info,lockData, () => {
+      let text = "config ip success";
+      successCallback(text);
+    }, failedCallback);
+  }
+
+  else if (lockOperation === "Lock upgrade") {
+    Toast.hidden()
+    navigation.navigate("LockUpgradePage", {lockData: lockData, lockMac: lockMac});
+  }
+
 }
 
 

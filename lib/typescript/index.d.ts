@@ -1,4 +1,4 @@
-import type { ScanGatewayModal, ScanLockModal, InitGatewayParam, CycleDateParam, ScanWifiModal, InitGatewayModal, LockVersion, ScanRemoteKeyModal, ScanDoorSensorModal, DeviceSystemModal, ScanWirelessKeypadModal } from './types';
+import type { ScanGatewayModal, ScanLockModal, InitGatewayParam, CycleDateParam, ScanWifiModal, InitGatewayModal, LockVersion, ScanRemoteKeyModal, ScanDoorSensorModal, DeviceSystemModal, ScanWirelessKeypadModal, WifiLockServerInfo } from './types';
 declare class TtWirelessKeypad {
     static defaultCallback: () => void;
     static startScan(callback: ((scanModal: ScanWirelessKeypadModal) => void)): void;
@@ -288,9 +288,10 @@ declare class Ttlock {
      */
     static setLockConfig(config: LockConfigType, isOn: boolean, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
     static setLockSoundVolume(soundVolume: LockSoundVolume, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
-    static getLockSoundVolume(lockData: string, success: ((lockSoundVolume: LockSoundVolume) => void), fail: null | ((errorCode: number, description: string) => void)): void;
-    static getUnlockDirection(lockData: string, success: ((direction: LockUnlockDirection) => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static getLockSoundVolume(lockData: string, success: null | ((lockSoundVolume: LockSoundVolume) => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static getUnlockDirection(lockData: string, success: null | ((direction: LockUnlockDirection) => void), fail: null | ((errorCode: number, description: string) => void)): void;
     static setUnlockDirection(direction: LockUnlockDirection, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static setUnlockDirectionAutomatic(lockData: string, success: null | ((direction: LockUnlockDirection) => void), fail: null | ((errorCode: number, description: string) => void)): void;
     /**
      * Set the lock always unlock.
      * @param mode LockPassageMode
@@ -318,6 +319,29 @@ declare class Ttlock {
     static addDoorSensor(doorSensorMac: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
     static clearAllDoorSensor(lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
     static setDoorSensorAlertTime(time: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    /**
+       * Recover card data to the lock
+       * @param cardNumber
+       * @param cycleList Periodic unlocking. You can set it to null if you don't need it
+       * @param startDate Timestamp millisecond. The start valid time of the card.
+       * @param endDate Timestamp millisecond. The expiration time of the card
+       * @param lockData
+       * @param success
+       * @param fail
+       */
+    static recoverCard(cardNumber: string, cycleList: null | CycleDateParam[], startDate: number, endDate: number, lockData: string, success: null | ((cardNumber: string) => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static recoverPasscode(passcode: string, passcodeType: number, cycleType: number, startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static scanWifi(lockData: string, callback: ((isFinihed: boolean, wifiList: []) => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static configWifi(wifiName: string, wifiPassword: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static configServer(ip: string, port: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static getWifiInfo(lockData: string, success: null | ((wifiMac: string, wifiRssi: number) => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static configIp(info: WifiLockServerInfo, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static addFace(cycleList: null | CycleDateParam[], startDate: number, endDate: number, lockData: string, progress: ((state: FaceState, FaceErrorCode: FaceErrorCode) => void), success: null | ((faceNumber: string) => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static addFaceFeatureData(faceFeatureData: string, cycleList: null | CycleDateParam[], startDate: number, endDate: number, lockData: string, success: null | ((faceNumber: string) => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static modifyFaceValidityPeriod(cycleList: null | CycleDateParam[], startDate: number, endDate: number, faceNumber: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static deleteFace(faceNumber: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static clearAllFace(lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
+    static enterUpgradeMode(lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)): void;
     /**
      * Monitor phone's Bluetooth status
      * @param callback
@@ -385,7 +409,8 @@ declare enum LockFunction {
     CpuCard = 55,
     Wifi = 56,
     WifiStaticIP = 58,
-    PasscodeKeyNumber = 60
+    PasscodeKeyNumber = 60,
+    AutoSetUnlockDirection = 81
 }
 declare enum LockRecordType {
     Latest = 0,
@@ -397,7 +422,10 @@ declare enum LockConfigType {
     Freeze = 2,
     TamperAlert = 3,
     ResetButton = 4,
-    PrivacyLock = 5
+    PrivacyLock = 5,
+    PassageModeAutoUnlock = 6,
+    WifiPowerSavingMode = 7,
+    DoubleAuth = 8
 }
 declare enum LockSoundVolume {
     On = -1,
@@ -409,6 +437,7 @@ declare enum LockSoundVolume {
     Livel_5 = 5
 }
 declare enum LockUnlockDirection {
+    Unknow = 0,
     Left = 1,
     Right = 2
 }
@@ -425,6 +454,33 @@ declare enum LockState {
     Unlock = 1,
     Unknow = 2,
     CarOnLock = 3
+}
+declare enum FaceState {
+    canAddFace = 0,
+    addFail = 1
+}
+declare enum FaceErrorCode {
+    normal = 0,
+    noFaceDetected = 1,
+    tooCloseToTheTop = 2,
+    tooCloseToTheBottom = 3,
+    tooCloseToTheLeft = 4,
+    tooCloseToTheRight = 5,
+    tooFarAway = 6,
+    tooClose = 7,
+    eyebrowsCovered = 8,
+    eyesCovered = 9,
+    faceCovered = 10,
+    wrongFaceDirection = 11,
+    eyeOpeningDetected = 12,
+    eyesClosedStatus = 13,
+    failedToDetectEye = 14,
+    needTurnHeadToLeft = 15,
+    needTurnHeadToRight = 16,
+    needRaiseHead = 17,
+    needLowerHead = 18,
+    needTiltHeadToLeft = 19,
+    needTiltHeadToRight = 20
 }
 declare enum ConnectState {
     Timeout = 0,
@@ -454,4 +510,4 @@ declare enum GatewayIpSettingType {
     STATIC_IP = 0,
     DHCP = 1
 }
-export { Ttlock, TtGateway, TtRemoteKey, TtDoorSensor, TtWirelessKeypad, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType, GatewayIpSettingType, LockSoundVolume, TtRemoteKeyEvent, TtDoorSensorEvent, LockUnlockDirection, LockAccessoryType, ScanLockModal, ScanRemoteKeyModal, ScanDoorSensorModal, DeviceSystemModal, WirelessKeypadEvent, ScanWirelessKeypadModal };
+export { Ttlock, TtGateway, TtRemoteKey, TtDoorSensor, TtWirelessKeypad, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType, GatewayIpSettingType, LockSoundVolume, TtRemoteKeyEvent, TtDoorSensorEvent, LockUnlockDirection, LockAccessoryType, ScanLockModal, ScanRemoteKeyModal, ScanDoorSensorModal, DeviceSystemModal, WirelessKeypadEvent, ScanWirelessKeypadModal, WifiLockServerInfo, FaceState, FaceErrorCode };

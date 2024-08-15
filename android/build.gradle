@@ -1,4 +1,8 @@
 buildscript {
+  ext {
+    agp_version = '7.4.2'
+  }
+
   // Buildscript is evaluated before everything else so we can't use getExtOrDefault
 //  def kotlin_version = rootProject.ext.has('kotlinVersion') ? rootProject.ext.get('kotlinVersion') : project.properties['Ttlock_kotlinVersion']
 
@@ -9,7 +13,7 @@ buildscript {
   }
 
   dependencies {
-    classpath 'com.android.tools.build:gradle:4.1.2'
+    classpath "com.android.tools.build:gradle:$agp_version"
     // noinspection DifferentKotlinGradleVersion
 //    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
   }
@@ -159,7 +163,7 @@ dependencies {
   // noinspection GradleDynamicVersion
   api 'com.facebook.react:react-native:+'
 //  implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-//  implementation 'com.ttlock:ttlock:3.3.4'
+//  implementation 'com.ttlock:ttlock:3.5.0'
   implementation(name: 'TTLockOnPremise', ext: 'aar')
   implementation 'com.google.code.gson:gson:2.6.1'
 }

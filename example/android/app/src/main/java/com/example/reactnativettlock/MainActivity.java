@@ -1,4 +1,4 @@
-package com.example.reactnativettlock;
+package com.justfor.test;
 
 import android.os.Bundle;
 

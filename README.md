@@ -1,49 +1,59 @@
-# react-native-ttlock
+new update
+bd7bc4b
 
+# react-native-ttlock
 ##### Developers Email && Quick Response
 ttlock-developers-email-list@googlegroups.com
-
 ## Installation
-
-Move `react-native-ttlock` to `yourProject/node_modules`
-
+`yarn add react-native-ttlock`
 ## Add configuration to project
-
 #### iOS
-
 1. `cd ./ios && pod install && cd ../`
-
 2. In XCode  `TARGETS` ➜ `info` ➜ add key `Privacy - Bluetooth Peripheral Usage Description` value `your description for bluetooth` and key `Privacy - Bluetooth Always Usage Description` value `your description for bluetooth`
-
 #### Android
 1. AndroidManifest.xml configuration:   
 (1) Add 'xmlns:tools="http://schemas.android.com/tools"' to element   
 (2) Add 'tools:replace="android:label"' to element   
 (3) Additional permissions:  
-
 ``` 
 <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 <uses-permission android:name="android.permission.BLUETOOTH" />
 <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-``` 
-
+android 12 needs below permission.
+  <!--
+ Needed only if your app looks for Bluetooth devices.
+         You must add an attribute to this permission, or declare the
+         ACCESS_FINE_LOCATION permission, depending on the results when you
+         check location usage in your app.
+    -->
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_SCAN"
+        android:usesPermissionFlags="neverForLocation"
+        tools:targetApi="s" />
+    <!--
+ Needed only if your app makes the device discoverable to Bluetooth
+         devices.
+    -->
+    <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
+    <!--
+ Needed only if your app communicates with already-paired Bluetooth
+         devices.
+    -->
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+```
 2. In order to get the permission request result in ttlock plugin, in MainActivity extends ReactActivity, you need override the onRequestPermissionsResult method and add below code:   
 (1) java code:
-
 ``` 
   @Override
   public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
     super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     ReactInstanceManager mReactInstanceManager = getReactNativeHost().getReactInstanceManager();
-
     TtlockModule ttlockModule = mReactInstanceManager.getCurrentReactContext().getNativeModule(TtlockModule.class);
     ttlockModule.onRequestPermissionsResult(requestCode, permissions, grantResults);
   }
-``` 
-
+```
 3. When you release the apk, you need disable proguard in release builds.Config buildTypes in build.gradle like this:
-
 ``` 
 repositories {
     buildTypes {
@@ -52,42 +62,35 @@ repositories {
             shrinkResources false
         }
     }
-``` 
+```
 4. Support min sdk version is 18
 ``` 
 defaultConfig {
         minSdkVersion 18
     }
- ``` 
+```
 ## Usage Lock
-
 ### 1 Lock basic operation
 1.0 Get bluetooth state
-
 ``` js
 Ttlock.getBluetoothState((state: BluetoothState)=>{
     console.log("bluetooth:",state);
 });
-``` 
-
-
+```
 1.1 Scan lock
-
 ``` js
 //Start scan lock
+android 12 needs request android.permission.BLUETOOTH_SCAN before Ttlock.startScan
 Ttlock.startScan((scanLockModal: ScanLockModal) => {
     //todo
 });
-
 //Stop scan lock
 Ttlock.stopScan();
-
 ```
-
 1.2 Init lock
-
-
 ``` js
+android 12 needs android.permission.BLUETOOTH_CONNECT permission before calling apis.
+All apis needs android.permission.BLUETOOTH_CONNECT permission
 const param = {
     lockMac: scanLockModal.lockMac,
     lockVersion: scanLockModal.lockVersion
@@ -100,10 +103,7 @@ const param = {
   })
 }
 ```
-
 1.3 Reset Lock
-
-
 ``` js
 Ttlock.resetLock(lockData, () => {
     //...
@@ -111,11 +111,7 @@ Ttlock.resetLock(lockData, () => {
     //...
 })
 ```
-
-
 1.4 Set Lock Time
-
-
 ``` js
 let timestamp = new Date().getTime();
 Ttlock.setLockTime(timestamp, lockData, () => {
@@ -124,11 +120,7 @@ Ttlock.setLockTime(timestamp, lockData, () => {
     //...
 });
 ```
-
-
 1.5 Get Lock Time
-
-
 ``` js
 Ttlock.getLockTime(lockData, (lockTimestamp: number) => {
     //...
@@ -136,16 +128,11 @@ Ttlock.getLockTime(lockData, (lockTimestamp: number) => {
     //...
 });
 ```
-
 1.6 Get Lock Operation Record
-
-
 ``` js
 Ttlock.getLockOperationRecord(LockRecordType.Latest, lockData, successCallback, failedCallback);
 ```
-
 1.7 Get Lock State
-
 ``` js
 Ttlock.getLockSwitchState(lockData, (state: LockState) => {
     //...
@@ -153,9 +140,7 @@ Ttlock.getLockSwitchState(lockData, (state: LockState) => {
     //...
 });
 ```
-
 1.8 Set lock automatic locking periodic time
-
 ``` js
 let seconds = 20;
 Ttlock.setLockAutomaticLockingPeriodicTime(seconds, lockData, () => {
@@ -164,9 +149,7 @@ Ttlock.setLockAutomaticLockingPeriodicTime(seconds, lockData, () => {
     //...
 });
 ```
-
 1.9 Get lock automatic locking periodic time
-
 ``` js
 Ttlock.getLockAutomaticLockingPeriodicTime(lockData, (currentTime: number, maxTime: number, minTime: number) => {
     //...
@@ -174,9 +157,7 @@ Ttlock.getLockAutomaticLockingPeriodicTime(lockData, (currentTime: number, maxTi
     //...
 });
 ```
-
 1.10 Set lock remote unlock switch state
-
 ``` js
 let isOn = true;
 Ttlock.setLockRemoteUnlockSwitchState(isOn, lockData, (lockDataNew: string) => {
@@ -186,10 +167,7 @@ Ttlock.setLockRemoteUnlockSwitchState(isOn, lockData, (lockDataNew: string) => {
     //...
 });
 ```
-
-
 1.11 Set lock config
-
 ``` js
 /*
 enum LockConfigType {
@@ -209,9 +187,7 @@ Ttlock.setLockConfig(LockConfigType.Audio, isOn, lockData, () => {
     //...
 });
 ```
-
 1.12 Get lock config
-
 ``` js
 /*
 enum LockConfigType {
@@ -230,11 +206,8 @@ Ttlock.getLockConfig(LockConfigType.Audio, lockData, (type: number, isOn: boolea
     //...
 });
 ```
-
 ### 2. Ekey
-
 2.1 Control lock
-
 ``` js
 Ttlock.controlLock(LockControlType.Unlock, lockData, (lockTime: number, electricQuantity: number, uniqueId: number) => {
       let text = "lockTime:" + lockTime + "\n" + "electricQuantity:" + electricQuantity + "\n" + "uniqueId:" + uniqueId;
@@ -243,9 +216,7 @@ Ttlock.controlLock(LockControlType.Unlock, lockData, (lockTime: number, electric
     //...
 });
 ```
-
 2.2 Reset ekey
-
 ``` js
 Ttlock.resetEkey(lockData, (lockDataNew) => {
     //important: upload lockDataNew to ttlock server. 
@@ -255,16 +226,10 @@ Ttlock.resetEkey(lockData, (lockDataNew) => {
     //...
 });
 ```
-
 ### 3. Passcode
-
 3.1 Get passcode
-
 https://open.sciener.com/doc/api/v3/keyboardPwd/get
-
-
 3.2 Custom passcode
-
 ``` js
  //example: passcode valid one day
 let startDate = new Date().getTime();
@@ -275,9 +240,7 @@ Ttlock.createCustomPasscode("1122", startDate, endDate, lockData, () => {
     //...
 });
 ```
-
 3.3 Modify passcode
-
 ``` js
 // passcode valid one minute
 let startDate = new Date().getTime();
@@ -290,9 +253,7 @@ Ttlock.modifyPasscode(oldPasscode, newPasscode, startDate, endDate, lockData, ()
     //...
 });   
 ```
-
 3.4 Delete passcode
-
 ``` js
 Ttlock.deletePasscode("2233", lockData, () => {
     successCallback("delete passcode success");
@@ -300,10 +261,7 @@ Ttlock.deletePasscode("2233", lockData, () => {
     //...
 });  
 ```
-
-
 3.5 Reset all passcode ( not contain the admin password )
-
 ``` js
 Ttlock.resetPasscode(lockData, (lockDataNew: string) => {
     //important: upload lockDataNew to ttlock server. 
@@ -312,9 +270,7 @@ Ttlock.resetPasscode(lockData, (lockDataNew: string) => {
     //...
 });   
 ```
-
 3.6 Modify admin passcode
-
 ``` js
 let adminPasscode = "9999";
 Ttlock.modifyAdminPasscode(adminPasscode, lockData, () => {
@@ -323,11 +279,8 @@ Ttlock.modifyAdminPasscode(adminPasscode, lockData, () => {
     //...
 });   
 ```
-
 ### 4. Card
-
 4.1 Add card
-
 ``` js
 // card valid one day
 let startDate = new Date().getTime();
@@ -342,9 +295,7 @@ let startDate = new Date().getTime();
     //...    
 });   
 ```
-
 4.2 Modify card validity period
-
 ``` js
 // card valid one minute
 let startDate = new Date().getTime();
@@ -355,10 +306,7 @@ Ttlock.modifyCardValidityPeriod(cardNumber, null, startDate, endDate, lockData, 
     //...        
 });   
 ```
-
-
 4.3 Delete card
-
 ``` js
 Ttlock.deleteCard(cardNumber, lockData, () => {
       let text = "delete card success";
@@ -366,9 +314,7 @@ Ttlock.deleteCard(cardNumber, lockData, () => {
     //...    
 });   
 ```
-
 4.4 Clear all cards
-
 ``` js
 Ttlock.clearAllCards(lockData, () => {
     let text = "clear all cards success";
@@ -376,16 +322,12 @@ Ttlock.clearAllCards(lockData, () => {
     //...    
 });   
 ```
-
 ### 5. Fingerprint
-
 5.1 Add fingerprint
-
 ``` js
 // card valid one day
 let startDate = new Date().getTime();
 let endDate = startDate + 24 * 3600 * 1000;
-
 Ttlock.addFingerprint(null, startDate, endDate, lockData, (currentCount: number, totalCount: number) => {
       let text = "currentCount:" + currentCount + "\n" + "totalCount:" + totalCount;
       progressCallback(text);
@@ -396,25 +338,18 @@ Ttlock.addFingerprint(null, startDate, endDate, lockData, (currentCount: number,
     //...    
 });  
 ```
-
-
 5.2 Modify fingerprint validity period
-
 ``` js
 // fingerprint valid one minute
 let startDate = new Date().getTime();
 let endDate = startDate + 1 * 60 * 1000;
-
 Ttlock.modifyFingerprintValidityPeriod(fingerprintNumber, null, startDate, endDate, lockData, () => {
       let text = "modify fingerprint validity period success";
 }, (errorCode, errorDesc) => {
     //...    
 });  
 ```
-
-
 5.3 Delete fingerprint 
-
 ``` js
 Ttlock.deleteFingerprint(fingerprintNumber, lockData, () => {
       let text = "delete fingerprint success";
@@ -422,9 +357,7 @@ Ttlock.deleteFingerprint(fingerprintNumber, lockData, () => {
     //...    
 });  
 ```
-
 5.4 Clear all fingerprints
-
 ``` js
 Ttlock.clearAllFingerprints(lockData, () => {
     let text = "clear all fingerprints success";
@@ -432,10 +365,7 @@ Ttlock.clearAllFingerprints(lockData, () => {
     //...    
 });  
 ```
-
-
 ### 6. Passage mode
-
 6.1 Add passage mode
 
 ``` js
@@ -448,7 +378,6 @@ Ttlock.addPassageMode(LockPassageMode.Weekly, [1, 2, 7], startTime, endTime, loc
     //...    
 });  
 ```
-
 6.2 Clear all passageModes
 
 ``` js
@@ -459,6 +388,38 @@ Ttlock.clearAllPassageModes(lockData, () => {
 });  
 ```
 
+### 7. WIFI
+7.1 Wifi lock scan nearby wifi
 
+``` js
+Ttlock.scanWifi(lockData, (isFinished: boolean, wifiList: []) => {
+     
+    }, (errorCode, errorDesc) => {
+    //...    
+});
+```
+7.2 Wifi lock config wifi
 
+``` js
+const wifiName = 'sciener'
+const wifiPassword = 'sciener.com'
+Ttlock.configWifi(wifiName, wifiPassword, lockData, () => {
+      let text = "config lock wifi success";
 
+    }, (errorCode, errorDesc) => {
+    //...    
+});  
+```
+
+7.3 Wifi lock config server
+
+``` js
+const serverIp = "121.196.45.110"
+const serverPort = "4999"
+Ttlock.configServer(serverIp, serverPort, lockData, () => {
+      let text = "config lock wifi ip address success";
+
+    }, (errorCode, errorDesc) => {
+    //...    
+});  
+```
