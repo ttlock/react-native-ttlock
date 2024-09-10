@@ -2,12 +2,14 @@ import * as React from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { Ttlock, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, LockSoundVolume, LockUnlockDirection, WifiLockServerInfo, FaceState, FaceErrorCode } from 'react-native-ttlock';
 import * as Toast from './toast-page';
+import { DeviceSystemModal } from 'lib/typescript';
 
 const getLockSupportOperationList = (lockData: string) => {
 
   const functionAllList: LockFunctionItemData[] = [
     { lockOperation: "Unlock", lockFuctionValue: null },
     { lockOperation: "Lock", lockFuctionValue: LockFunction.Locking },
+    { lockOperation: "Get lock system", lockFuctionValue: null },
     { lockOperation: "Get lock time", lockFuctionValue: null },
     { lockOperation: "Set lock time", lockFuctionValue: null },
     { lockOperation: "Get lock operate record", lockFuctionValue: null },
@@ -137,6 +139,14 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
       let text = "lockTime:" + lockTime + "\n" + "electricQuantity:" + electricQuantity + "\n" + "uniqueId:" + uniqueId;
       successCallback(text);
     }, failedCallback)
+  }
+
+  if (lockOperation === "Get lock system") {
+    Ttlock.getLockSystem(lockData, (lockSystemInfo: DeviceSystemModal) => {
+      console.log(lockSystemInfo);
+      let text = "get lock system success:";
+      successCallback(text);
+    }, failedCallback);
   }
 
   if (lockOperation === "Get lock time") {
