@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { Ttlock, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, LockSoundVolume, LockUnlockDirection, WifiLockServerInfo, FaceState, FaceErrorCode } from 'react-native-ttlock';
+import { Ttlock, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, LockSoundVolume, LockUnlockDirection, WifiLockServerInfo, FaceState, FaceErrorCode, DeviceSystemModal } from 'react-native-ttlock';
 import * as Toast from './toast-page';
 
 const getLockSupportOperationList = (lockData: string) => {
@@ -8,6 +8,7 @@ const getLockSupportOperationList = (lockData: string) => {
   const functionAllList: LockFunctionItemData[] = [
     { lockOperation: "Unlock", lockFuctionValue: null },
     { lockOperation: "Lock", lockFuctionValue: LockFunction.Locking },
+    { lockOperation: "Get lock system", lockFuctionValue: null },
     { lockOperation: "Get lock time", lockFuctionValue: null },
     { lockOperation: "Set lock time", lockFuctionValue: null },
     { lockOperation: "Get lock operate record", lockFuctionValue: null },
@@ -149,6 +150,12 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
     let timestamp = new Date().getTime();
     Ttlock.setLockTime(timestamp, lockData, () => {
       successCallback("set lock time success");
+    }, failedCallback);
+  }
+  else if (lockOperation === "Get lock system") {
+    Ttlock.getLockSystem(lockData, (systemModel: DeviceSystemModal) => {
+      console.log(JSON.stringify(systemModel))
+      successCallback("get lock system success");
     }, failedCallback);
   }
   else if (lockOperation === "Get lock electric quantity") {
