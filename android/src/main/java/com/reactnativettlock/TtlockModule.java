@@ -74,6 +74,7 @@ import com.ttlock.bl.sdk.callback.GetBatteryLevelCallback;
 import com.ttlock.bl.sdk.callback.GetLockConfigCallback;
 import com.ttlock.bl.sdk.callback.GetLockSoundWithSoundVolumeCallback;
 import com.ttlock.bl.sdk.callback.GetLockStatusCallback;
+import com.ttlock.bl.sdk.callback.GetLockSystemInfoCallback;
 import com.ttlock.bl.sdk.callback.GetLockTimeCallback;
 import com.ttlock.bl.sdk.callback.GetLockVersionCallback;
 import com.ttlock.bl.sdk.callback.GetOperationLogCallback;
@@ -2212,6 +2213,32 @@ public class TtlockModule extends ReactContextBaseJavaModule {
           @Override
           public void onClearSuccess() {
             successCallback.invoke();
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            lockErrorCallback(lockError, fail);
+          }
+        });
+      } else {
+        noPermissionCallback(fail);
+      }
+    });
+  }
+
+  @ReactMethod
+  public void getLockSystem(String lockData, Callback successCallback, Callback fail) {
+    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+      if (success) {
+        TTLockClient.getDefault().getLockSystemInfo(lockData, null, new GetLockSystemInfoCallback() {
+          @Override
+          public void onGetLockSystemInfoSuccess(com.ttlock.bl.sdk.entity.DeviceInfo deviceInfo) {
+            WritableMap map = Arguments.createMap();
+            map.putString(TTBaseFieldConstant.MODEL_NUM, deviceInfo.getModelNum());
+            map.putString(TTBaseFieldConstant.HARDWARE_REVISION, deviceInfo.getHardwareRevision());
+            map.putString(TTBaseFieldConstant.FIRMWARE_REVISION, deviceInfo.getFirmwareRevision());
+            map.putString(TTLockFieldConstant.LOCK_DATA, deviceInfo.getLockData());
+            successCallback.invoke(map);
           }
 
           @Override
