@@ -672,17 +672,6 @@ RCT_EXPORT_METHOD(clearFace:(NSString *)lockData success:(RCTResponseSenderBlock
 }
 
 
-RCT_EXPORT_METHOD(enterUpgradeMode:(NSString *) lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
-{
-    [TTLock enterUpgradeModeWithLockData:lockData success:^{
-        [Ttlock response:nil success:success];
-    } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock response:errorCode message:errorMsg fail:fail];
-    }];
-}
-
-
-
 RCT_EXPORT_METHOD(supportFunction:(int)fuction lockData:(NSString *)lockData callback:(RCTResponseSenderBlock)callback)
 {
     BOOL isSupport = [TTUtil lockFeatureValue:lockData suportFunction:fuction];
