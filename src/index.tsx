@@ -920,14 +920,6 @@ class Ttlock {
     ttlockModule.clearFace(lockData, success, fail);
   }
 
-
-  static enterUpgradeMode(lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) {
-    success = success || this.defaultCallback;
-    fail = fail || this.defaultCallback;
-    ttlockModule.enterUpgradeMode(lockData, success, fail);
-  }
-
-
   /**
    * Monitor phone's Bluetooth status
    * @param callback
