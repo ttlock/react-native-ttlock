@@ -5,7 +5,18 @@ bd7bc4b
 ##### Developers Email && Quick Response
 ttlock-developers-email-list@googlegroups.com
 ## Installation
-`yarn add react-native-ttlock`
+
+```js
+package.json
+
+{
+  "name": "your-project",
+  "dependencies": {
+    "react-native-ttlock": "https://github.com/ttlock/react-native-ttlock.git#premise"
+  }
+}
+```
+
 ## Add configuration to project
 #### iOS
 1. `cd ./ios && pod install && cd ../`
