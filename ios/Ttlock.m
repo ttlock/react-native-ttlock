@@ -747,21 +747,36 @@ RCT_EXPORT_METHOD(initGateway:(NSDictionary *)dict success:(RCTResponseSenderBlo
         paramDict[@"wifiPwd"] = @"1";
     }
     
-    paramDict[@"type"] = dict[@"ipSettingType"];
-    paramDict[@"ipAddress"] = dict[@"ipAddress"];
-    paramDict[@"subnetMask"] = dict[@"subnetMask"];
-    paramDict[@"router"] = dict[@"router"];
-    paramDict[@"preferredDns"] = dict[@"preferredDns"];
-    paramDict[@"alternateDns"] = dict[@"alternateDns"];
-    
     [TTGateway initializeGatewayWithInfoDic:paramDict block:^(TTSystemInfoModel *systemInfoModel, TTGatewayStatus status) {
         if (status == TTGatewaySuccess) {
-            NSDictionary *resultDict = @{
-                @"modelNum":NOT_NULL_STRING(systemInfoModel.modelNum),
-                @"hardwareRevision":NOT_NULL_STRING(systemInfoModel.hardwareRevision),
-                @"firmwareRevision":NOT_NULL_STRING(systemInfoModel.firmwareRevision)
-            };
-            [Ttlock response:resultDict success:success];
+            if(dict[@"ipAddress"] != nil){
+                NSMutableDictionary *staticIpDict = @{}.mutableCopy;
+                staticIpDict[@"type"] = dict[@"ipSettingType"];
+                staticIpDict[@"ipAddress"] = dict[@"ipAddress"];
+                staticIpDict[@"subnetMask"] = dict[@"subnetMask"];
+                staticIpDict[@"router"] = dict[@"router"];
+                staticIpDict[@"preferredDns"] = dict[@"preferredDns"];
+                staticIpDict[@"alternateDns"] = dict[@"alternateDns"];
+                [TTGateway configIpWithInfo:staticIpDict block:^(TTGatewayStatus status) {
+                    if (status == TTGatewaySuccess) {
+                        NSDictionary *resultDict = @{
+                            @"modelNum":NOT_NULL_STRING(systemInfoModel.modelNum),
+                            @"hardwareRevision":NOT_NULL_STRING(systemInfoModel.hardwareRevision),
+                            @"firmwareRevision":NOT_NULL_STRING(systemInfoModel.firmwareRevision)
+                        };
+                        [Ttlock response:resultDict success:success];
+                    }else{
+                        [Ttlock response:status  message:nil fail:fail];
+                    }
+                }];
+            }else{
+                NSDictionary *resultDict = @{
+                    @"modelNum":NOT_NULL_STRING(systemInfoModel.modelNum),
+                    @"hardwareRevision":NOT_NULL_STRING(systemInfoModel.hardwareRevision),
+                    @"firmwareRevision":NOT_NULL_STRING(systemInfoModel.firmwareRevision)
+                };
+                [Ttlock response:resultDict success:success];
+            }
         }else{
             [Ttlock response:status  message:nil fail:fail];
         }
