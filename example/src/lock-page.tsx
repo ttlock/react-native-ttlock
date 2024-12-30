@@ -530,7 +530,9 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
     }, failedCallback);
   }
   else if (lockOperation === "Wifi lock config wifi") {
-    Ttlock.configWifi("sciener", "sciener.com", lockData, () => {
+    let wifi = "sciener"
+    let wifiPassword = "sciener.com"
+    Ttlock.configWifi(wifi, wifiPassword, lockData, () => {
       let text = "config lock wifi success";
       successCallback(text);
     }, failedCallback)

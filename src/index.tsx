@@ -1057,7 +1057,9 @@ enum LockConfigType {
   PrivacyLock = 5,
   PassageModeAutoUnlock = 6,
   WifiPowerSavingMode = 7,
-  DoubleAuth = 8
+  DoubleAuth = 8,
+  PublicMode = 9,
+  LowBatteryAutoUnlock = 10
 }
 
 enum LockSoundVolume {
