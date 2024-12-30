@@ -20,14 +20,6 @@
 
 //static bool isAddListenBluetoothState = false;
 
-typedef enum {
-    LOCK = 0,
-    GATEWAY = 1,
-    DOOR_SENSOR = 2,
-    REMOTE_KEY_PAD = 3,
-    REMOTE_KEY = 4
-}DEVICE;
-
 
 @implementation Ttlock
 
@@ -79,7 +71,7 @@ RCT_EXPORT_MODULE()
 RCT_EXPORT_METHOD(getBluetoothState:(RCTResponseSenderBlock)callbackBlock)
 {
     TTBluetoothState bluetoothState = [TTLock bluetoothState];
-    [Ttlock reseponseSuccess:@(bluetoothState) success:callbackBlock];
+    [Ttlock response:@(bluetoothState) success:callbackBlock];
     
 }
 
@@ -109,21 +101,21 @@ RCT_EXPORT_METHOD(stopScan)
 }
 
 
-RCT_EXPORT_METHOD(initLock:(NSDictionary *)dict success:(RCTResponseSenderBlock)successfulBlock fail:(RCTResponseSenderBlock)faile)
+RCT_EXPORT_METHOD(initLock:(NSDictionary *)dict success:(RCTResponseSenderBlock)successfulBlock fail:(RCTResponseSenderBlock)failedBlock)
 {
     [TTLock initLockWithDict:dict success:^(NSString *lockData) {
         successfulBlock(@[lockData]);
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:faile];
+        failedBlock(@[@(errorCode),NOT_NULL_STRING(errorMsg)]);
     }];
 }
 
 RCT_EXPORT_METHOD(resetLock:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock resetLockWithLockData:lockData success:^() {
-        [Ttlock reseponseSuccess:nil success:success];
+        [Ttlock response:nil success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
     
 }
@@ -132,9 +124,9 @@ RCT_EXPORT_METHOD(resetLock:(NSString *)lockData success:(RCTResponseSenderBlock
 RCT_EXPORT_METHOD(getLockVersionWithLockMac:(NSString *)lockMac success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock getLockVersionWithLockMac:lockMac success:^(NSDictionary *lockVersion) {
-        [Ttlock reseponseSuccess:lockVersion success:success];
+        [Ttlock response:lockVersion success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -144,9 +136,9 @@ RCT_EXPORT_METHOD(controlLock:(NSInteger)controlAction lockData:(NSString *)lock
     
     TTControlAction action = controlAction + 1;
     [TTLock controlLockWithControlAction:action lockData:lockData success:^(long long lockTime, NSInteger electricQuantity, long long uniqueId) {
-        [Ttlock reseponseSuccess:@[@(lockTime),@(electricQuantity),@(uniqueId)] success:success];
+        [Ttlock response:@[@(lockTime),@(electricQuantity),@(uniqueId)] success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -155,18 +147,18 @@ RCT_EXPORT_METHOD(resetEkey:(NSString *)lockData success:(RCTResponseSenderBlock
 {
     
     [TTLock resetEkeyWithLockData:lockData success:^(NSString *lockData) {
-        [Ttlock reseponseSuccess:lockData success:success];
+        [Ttlock response:lockData success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
 RCT_EXPORT_METHOD(setLockTime:(nonnull NSNumber *)timestamp lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock setLockTimeWithTimestamp:timestamp.longLongValue lockData:lockData success:^{
-        [Ttlock reseponseSuccess:nil success:success];
+        [Ttlock response:nil success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -174,27 +166,27 @@ RCT_EXPORT_METHOD(getLockTime:(NSString *)lockData success:(RCTResponseSenderBlo
 {
     
     [TTLock getLockTimeWithLockData:lockData success:^(long long lockTimestamp) {
-        [Ttlock reseponseSuccess:@(lockTimestamp) success:success];
+        [Ttlock response:@(lockTimestamp) success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
 RCT_EXPORT_METHOD(getLockSystem:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock getLockSystemInfoWithLockData:lockData success:^(TTSystemInfoModel *systemModel) {
-        [Ttlock reseponseSuccess:[Ttlock dictionaryFromModel:systemModel] success:success];
+        [Ttlock response:[Ttlock dictionaryFromModel:systemModel] success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
 RCT_EXPORT_METHOD(getLockElectricQuantity:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock getElectricQuantityWithLockData:lockData success:^(NSInteger electricQuantity) {
-        [Ttlock reseponseSuccess:@(electricQuantity) success:success];
+        [Ttlock response:@(electricQuantity) success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -202,9 +194,9 @@ RCT_EXPORT_METHOD(getLockOperationRecord:(int)type lockData:(NSString *)lockData
 {
     TTOperateLogType logType = type + 1;
     [TTLock getOperationLogWithType:logType lockData:lockData success:^(NSString *operateRecord) {
-        [Ttlock reseponseSuccess:operateRecord success:success];
+        [Ttlock response:operateRecord success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -214,9 +206,9 @@ RCT_EXPORT_METHOD(createCustomPasscode:(NSString *)passcode startDate:(nonnull N
 {
     
     [TTLock createCustomPasscode:passcode startDate:startDate.longLongValue endDate:endDate.longLongValue lockData:lockData success:^{
-        [Ttlock reseponseSuccess:nil success:success];
+        [Ttlock response:nil success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -224,9 +216,9 @@ RCT_EXPORT_METHOD(modifyPasscode:(NSString *)passcodeOrigin passcodeNew:(NSStrin
 {
     
     [TTLock modifyPasscode:passcodeOrigin newPasscode:passcodeNew startDate:startDate.longLongValue endDate:endDate.longLongValue lockData:lockData success:^{
-        [Ttlock reseponseSuccess:nil success:success];
+        [Ttlock response:nil success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -235,9 +227,9 @@ RCT_EXPORT_METHOD(deletePasscode:(NSString *)passcode lockData:(NSString *)lockD
 {
     
     [TTLock deletePasscode:passcode lockData:lockData success:^{
-        [Ttlock reseponseSuccess:nil success:success];
+        [Ttlock response:nil success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -245,18 +237,18 @@ RCT_EXPORT_METHOD(resetPasscode:(NSString *)lockData success:(RCTResponseSenderB
 {
     
     [TTLock resetPasscodesWithLockData:lockData success:^(NSString *lockData) {
-        [Ttlock reseponseSuccess:lockData success:success];
+        [Ttlock response:lockData success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
 RCT_EXPORT_METHOD(getLockSwitchState:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock getLockSwitchStateWithLockData:lockData success:^(TTLockSwitchState state, TTDoorSensorState doorSensorState) {
-        [Ttlock reseponseSuccess:@(state) success:success];
+        [Ttlock response:@(state) success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -268,9 +260,9 @@ RCT_EXPORT_METHOD(addCard:(NSArray *)cycleList startDate:(nonnull NSNumber *)sta
     [TTLock addICCardWithCyclicConfig:cycleList startDate:startDate.longLongValue endDate:endDate.longLongValue lockData:lockData progress:^(TTAddICState state) {
         [weakSelf sendEventWithName:EVENT_ADD_CARD_PROGRESS body:nil];
     } success:^(NSString *cardNumber) {
-        [Ttlock reseponseSuccess:cardNumber success:success];
+        [Ttlock response:cardNumber success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -278,9 +270,9 @@ RCT_EXPORT_METHOD(modifyCardValidityPeriod:(NSString *)cardNumber cycleList:(NSA
 {
     
     [TTLock modifyICCardValidityPeriodWithCyclicConfig:cycleList cardNumber:cardNumber startDate:startDate.longLongValue endDate:endDate.longLongValue lockData:lockData success:^{
-        [Ttlock reseponseSuccess:nil success:success];
+        [Ttlock response:nil success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -288,9 +280,9 @@ RCT_EXPORT_METHOD(modifyCardValidityPeriod:(NSString *)cardNumber cycleList:(NSA
 RCT_EXPORT_METHOD(deleteCard:(NSString *)cardNumber lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock deleteICCardNumber:cardNumber lockData:lockData success:^{
-        [Ttlock reseponseSuccess:nil success:success];
+        [Ttlock response:nil success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -298,9 +290,9 @@ RCT_EXPORT_METHOD(clearAllCards:(NSString *)lockData success:(RCTResponseSenderB
 {
     
     [TTLock clearAllICCardsWithLockData:lockData success:^{
-        [Ttlock reseponseSuccess:nil success:success];
+        [Ttlock response:nil success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -312,9 +304,9 @@ RCT_EXPORT_METHOD(addFingerprint:(NSArray *)cycleList startDate:(nonnull NSNumbe
     [TTLock addFingerprintWithCyclicConfig:cycleList startDate:startDate.longLongValue endDate:endDate.longLongValue lockData:lockData progress:^(int currentCount, int totalCount) {
         [weakSelf sendEventWithName:EVENT_ADD_FINGERPRINT_PROGRESS body:@[@(currentCount),@(totalCount)]];
     } success:^(NSString *fingerprintNumber) {
-        [Ttlock reseponseSuccess:fingerprintNumber success:success];
+        [Ttlock response:fingerprintNumber success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -322,9 +314,9 @@ RCT_EXPORT_METHOD(modifyFingerprintValidityPeriod:(NSString *)fingerprintNumber 
 {
     
     [TTLock modifyFingerprintValidityPeriodWithCyclicConfig:cycleList fingerprintNumber:fingerprintNumber startDate:startDate.longLongValue endDate:endDate.longLongValue lockData:lockData success:^{
-        [Ttlock reseponseSuccess:nil success:success];
+        [Ttlock response:nil success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -332,9 +324,9 @@ RCT_EXPORT_METHOD(modifyFingerprintValidityPeriod:(NSString *)fingerprintNumber 
 RCT_EXPORT_METHOD(deleteFingerprint:(NSString *)fingerprintNumber lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock deleteFingerprintNumber:fingerprintNumber lockData:lockData success:^{
-        [Ttlock reseponseSuccess:nil success:success];
+        [Ttlock response:nil success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -342,18 +334,18 @@ RCT_EXPORT_METHOD(clearAllFingerprints:(NSString *)lockData success:(RCTResponse
 {
     
     [TTLock clearAllFingerprintsWithLockData:lockData success:^{
-        [Ttlock reseponseSuccess:nil success:success];
+        [Ttlock response:nil success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
 RCT_EXPORT_METHOD(modifyAdminPasscode:(NSString *)adminPasscode  lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock modifyAdminPasscode:adminPasscode lockData:lockData success:^{
-        [Ttlock reseponseSuccess:nil success:success];
+        [Ttlock response:nil success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -363,9 +355,9 @@ RCT_EXPORT_METHOD(modifyAdminPasscode:(NSString *)adminPasscode  lockData:(NSStr
 RCT_EXPORT_METHOD(getLockAutomaticLockingPeriodicTime:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock getAutomaticLockingPeriodicTimeWithLockData:lockData success:^(int currentTime, int minTime, int maxTime) {
-        [Ttlock reseponseSuccess:@[@(currentTime),@(maxTime),@(minTime)] success:success];
+        [Ttlock response:@[@(currentTime),@(maxTime),@(minTime)] success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -374,9 +366,9 @@ RCT_EXPORT_METHOD(getLockAutomaticLockingPeriodicTime:(NSString *)lockData succe
 RCT_EXPORT_METHOD(setLockAutomaticLockingPeriodicTime:(int)time  lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock setAutomaticLockingPeriodicTime:time lockData:lockData success:^{
-        [Ttlock reseponseSuccess:nil success:success];
+        [Ttlock response:nil success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -384,18 +376,18 @@ RCT_EXPORT_METHOD(setLockAutomaticLockingPeriodicTime:(int)time  lockData:(NSStr
 RCT_EXPORT_METHOD(getLockRemoteUnlockSwitchState:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock getRemoteUnlockSwitchWithLockData:lockData success:^(BOOL isOn) {
-        [Ttlock reseponseSuccess:@(isOn) success:success];
+        [Ttlock response:@(isOn) success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
 RCT_EXPORT_METHOD(setLockRemoteUnlockSwitchState:(BOOL)isOn  lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock setRemoteUnlockSwitchOn:isOn lockData:lockData success:^(NSString *lockData) {
-        [Ttlock reseponseSuccess:lockData success:success];
+        [Ttlock response:lockData success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -404,9 +396,9 @@ RCT_EXPORT_METHOD(getLockConfig:(int)config  lockData:(NSString *)lockData succe
 {
     TTLockConfigType type = config + 1;
     [TTLock getLockConfigWithType:type lockData:lockData success:^(TTLockConfigType type, BOOL isOn) {
-        [Ttlock reseponseSuccess:@[@(type),@(isOn)] success:success];
+        [Ttlock response:@[@(type),@(isOn)] success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -414,9 +406,9 @@ RCT_EXPORT_METHOD(setLockConfig:(int)config isOn:(BOOL)isOn lockData:(NSString *
 {
     TTLockConfigType type = config + 1;
     [TTLock setLockConfigWithType:type on:isOn lockData:lockData success:^{
-        [Ttlock reseponseSuccess:nil success:success];
+        [Ttlock response:nil success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -424,18 +416,18 @@ RCT_EXPORT_METHOD(setLockConfig:(int)config isOn:(BOOL)isOn lockData:(NSString *
 RCT_EXPORT_METHOD(setLockSoundVolume:(int)soundVolume lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock setLockSoundWithSoundVolume:soundVolume lockData:lockData success:^{
-        [Ttlock reseponseSuccess:nil success:success];
+        [Ttlock response:nil success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
 RCT_EXPORT_METHOD(getLockSoundVolume:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock getLockSoundWithLockData:lockData success:^(TTSoundVolume soundVolume) {
-        [Ttlock reseponseSuccess:@(soundVolume) success:success];
+        [Ttlock response:@(soundVolume) success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -443,27 +435,27 @@ RCT_EXPORT_METHOD(getLockSoundVolume:(NSString *)lockData success:(RCTResponseSe
 RCT_EXPORT_METHOD(getUnlockDirection:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock getUnlockDirectionWithLockData:lockData success:^(TTUnlockDirection direction) {
-        [Ttlock reseponseSuccess:@(direction) success:success];
+        [Ttlock response:@(direction) success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
 RCT_EXPORT_METHOD(setUnlockDirection:(int)unlockDirection lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock setUnlockDirection:unlockDirection lockData:lockData success:^{
-        [Ttlock reseponseSuccess:nil success:success];
+        [Ttlock response:nil success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
 RCT_EXPORT_METHOD(setUnlockDirectionAutomatic:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock autoSetUnlockDirectionWithLockData:lockData success:^(TTAutoUnlockDirection state) {
-        [Ttlock reseponseSuccess:@(state) success:success];
+        [Ttlock response:@(state) success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -472,9 +464,9 @@ RCT_EXPORT_METHOD(addPassageMode:(int)type weekly:(NSArray<NSNumber *> *)weekly 
 {
     TTPassageModeType modeType = type + 1;
     [TTLock configPassageModeWithType:modeType weekly:weekly monthly:monthly startDate:startDate endDate:endDate lockData:lockData success:^{
-        [Ttlock reseponseSuccess:nil success:success];
+        [Ttlock response:nil success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -482,9 +474,9 @@ RCT_EXPORT_METHOD(addPassageMode:(int)type weekly:(NSArray<NSNumber *> *)weekly 
 RCT_EXPORT_METHOD(clearAllPassageModes:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock clearPassageModeWithLockData:lockData success:^{
-        [Ttlock reseponseSuccess:nil success:success];
+        [Ttlock response:nil success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -493,9 +485,9 @@ RCT_EXPORT_METHOD(addRemoteKey:(NSString *)remoteKeyMac cyclicConfig:(NSArray *)
 {
     
     [TTLock addWirelessKeyFobWithCyclicConfig:cyclicConfig keyFobMac:remoteKeyMac startDate:startDate.longLongValue endDate:endDate.longLongValue lockData:lockData success:^{
-        [Ttlock reseponseSuccess:nil success:success];
+        [Ttlock response:nil success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -503,9 +495,9 @@ RCT_EXPORT_METHOD(modifyRemoteKey:(NSString *)remoteKeyMac cyclicConfig:(NSArray
 {
     
     [TTLock modifyWirelessKeyFobValidityPeriodWithCyclicConfig:cyclicConfig keyFobMac:remoteKeyMac startDate:startDate.longLongValue endDate:endDate.longLongValue lockData:lockData success:^{
-        [Ttlock reseponseSuccess:nil success:success];
+        [Ttlock response:nil success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -513,18 +505,18 @@ RCT_EXPORT_METHOD(modifyRemoteKey:(NSString *)remoteKeyMac cyclicConfig:(NSArray
 RCT_EXPORT_METHOD(deleteRemoteKey:(NSString *)remoteKeyMac lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock deleteWirelessKeyFobWithKeyFobMac:remoteKeyMac lockData:lockData success:^{
-        [Ttlock reseponseSuccess:nil success:success];
+        [Ttlock response:nil success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
 RCT_EXPORT_METHOD(clearAllRemoteKey:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock clearWirelessKeyFobsWithLockData:lockData success:^{
-        [Ttlock reseponseSuccess:nil success:success];
+        [Ttlock response:nil success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -532,18 +524,18 @@ RCT_EXPORT_METHOD(clearAllRemoteKey:(NSString *)lockData success:(RCTResponseSen
 RCT_EXPORT_METHOD(addDoorSensor:(NSString *)doorSensorMac lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock addDoorSensorWithDoorSensorMac:doorSensorMac lockData:lockData success:^{
-        [Ttlock reseponseSuccess:nil success:success];
+        [Ttlock response:nil success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
 RCT_EXPORT_METHOD(clearAllDoorSensor:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock clearDoorSensorWithLockData:lockData success:^{
-        [Ttlock reseponseSuccess:nil success:success];
+        [Ttlock response:nil success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -551,9 +543,9 @@ RCT_EXPORT_METHOD(clearAllDoorSensor:(NSString *)lockData success:(RCTResponseSe
 RCT_EXPORT_METHOD(setDoorSensorAlertTime:(int) time lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock setDoorSensorAlertTime:time lockData:lockData success:^{
-        [Ttlock reseponseSuccess:nil success:success];
+        [Ttlock response:nil success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -561,9 +553,9 @@ RCT_EXPORT_METHOD(setDoorSensorAlertTime:(int) time lockData:(NSString *)lockDat
 RCT_EXPORT_METHOD(recoverCard:(NSString *) cardNumber cycleList: (NSArray *) cycleList  startDate:(nonnull NSNumber *)startDate endDate:(nonnull NSNumber *)endDate lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock recoverICCardWithCyclicConfig:cycleList cardNumber:cardNumber startDate:startDate.longLongValue endDate:endDate.longLongValue lockData:lockData success:^(NSString *cardNumber2) {
-        [Ttlock reseponseSuccess:cardNumber2 success:success];
+        [Ttlock response:cardNumber2 success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -571,9 +563,9 @@ RCT_EXPORT_METHOD(recoverCard:(NSString *) cardNumber cycleList: (NSArray *) cyc
 RCT_EXPORT_METHOD(recoverPasscode:(NSString *) passcode passcodeType:(int)passcodeType cycleType: (int) cycleType  startDate:(nonnull NSNumber *)startDate endDate:(nonnull NSNumber *)endDate lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock recoverPasscode:passcode newPasscode:passcode passcodeType:passcodeType startDate:startDate.longLongValue endDate:endDate.longLongValue cycleType:cycleType lockData:lockData success:^{
-        [Ttlock reseponseSuccess:nil success:success];
+        [Ttlock response:nil success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -582,7 +574,7 @@ RCT_EXPORT_METHOD(scanWifi:(NSString *) lockData fail:(RCTResponseSenderBlock)fa
     [TTLock scanWifiWithLockData:lockData success:^(BOOL isFinished, NSArray *wifiArr) {
         [self sendEventWithName:EVENT_SCAN_LOCK_WIFI body:@[@(isFinished), wifiArr]];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -590,9 +582,9 @@ RCT_EXPORT_METHOD(scanWifi:(NSString *) lockData fail:(RCTResponseSenderBlock)fa
 RCT_EXPORT_METHOD(configWifi:(NSString *) wifiName wifiPassword:(NSString *) wifiPassword lockData:(NSString *) lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock configWifiWithSSID:wifiName wifiPassword:wifiPassword lockData:lockData success:^{
-        [Ttlock reseponseSuccess:nil success:success];
+        [Ttlock response:nil success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -600,9 +592,9 @@ RCT_EXPORT_METHOD(configWifi:(NSString *) wifiName wifiPassword:(NSString *) wif
 RCT_EXPORT_METHOD(configServer:(NSString *) ip port:(NSString *) port lockData:(NSString *) lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock configServerWithServerAddress:ip portNumber:port lockData:lockData success:^{
-        [Ttlock reseponseSuccess:nil success:success];
+        [Ttlock response:nil success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -610,9 +602,9 @@ RCT_EXPORT_METHOD(configServer:(NSString *) ip port:(NSString *) port lockData:(
 RCT_EXPORT_METHOD(getWifiInfo:(NSString *) lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock getWifiInfoWithLockData:lockData success:^(NSString *wifiMac, NSInteger wifiRssi) {
-        [Ttlock reseponseSuccess:@[wifiMac, @(wifiRssi)] success:success];
+        [Ttlock response:@[wifiMac, @(wifiRssi)] success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -620,9 +612,9 @@ RCT_EXPORT_METHOD(getWifiInfo:(NSString *) lockData success:(RCTResponseSenderBl
 RCT_EXPORT_METHOD(configIp:(NSDictionary *) info lockData:(NSString *) lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock configIpWithInfo:info lockData:lockData success:^{
-        [Ttlock reseponseSuccess:nil success:success];
+        [Ttlock response:nil success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -636,18 +628,18 @@ RCT_EXPORT_METHOD(addFace:(NSArray *)cycleList startDate:(nonnull NSNumber *)sta
             [weakSelf sendEventWithName:EVENT_ADD_FACE_PROGRESS body:@[stateValue, @(faceErrorCode)]];
         }
     } success:^(NSString *faceNumber) {
-        [Ttlock reseponseSuccess:faceNumber success:success];
+        [Ttlock response:faceNumber success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
 RCT_EXPORT_METHOD(addFaceFeatureData:(NSString *)faceFeatureData cycleList:(NSArray *) cycleList startDate:(nonnull NSNumber *)startDate endDate:(nonnull NSNumber *)endDate lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock addFaceFeatureData:faceFeatureData cyclicConfig:cycleList startDate:startDate.longLongValue endDate:endDate.longLongValue lockData:lockData success:^(NSString *faceNumber) {
-        [Ttlock reseponseSuccess:faceNumber success:success];
+        [Ttlock response:faceNumber success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -655,27 +647,27 @@ RCT_EXPORT_METHOD(addFaceFeatureData:(NSString *)faceFeatureData cycleList:(NSAr
 RCT_EXPORT_METHOD(modifyFaceValidityPeriod:(NSArray *)cycleList startDate:(nonnull NSNumber *)startDate endDate:(nonnull NSNumber *)endDate faceNumber:(NSString *)faceNumber lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock modifyFaceValidityWithCyclicConfig:cycleList faceNumber:faceNumber startDate:startDate.longLongValue endDate:endDate.longLongValue lockData:lockData success:^{
-        [Ttlock reseponseSuccess:nil success:success];
+        [Ttlock response:nil success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
 RCT_EXPORT_METHOD(deleteFace:(NSString *)faceNumber lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock deleteFaceNumber:faceNumber lockData:lockData success:^{
-        [Ttlock reseponseSuccess:nil success:success];
+        [Ttlock response:nil success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
 RCT_EXPORT_METHOD(clearFace:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock clearFaceWithLockData:lockData success:^{
-        [Ttlock reseponseSuccess:nil success:success];
+        [Ttlock response:nil success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode message:errorMsg fail:fail];
     }];
 }
 
@@ -683,7 +675,7 @@ RCT_EXPORT_METHOD(clearFace:(NSString *)lockData success:(RCTResponseSenderBlock
 RCT_EXPORT_METHOD(supportFunction:(int)fuction lockData:(NSString *)lockData callback:(RCTResponseSenderBlock)callback)
 {
     BOOL isSupport = [TTUtil lockFeatureValue:lockData suportFunction:fuction];
-    [Ttlock reseponseSuccess:@(isSupport) success:callback];
+    [Ttlock response:@(isSupport) success:callback];
 }
 
 
@@ -710,7 +702,7 @@ RCT_EXPORT_METHOD(stopScanGateway)
 RCT_EXPORT_METHOD(connect:(NSString *)mac block:(RCTResponseSenderBlock)block)
 {
     [TTGateway connectGatewayWithGatewayMac:mac block:^(TTGatewayConnectStatus connectStatus) {
-        [Ttlock reseponseSuccess:@(connectStatus) success:block];
+        [Ttlock response:@(connectStatus) success:block];
     }];
 }
 
@@ -728,10 +720,10 @@ RCT_EXPORT_METHOD(getNearbyWifi:(RCTResponseSenderBlock)block)
             [self sendEventWithName:EVENT_SCAN_WIFI body:wifiList];
             
             if (isFinished) {
-                [Ttlock reseponseSuccess:@(status) success:block];
+                [Ttlock response:@(status) success:block];
             }
         }else{
-            [Ttlock reseponseSuccess:@(status) success:block];
+            [Ttlock response:@(status) success:block];
         }
     }];
 }
@@ -773,13 +765,13 @@ RCT_EXPORT_METHOD(initGateway:(NSDictionary *)dict success:(RCTResponseSenderBlo
                             @"hardwareRevision":NOT_NULL_STRING(systemInfoModel.hardwareRevision),
                             @"firmwareRevision":NOT_NULL_STRING(systemInfoModel.firmwareRevision)
                         };
-                        [Ttlock reseponseSuccess:resultDict success:success];
+                        [Ttlock response:resultDict success:success];
                     }else{
-                        [Ttlock responseFail:GATEWAY code:status errorMessage:nil fail:fail];
+                        [Ttlock response:status  message:nil fail:fail];
                     }
                 }];
             }else{
-                [Ttlock responseFail:GATEWAY code:status errorMessage:nil fail:fail];
+                [Ttlock response:status  message:nil fail:fail];
             }
         }];
     }else{
@@ -790,9 +782,9 @@ RCT_EXPORT_METHOD(initGateway:(NSDictionary *)dict success:(RCTResponseSenderBlo
                     @"hardwareRevision":NOT_NULL_STRING(systemInfoModel.hardwareRevision),
                     @"firmwareRevision":NOT_NULL_STRING(systemInfoModel.firmwareRevision)
                 };
-                [Ttlock reseponseSuccess:resultDict success:success];
+                [Ttlock response:resultDict success:success];
             }else{
-                [Ttlock responseFail:GATEWAY code:status errorMessage:nil fail:fail];
+                [Ttlock response:status  message:nil fail:fail];
             }
         }];
     }
@@ -823,9 +815,9 @@ RCT_EXPORT_METHOD(initRemoteKey:(NSString *)mac lockData:(NSString *) lockData s
 {
     [TTWirelessKeyFob newInitializeWithKeyFobMac:mac lockData:lockData block:^(TTKeyFobStatus status, int electricQuantity, TTSystemInfoModel *systemModel) {
         if (status == TTKeyFobSuccess) {
-            [Ttlock reseponseSuccess:@[@(electricQuantity),[Ttlock dictionaryFromModel:systemModel]] success:success];
+            [Ttlock response:@[@(electricQuantity),[Ttlock dictionaryFromModel:systemModel]] success:success];
         }else{
-            [Ttlock responseFail:REMOTE_KEY code:status errorMessage:nil fail:fail];
+            [Ttlock response:status  message:nil fail:fail];
         }
     }];
    
@@ -835,9 +827,9 @@ RCT_EXPORT_METHOD(initRemoteKey:(NSString *)mac lockData:(NSString *) lockData s
 RCT_EXPORT_METHOD(getAccessoryElectricQuantity:(int)type mac:(NSString *)mac lockData:(NSString *) lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     [TTLock getAccessoryElectricQuantityWithType:type accessoryMac:mac lockData:lockData success:^(NSInteger electricQuantity, long long updateDate) {
-        [Ttlock reseponseSuccess:@[@(electricQuantity),@(updateDate)] success:success];
+        [Ttlock response:@[@(electricQuantity),@(updateDate)] success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+        [Ttlock response:errorCode  message:nil fail:fail];
     }];
 }
 
@@ -869,9 +861,9 @@ RCT_EXPORT_METHOD(initDoorSensor:(NSString *)mac lockData:(NSString *) lockData 
 {
     
     [TTDoorSensor initializeWithDoorSensorMac:mac lockData:lockData success:^(int electricQuantity, TTSystemInfoModel * _Nonnull systemModel) {
-        [Ttlock reseponseSuccess:@[@(electricQuantity),[Ttlock dictionaryFromModel:systemModel]] success:success];
+        [Ttlock response:@[@(electricQuantity),[Ttlock dictionaryFromModel:systemModel]] success:success];
     } failure:^(TTDoorSensorError error) {
-        [Ttlock responseFail:DOOR_SENSOR code:error errorMessage:nil fail:fail];
+        [Ttlock response:error  message:nil fail:fail];
     }];
 }
 
@@ -900,9 +892,9 @@ RCT_EXPORT_METHOD(initWirelessKeypad:(NSString *)mac lockMac:(NSString *) lockMa
 {
     [TTWirelessKeypad initializeKeypadWithKeypadMac:mac lockMac:lockMac block:^(NSString *wirelessKeypadFeatureValue, TTKeypadStatus status, int electricQuantity) {
         if(status == TTKeypadSuccess){
-            [Ttlock reseponseSuccess:@[@(electricQuantity),wirelessKeypadFeatureValue] success:success];
+            [Ttlock response:@[@(electricQuantity),wirelessKeypadFeatureValue] success:success];
         }else{
-            [Ttlock responseFail:REMOTE_KEY_PAD code:status errorMessage:nil fail:fail];
+            [Ttlock response:status  message:nil fail:fail];
         }
     }];
     
@@ -911,32 +903,21 @@ RCT_EXPORT_METHOD(initWirelessKeypad:(NSString *)mac lockMac:(NSString *) lockMa
 
 
 #pragma mark - private method
-+ (void)reseponseSuccess:(NSObject *)data success:(RCTResponseSenderBlock)success{
++ (void)response:(NSObject *)data success:(RCTResponseSenderBlock)success{
     NSArray *responseData = data ? @[data] : nil;
     success(responseData);
 }
 
-
-
-
-+ (void)responseFail:(DEVICE)device code:(NSInteger)code errorMessage:(NSString *)errorMessage fail:(RCTResponseSenderBlock)fail{
-    NSNumber *errorCode = nil;
-    if(device == GATEWAY){
-        errorCode = @([self getTTGatewayErrorCode:code]);
-    }else if(device == REMOTE_KEY){
-        errorCode = @([self getTTRemoteKeyErrorCode:code]);
-    }else if(device == REMOTE_KEY_PAD){
-        errorCode = @([self getTTRemoteKeypadErrorCode:code]);
-    }else if(device == DOOR_SENSOR){
-        errorCode = @([self getTTDoorSensoryErrorCode:code]);
-    }else{
-        errorCode = [self getTTLockErrorCode:@(code)];
++ (void)response:(NSInteger)code message:(NSString *)message fail:(RCTResponseSenderBlock)fail{
+    
+    NSInteger errorCode = code;
+    if (code > TTErrorRecordNotExist) {
+        errorCode = code - 65;
+    }else if(code > TTErrorWrongDynamicCode){
+        errorCode =code - 1;
     }
-    
-    fail(@[errorCode,NOT_NULL_STRING(errorMessage)]);
-    
+    fail(@[@(errorCode),NOT_NULL_STRING(message)]);
 }
-
 
 
 + (NSDictionary *)dictionaryFromModel:(id)model {
@@ -953,137 +934,6 @@ RCT_EXPORT_METHOD(initWirelessKeypad:(NSString *)mac lockMac:(NSString *) lockMa
     }
     free(properties);
     return resultDict;
-}
-
-
-
-+ (NSInteger)getTTGatewayErrorCode:(TTGatewayStatus) status{
-    NSArray *codeArray =@[@(TTGatewayFail),
-                          @(TTGatewayWrongSSID),
-                          @(TTGatewayWrongWifiPassword),
-                          @(TTGatewayWrongCRC),
-                          @(TTGatewayWrongAeskey),
-                          @(TTGatewayNotConnect),
-                          @(TTGatewayDisconnect),
-                          @(TTGatewayFailConfigRouter),
-                          @(TTGatewayFailConfigServer),
-                          @(TTGatewayFailConfigAccount),
-                          @(TTGatewayNoSIM),
-                          @(TTGatewayInvalidCommand),
-                          @(TTGatewayFailConfigIP),
-                          @(TTGatewayFailInvaildIP)
-    
-    ];
-    
-    NSInteger errorCode = TTGatewayFail;
-    for (int i = 0; i < codeArray.count; i++) {
-        if([codeArray[i] intValue] == status){
-            errorCode = i;
-        }
-    }
-    return errorCode;
-}
-
-
-
-+ (NSInteger)getTTRemoteKeyErrorCode:(NSInteger) status{
-    
-    NSArray *codeArray =@[@(TTKeyFobFail),
-                          @(TTKeyFobWrongCRC),
-                          @(TTKeyFobConnectTimeout)
-    
-    ];
-    NSInteger errorCode = TTKeyFobFail;
-    for (int i = 0; i < codeArray.count; i++) {
-        if([codeArray[i] intValue] == status){
-            errorCode = i;
-        }
-    }
-    return errorCode;
-}
-
-+ (NSInteger)getTTRemoteKeypadErrorCode:(NSInteger) status{
-    
-    NSArray *codeArray =@[@(TTKeypadFail),
-                          @(TTKeypadWrongCRC),
-                          @(TTKeypadConnectTimeout),
-    
-    ];
-    NSInteger errorCode = TTKeypadFail;
-    for (int i = 0; i < codeArray.count; i++) {
-        if([codeArray[i] intValue] == status){
-            errorCode = i;
-        }
-    }
-    return errorCode;
-}
-
-
-+ (NSInteger)getTTDoorSensoryErrorCode:(TTDoorSensorError) status{
-    NSArray *codeArray =@[@(TTDoorSensorErrorFail),
-                          @(TTDoorSensorErrorWrongCRC),
-                          @(TTDoorSensorErrorConnectTimeout)
-    
-    ];
-    NSInteger errorCode = TTDoorSensorErrorFail;
-    for (int i = 0; i < codeArray.count; i++) {
-        if([codeArray[i] intValue] == status){
-            errorCode = i;
-        }
-    }
-    return errorCode;
-}
-
-
-+ (NSNumber *)getTTLockErrorCode:(NSNumber *) code{
-    NSInteger errorCode = TTErrorFail;
-    NSArray *codeArray =@[@(TTErrorHadReseted),
-                          @(TTErrorCRCError),
-                          @(TTErrorNoPermisstion),
-                          @(TTErrorWrongAdminCode),
-                          @(TTErrorLackOfStorageSpace),
-                          @(TTErrorInSettingMode),
-                          @(TTErrorNoAdmin),
-                          @(TTErrorNotInSettingMode),
-                          @(TTErrorWrongDynamicCode),
-                          @(TTErrorIsNoPower),
-                          @(TTErrorResetPasscode),
-                          @(TTErrorUpdatePasscodeIndex) ,
-                          @(TTErrorInvalidLockFlagPos),
-                          @(TTErrorEkeyExpired),
-                          @(TTErrorPasscodeLengthInvalid),
-                          @(TTErrorSamePasscodes),
-                          @(TTErrorEkeyInactive),
-                          @(TTErrorAesKey),
-                          @(TTErrorFail),
-                          @(TTErrorPasscodeExist),
-                          @(TTErrorPasscodeNotExist),
-                          @(TTErrorLackOfStorageSpaceWhenAddingPasscodes),
-                          @(TTErrorInvalidParaLength) ,
-                          @(TTErrorCardNotExist),
-                          @(TTErrorFingerprintDuplication),
-                          @(TTErrorFingerprintNotExist) ,
-                          @(TTErrorInvalidCommand),
-                          @(TTErrorInFreezeMode) ,
-                          @(TTErrorInvalidClientPara),
-                          @(TTErrorLockIsLocked),
-                          @(TTErrorRecordNotExist),
-                          @(TTErrorFail),
-                          @(TTErrorBluetoothPoweredOff),
-                          @(TTErrorConnectionTimeout),
-                          @(TTErrorDisconnection),
-                          @(TTErrorLockIsBusy) ,
-                          @(TTErrorWrongLockData),
-                          @(TTErrorInvalidParameter),
-                          @(TTErrorWrongSSID),
-                          @(TTErrorWrongWifiPassword)];
-    
-    for (int i = 0; i < codeArray.count; i++) {
-        if([codeArray[i] intValue] == code.intValue){
-            errorCode = i;
-        }
-    }
-    return @(errorCode);
 }
 
 @end
