@@ -993,7 +993,7 @@ RCT_EXPORT_METHOD(initWirelessKeypad:(NSString *)mac lockMac:(NSString *) lockMa
                           @(TTKeyFobConnectTimeout)
     
     ];
-    NSInteger errorCode = TTKeyFobFail;
+    NSInteger errorCode = 0;
     for (int i = 0; i < codeArray.count; i++) {
         if([codeArray[i] intValue] == status){
             errorCode = i;
@@ -1007,9 +1007,11 @@ RCT_EXPORT_METHOD(initWirelessKeypad:(NSString *)mac lockMac:(NSString *) lockMa
     NSArray *codeArray =@[@(TTKeypadFail),
                           @(TTKeypadWrongCRC),
                           @(TTKeypadConnectTimeout),
+                          @(TTKeypadWrongFactorydDate)
+                          
     
     ];
-    NSInteger errorCode = TTKeypadFail;
+    NSInteger errorCode = 0;
     for (int i = 0; i < codeArray.count; i++) {
         if([codeArray[i] intValue] == status){
             errorCode = i;
@@ -1020,12 +1022,11 @@ RCT_EXPORT_METHOD(initWirelessKeypad:(NSString *)mac lockMac:(NSString *) lockMa
 
 
 + (NSInteger)getTTDoorSensoryErrorCode:(TTDoorSensorError) status{
-    NSArray *codeArray =@[@(TTDoorSensorErrorFail),
-                          @(TTDoorSensorErrorWrongCRC),
-                          @(TTDoorSensorErrorConnectTimeout)
-    
-    ];
-    NSInteger errorCode = TTDoorSensorErrorFail;
+    NSArray *codeArray =@[@(TTDoorSensorErrorBluetoothPowerOff),
+                          @(TTDoorSensorErrorConnectTimeout),
+                          @(TTDoorSensorErrorFail),
+                          @(TTDoorSensorErrorWrongCRC)];
+    NSInteger errorCode = 2;
     for (int i = 0; i < codeArray.count; i++) {
         if([codeArray[i] intValue] == status){
             errorCode = i;
@@ -1036,7 +1037,7 @@ RCT_EXPORT_METHOD(initWirelessKeypad:(NSString *)mac lockMac:(NSString *) lockMa
 
 
 + (NSNumber *)getTTLockErrorCode:(NSNumber *) code{
-    NSInteger errorCode = TTErrorFail;
+    NSInteger errorCode = 18;
     NSArray *codeArray =@[@(TTErrorHadReseted),
                           @(TTErrorCRCError),
                           @(TTErrorNoPermisstion),

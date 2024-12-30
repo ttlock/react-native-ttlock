@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react';
 import React, { useEffect } from 'react';
 import { FlatList, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { TtWirelessKeypad, ScanWirelessKeypadModal } from 'react-native-ttlock';
+import { TtWirelessKeypad, ScanWirelessKeypadModal, RemoteKeyPadErrorCode } from 'react-native-ttlock';
 import * as Toast from './toast-page';
 import store from './store'
 
@@ -19,7 +19,7 @@ const renderItem = (item: ScanWirelessKeypadModal, operation: string, lockMac: s
         console.log("electricQuantity:" + String(electricQuantity) + "    wirelessKeypadFeatureValue:" + wirelessKeypadFeatureValue);
 
         navigation.pop();
-      }, (errorCode: number, description: string) => {
+      }, (errorCode: RemoteKeyPadErrorCode, description: string) => {
         Toast.showToast(description + errorCode.toString())
       });
     }

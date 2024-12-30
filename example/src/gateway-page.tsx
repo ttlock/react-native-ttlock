@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, TextInput, StyleSheet, Text, TouchableHighlight } from 'react-native';
-import { GatewayType, TtGateway, GatewayIpSettingType } from 'react-native-ttlock';
-import type { InitGatewayParam, InitGatewayModal } from 'react-native-ttlock';
+import { GatewayType, TtGateway } from 'react-native-ttlock';
+import type { InitGatewayParam, InitGatewayModal, GatewayErrorCode } from 'react-native-ttlock';
 import * as Toast from './toast-page';
 import config from './config'
 
@@ -29,7 +29,7 @@ const GatewayPage = (props: { navigation: any; route: any; }) => {
         wifi: wifi,
         wifiPassword: wifiPassword,
         serverIp: undefined,  //your gateway server ip address (The default is sciener's gateway server ip address)
-        serverPort: 2229,  //your gateway server port
+        serverPort: 2229,  //your gateway server port 
 
         ipSettingType: undefined,
         ipAddress: undefined,
@@ -54,6 +54,8 @@ const GatewayPage = (props: { navigation: any; route: any; }) => {
         ttlockLoginPassword: config.ttlockLoginPassword,
         wifi: undefined,
         wifiPassword: undefined,
+        serverIp: undefined,  //your gateway server ip address (The default is sciener's gateway server ip address)
+        serverPort: undefined,  //your gateway server port
 
         ipSettingType: undefined,
         ipAddress: undefined,
@@ -77,8 +79,9 @@ const GatewayPage = (props: { navigation: any; route: any; }) => {
       let text = "Gateway init success: " + data.firmwareRevision;
       Toast.showToast(text);
       console.log(text);
-    }, (errorCode: number, errorMessage: string) => {
+    }, (errorCode: GatewayErrorCode, errorMessage: string) => {
       let text = "errorCode:" + errorCode + " errorMessage:" + errorMessage;
+      console.log(text);
       Toast.showToast(text);
     })
   }

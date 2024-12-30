@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react';
 import React, { useEffect } from 'react';
 import { FlatList, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { TtDoorSensor, Ttlock, ScanDoorSensorModal, DeviceSystemModal } from 'react-native-ttlock';
+import { TtDoorSensor, Ttlock, ScanDoorSensorModal, DeviceSystemModal, DoorSensorErrorCode } from 'react-native-ttlock';
 import * as Toast from './toast-page';
 import store from './store'
 
@@ -32,7 +32,7 @@ const initDoorSensor = (doorSensorMac: string, lockData: string, navigation: any
     console.log("electricQuantity:" + String(electricQuantity));
     console.log("systemModel:" + JSON.stringify(systemModel));
     navigation.pop();
-  }, (errorCode: number, description: string) => {
+  }, (errorCode: DoorSensorErrorCode, description: string) => {
     Toast.showToast("init door sensor " + errorCode.toString())
   });
 }

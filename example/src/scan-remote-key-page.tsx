@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react';
 import React, { useEffect } from 'react';
 import { FlatList, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { TtRemoteKey, Ttlock, LockAccessoryType, ScanRemoteKeyModal, DeviceSystemModal } from 'react-native-ttlock';
+import { TtRemoteKey, Ttlock, LockAccessoryType, ScanRemoteKeyModal, DeviceSystemModal, RemoteKeyErrorCode } from 'react-native-ttlock';
 import * as Toast from './toast-page';
 import store from './store'
 
@@ -39,7 +39,7 @@ const initRemoteKey = (remoteKeyMac: string, lockData: string, navigation: any) 
 
 
     navigation.pop();
-  }, (errorCode: number, description: string) => {
+  }, (errorCode: RemoteKeyErrorCode, description: string) => {
     Toast.showToast("init remote key fail " + errorCode.toString())
 
   });

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { Ttlock, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, LockSoundVolume, LockUnlockDirection, WifiLockServerInfo, FaceState, FaceErrorCode } from 'react-native-ttlock';
+import { Ttlock, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, LockSoundVolume, LockUnlockDirection, WifiLockServerInfo, FaceState, FaceErrorCode, LockErrorCode } from 'react-native-ttlock';
 import * as Toast from './toast-page';
 import { DeviceSystemModal } from 'lib/typescript';
 
@@ -114,7 +114,7 @@ const progressCallback = function (text: string) {
   Toast.showToast(text);
 }
 
-const failedCallback = function (errorCode: number, errorMessage: string) {
+const failedCallback = function (errorCode: LockErrorCode, errorMessage: string) {
   let text = "errorCode:" + errorCode + "    errorMessage:" + errorMessage;
   console.log(text);
   Toast.showToast(text);
@@ -175,7 +175,13 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
     let endDate = startDate + 24 * 3600 * 1000;
     Ttlock.createCustomPasscode("1122", startDate, endDate, lockData, () => {
       successCallback("create cutome passcode success");
-    }, failedCallback);
+    }, (error: LockErrorCode, description: string) => {
+      if(error === LockErrorCode.passcodeLengthInvalid){
+        console.log(error)
+      }
+      
+      console.log("errorCode:" + error + "    errorMessage:" + description);
+    });
   }
   else if (lockOperation === "Modify passcode 1122 -> 2233") {
 
@@ -465,7 +471,7 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
     Ttlock.setDoorSensorAlertTime(alertTime, lockData, () => {
       Toast.showToast("ssuccess")
       navigation.pop();
-    }, (errorCode: number, description: string) => {
+    }, (errorCode: LockErrorCode, description: string) => {
       Toast.showToast("set door sensor alert time fail " + errorCode.toString())
     })
   }
