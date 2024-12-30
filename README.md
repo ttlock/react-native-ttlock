@@ -107,7 +107,7 @@ const param = {
 ``` js
 Ttlock.resetLock(lockData, () => {
     //...
-}, (errorCode, errorDesc) => {
+}, (errorCode: LockErrorCode, errorDesc: string) => {
     //...
 })
 ```
@@ -116,7 +116,7 @@ Ttlock.resetLock(lockData, () => {
 let timestamp = new Date().getTime();
 Ttlock.setLockTime(timestamp, lockData, () => {
     //...
-}, (errorCode, errorDesc) => {
+}, (errorCode: LockErrorCode, errorDesc: string) => {
     //...
 });
 ```
@@ -124,7 +124,7 @@ Ttlock.setLockTime(timestamp, lockData, () => {
 ``` js
 Ttlock.getLockTime(lockData, (lockTimestamp: number) => {
     //...
-}, (errorCode, errorDesc) => {
+}, (errorCode: LockErrorCode, errorDesc: string) => {
     //...
 });
 ```
@@ -136,7 +136,7 @@ Ttlock.getLockOperationRecord(LockRecordType.Latest, lockData, successCallback, 
 ``` js
 Ttlock.getLockSwitchState(lockData, (state: LockState) => {
     //...
-},  (errorCode, errorDesc) => {
+},  (errorCode: LockErrorCode, errorDesc: string) => {
     //...
 });
 ```
@@ -145,7 +145,7 @@ Ttlock.getLockSwitchState(lockData, (state: LockState) => {
 let seconds = 20;
 Ttlock.setLockAutomaticLockingPeriodicTime(seconds, lockData, () => {
       //...
-},  (errorCode, errorDesc) => {
+},  (errorCode: LockErrorCode, errorDesc: string) => {
     //...
 });
 ```
@@ -153,7 +153,7 @@ Ttlock.setLockAutomaticLockingPeriodicTime(seconds, lockData, () => {
 ``` js
 Ttlock.getLockAutomaticLockingPeriodicTime(lockData, (currentTime: number, maxTime: number, minTime: number) => {
     //...
-},  (errorCode, errorDesc) => {
+},  (errorCode: LockErrorCode, errorDesc: string) => {
     //...
 });
 ```
@@ -163,7 +163,7 @@ let isOn = true;
 Ttlock.setLockRemoteUnlockSwitchState(isOn, lockData, (lockDataNew: string) => {
       let text = "set lock remote unlock switch success, please upload lockDataNew to server";
       console.log(text);
-}, (errorCode, errorDesc) => {
+}, (errorCode: LockErrorCode, errorDesc: string) => {
     //...
 });
 ```
@@ -183,7 +183,7 @@ let isOn = true;
 Ttlock.setLockConfig(LockConfigType.Audio, isOn, lockData, () => {
       let text = "config lock success";
       successCallback(text);
-}, (errorCode, errorDesc) => {
+}, (errorCode: LockErrorCode, errorDesc: string) => {
     //...
 });
 ```
@@ -202,7 +202,7 @@ enum LockConfigType {
 Ttlock.getLockConfig(LockConfigType.Audio, lockData, (type: number, isOn: boolean) => {
       let text = "type:" + type + "\n" + "isOn:" + isOn;
       successCallback(text);
-}, (errorCode, errorDesc) => {
+}, (errorCode: LockErrorCode, errorDesc: string) => {
     //...
 });
 ```
@@ -212,7 +212,7 @@ Ttlock.getLockConfig(LockConfigType.Audio, lockData, (type: number, isOn: boolea
 Ttlock.controlLock(LockControlType.Unlock, lockData, (lockTime: number, electricQuantity: number, uniqueId: number) => {
       let text = "lockTime:" + lockTime + "\n" + "electricQuantity:" + electricQuantity + "\n" + "uniqueId:" + uniqueId;
       successCallback(text);
-}, (errorCode, errorDesc) => {
+}, (errorCode: LockErrorCode, errorDesc: string) => {
     //...
 });
 ```
@@ -222,7 +222,7 @@ Ttlock.resetEkey(lockData, (lockDataNew) => {
     //important: upload lockDataNew to ttlock server. 
     let text = "reset ekey success";
     console.log(text);
-}, (errorCode, errorDesc) => {
+}, (errorCode: LockErrorCode, errorDesc: string) => {
     //...
 });
 ```
@@ -236,7 +236,7 @@ let startDate = new Date().getTime();
 let endDate = startDate + 24 * 3600 * 1000;
 Ttlock.createCustomPasscode("1122", startDate, endDate, lockData, () => {
       successCallback("create cutome passcode success");
-}, (errorCode, errorDesc) => {
+}, (errorCode: LockErrorCode, errorDesc: string) => {
     //...
 });
 ```
@@ -249,7 +249,7 @@ let oldPasscode = "1122";
 let newPasscode = "2233";
 Ttlock.modifyPasscode(oldPasscode, newPasscode, startDate, endDate, lockData, () => {
       successCallback("modify passcode success");
-}, (errorCode, errorDesc) => {
+}, (errorCode: LockErrorCode, errorDesc: string) => {
     //...
 });   
 ```
@@ -257,7 +257,7 @@ Ttlock.modifyPasscode(oldPasscode, newPasscode, startDate, endDate, lockData, ()
 ``` js
 Ttlock.deletePasscode("2233", lockData, () => {
     successCallback("delete passcode success");
-}, (errorCode, errorDesc) => {
+}, (errorCode: LockErrorCode, errorDesc: string) => {
     //...
 });  
 ```
@@ -266,7 +266,7 @@ Ttlock.deletePasscode("2233", lockData, () => {
 Ttlock.resetPasscode(lockData, (lockDataNew: string) => {
     //important: upload lockDataNew to ttlock server. 
     console.log("reset passcode success, please upload lockDataNew to server");
-}, (errorCode, errorDesc) => {
+}, (errorCode: LockErrorCode, errorDesc: string) => {
     //...
 });   
 ```
@@ -275,7 +275,7 @@ Ttlock.resetPasscode(lockData, (lockDataNew: string) => {
 let adminPasscode = "9999";
 Ttlock.modifyAdminPasscode(adminPasscode, lockData, () => {
       let text = "modify admin passcode success";
-}, (errorCode, errorDesc) => {
+}, (errorCode: LockErrorCode, errorDesc: string) => {
     //...
 });   
 ```
@@ -291,7 +291,7 @@ let startDate = new Date().getTime();
       cardNumber = cNumber;
       let text = "cardNumber:" + cardNumber;
       successCallback(text);
-}, (errorCode, errorDesc) => {
+}, (errorCode: LockErrorCode, errorDesc: string) => {
     //...    
 });   
 ```
@@ -302,7 +302,7 @@ let startDate = new Date().getTime();
 let endDate = startDate + 1 * 60 * 1000;
 Ttlock.modifyCardValidityPeriod(cardNumber, null, startDate, endDate, lockData, () => {
     let text = "modify card validity period success";
-}, (errorCode, errorDesc) => {
+}, (errorCode: LockErrorCode, errorDesc: string) => {
     //...        
 });   
 ```
@@ -310,7 +310,7 @@ Ttlock.modifyCardValidityPeriod(cardNumber, null, startDate, endDate, lockData, 
 ``` js
 Ttlock.deleteCard(cardNumber, lockData, () => {
       let text = "delete card success";
-}, (errorCode, errorDesc) => {
+}, (errorCode: LockErrorCode, errorDesc: string) => {
     //...    
 });   
 ```
@@ -318,7 +318,7 @@ Ttlock.deleteCard(cardNumber, lockData, () => {
 ``` js
 Ttlock.clearAllCards(lockData, () => {
     let text = "clear all cards success";
-}, (errorCode, errorDesc) => {
+}, (errorCode: LockErrorCode, errorDesc: string) => {
     //...    
 });   
 ```
@@ -334,7 +334,7 @@ Ttlock.addFingerprint(null, startDate, endDate, lockData, (currentCount: number,
 }, (fNumber: string) => {
       fingerprintNumber = fNumber;
       let text = "fingerprintNumber:" + fingerprintNumber
-    }, (errorCode, errorDesc) => {
+    }, (errorCode: LockErrorCode, errorDesc: string) => {
     //...    
 });  
 ```
@@ -345,7 +345,7 @@ let startDate = new Date().getTime();
 let endDate = startDate + 1 * 60 * 1000;
 Ttlock.modifyFingerprintValidityPeriod(fingerprintNumber, null, startDate, endDate, lockData, () => {
       let text = "modify fingerprint validity period success";
-}, (errorCode, errorDesc) => {
+}, (errorCode: LockErrorCode, errorDesc: string) => {
     //...    
 });  
 ```
@@ -353,7 +353,7 @@ Ttlock.modifyFingerprintValidityPeriod(fingerprintNumber, null, startDate, endDa
 ``` js
 Ttlock.deleteFingerprint(fingerprintNumber, lockData, () => {
       let text = "delete fingerprint success";
-}, (errorCode, errorDesc) => {
+}, (errorCode: LockErrorCode, errorDesc: string) => {
     //...    
 });  
 ```
@@ -361,7 +361,7 @@ Ttlock.deleteFingerprint(fingerprintNumber, lockData, () => {
 ``` js
 Ttlock.clearAllFingerprints(lockData, () => {
     let text = "clear all fingerprints success";
-}, (errorCode, errorDesc) => {
+}, (errorCode: LockErrorCode, errorDesc: string) => {
     //...    
 });  
 ```
@@ -374,7 +374,7 @@ let startTime = 8 * 60;
 let endTime = 17 * 60;
 Ttlock.addPassageMode(LockPassageMode.Weekly, [1, 2, 7], startTime, endTime, lockData, () => {
       let text = "add passage mode success";
-}, (errorCode, errorDesc) => {
+}, (errorCode: LockErrorCode, errorDesc: string) => {
     //...    
 });  
 ```
@@ -383,7 +383,7 @@ Ttlock.addPassageMode(LockPassageMode.Weekly, [1, 2, 7], startTime, endTime, loc
 ``` js
 Ttlock.clearAllPassageModes(lockData, () => {
     let text = "clear all passage modes success";
-}, (errorCode, errorDesc) => {
+}, (errorCode: LockErrorCode, errorDesc: string) => {
     //...    
 });  
 ```
@@ -394,7 +394,7 @@ Ttlock.clearAllPassageModes(lockData, () => {
 ``` js
 Ttlock.scanWifi(lockData, (isFinished: boolean, wifiList: []) => {
      
-    }, (errorCode, errorDesc) => {
+    }, (errorCode: LockErrorCode, errorDesc: string) => {
     //...    
 });
 ```
@@ -406,7 +406,7 @@ const wifiPassword = 'sciener.com'
 Ttlock.configWifi(wifiName, wifiPassword, lockData, () => {
       let text = "config lock wifi success";
 
-    }, (errorCode, errorDesc) => {
+    }, (errorCode: LockErrorCode, errorDesc: string) => {
     //...    
 });  
 ```
@@ -419,7 +419,7 @@ const serverPort = "4999"
 Ttlock.configServer(serverIp, serverPort, lockData, () => {
       let text = "config lock wifi ip address success";
 
-    }, (errorCode, errorDesc) => {
+    }, (errorCode: LockErrorCode, errorDesc: string) => {
     //...    
 });  
 ```
