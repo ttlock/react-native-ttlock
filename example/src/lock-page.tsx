@@ -175,13 +175,7 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
     let endDate = startDate + 24 * 3600 * 1000;
     Ttlock.createCustomPasscode("1122", startDate, endDate, lockData, () => {
       successCallback("create cutome passcode success");
-    }, (error: LockErrorCode, description: string) => {
-      if(error === LockErrorCode.passcodeLengthInvalid){
-        console.log(error)
-      }
-      
-      console.log("errorCode:" + error + "    errorMessage:" + description);
-    });
+    }, failedCallback);
   }
   else if (lockOperation === "Modify passcode 1122 -> 2233") {
 
