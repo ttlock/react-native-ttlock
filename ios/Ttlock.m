@@ -1068,15 +1068,16 @@ RCT_EXPORT_METHOD(initWirelessKeypad:(NSString *)mac lockMac:(NSString *) lockMa
                           @(TTErrorInvalidClientPara),
                           @(TTErrorLockIsLocked),
                           @(TTErrorRecordNotExist),
-                          @(TTErrorFail),
+                          @(TTErrorWrongSSID),
+                          @(TTErrorWrongWifiPassword),
                           @(TTErrorBluetoothPoweredOff),
                           @(TTErrorConnectionTimeout),
                           @(TTErrorDisconnection),
                           @(TTErrorLockIsBusy) ,
                           @(TTErrorWrongLockData),
-                          @(TTErrorInvalidParameter),
-                          @(TTErrorWrongSSID),
-                          @(TTErrorWrongWifiPassword)];
+                          @(TTErrorInvalidParameter)
+                          ];
+    
     
     for (int i = 0; i < codeArray.count; i++) {
         if([codeArray[i] intValue] == code.intValue){

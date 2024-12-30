@@ -1126,6 +1126,49 @@ enum FaceErrorCode {
 };
 
 
+enum LockErrorCode{
+  hadReseted = 0,
+crcError = 1,
+noPermisstion = 2,
+wrongAdminCode = 3,
+lackOfStorageSpace = 4,
+inSettingMode = 5,
+noAdmin = 6,
+notInSettingMode = 7,
+wrongDynamicCode = 8,
+isNoPower = 9,
+resetPasscode = 10,
+updatePasscodeIndex = 11,
+invalidLockFlagPos = 12,
+ekeyExpired = 13,
+passcodeLengthInvalid = 14,
+samePasscodes = 15,
+ekeyInactive = 16,
+aesKey = 17,
+fail = 18,
+passcodeExist = 19,
+passcodeNotExist = 20,
+lackOfStorageSpaceWhenAddingPasscodes = 21,
+invalidParaLength = 22,
+cardNotExist = 23,
+fingerprintDuplication = 24,
+fingerprintNotExist = 25,
+invalidCommand = 26,
+inFreezeMode = 27,
+invalidClientPara = 28,
+lockIsLocked = 29,
+recordNotExist = 30,
+wrongSSID = 31,
+wrongWifiPassword = 32,
+bluetoothPoweredOff = 33,
+connectionTimeout = 34,
+disconnection = 35,
+lockIsBusy = 36,
+wrongLockData = 37,
+invalidParameter = 38
+}
+
+
 enum ConnectState {
   Timeout = 0,
   Success = 1,
@@ -1178,4 +1221,4 @@ enum GatewayIpSettingType {
   DHCP = 1
 }
 
-export { Ttlock, TtGateway, TtRemoteKey, TtDoorSensor, TtWirelessKeypad, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType, GatewayIpSettingType, LockSoundVolume, TtRemoteKeyEvent, TtDoorSensorEvent, LockUnlockDirection, LockAccessoryType, ScanLockModal, ScanRemoteKeyModal, ScanDoorSensorModal, DeviceSystemModal, WirelessKeypadEvent, ScanWirelessKeypadModal, WifiLockServerInfo, FaceState, FaceErrorCode }
+export { Ttlock, TtGateway, TtRemoteKey, TtDoorSensor, TtWirelessKeypad, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType, GatewayIpSettingType, LockSoundVolume, TtRemoteKeyEvent, TtDoorSensorEvent, LockUnlockDirection, LockAccessoryType, ScanLockModal, ScanRemoteKeyModal, ScanDoorSensorModal, DeviceSystemModal, WirelessKeypadEvent, ScanWirelessKeypadModal, WifiLockServerInfo, FaceState, FaceErrorCode, LockErrorCode }

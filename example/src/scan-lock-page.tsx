@@ -17,6 +17,7 @@ const initLock = (scanLockModal: ScanLockModal, navigation: any) => {
     navigation.navigate("LockPage", {lockData: lockData, lockMac: scanLockModal.lockMac});
     Toast.hidden();
   }, (errorCode, errorDesc) => {
+
     Toast.showToast("errorCode："+ errorCode + " errorDesc:"+errorDesc);
   })
 }
