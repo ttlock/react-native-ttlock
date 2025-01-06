@@ -15,7 +15,9 @@ public enum TTLockConfigConverter {
   privacyLock,
   passageModeAutoUnlock,
   wifiPowerSavingMode,
-  doubleAuth;
+  doubleAuth,
+  PublicMode,
+  LowBatteryAutoUnlock;
 
   public static TTLockConfigType RN2Native(int index) {
     if (index < TTLockConfigConverter.class.getEnumConstants().length) {

@@ -31,11 +31,14 @@ import com.reactnativettlock.model.IpSettingConverter;
 import com.reactnativettlock.model.RNControlAction;
 import com.reactnativettlock.model.ScanRemoteModal;
 import com.reactnativettlock.model.TTBaseFieldConstant;
+import com.reactnativettlock.model.TTDoorSensorErrorConverter;
 import com.reactnativettlock.model.TTDoorSensorEvent;
 import com.reactnativettlock.model.TTDoorSensorFieldConstant;
+import com.reactnativettlock.model.TTGatewayErrorConverter;
 import com.reactnativettlock.model.TTGatewayEvent;
 import com.reactnativettlock.model.TTGatewayFieldConstant;
 import com.reactnativettlock.model.TTKeypadConstant;
+import com.reactnativettlock.model.TTKeypadErrorConverter;
 import com.reactnativettlock.model.TTKeypadEvent;
 import com.reactnativettlock.model.TTLockConfigConverter;
 import com.reactnativettlock.model.TTLockErrorConverter;
@@ -43,6 +46,7 @@ import com.reactnativettlock.model.TTLockEvent;
 import com.reactnativettlock.model.TTLockFieldConstant;
 import com.reactnativettlock.model.TTRemoteEvent;
 import com.reactnativettlock.model.TTRemoteFieldConstant;
+import com.reactnativettlock.model.TTRemoteKeyErrorConverter;
 import com.reactnativettlock.util.PermissionUtils;
 import com.reactnativettlock.util.Utils;
 import com.ttlock.bl.sdk.api.ExtendedBluetoothDevice;
@@ -326,7 +330,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
 
       @Override
       public void onFail(KeypadError error) {
-        fail.invoke(error.getErrorCode(), error.getDescription());
+        fail.invoke(TTKeypadErrorConverter.native2RN(error), error.getDescription());
       }
     });
   }
@@ -368,9 +372,9 @@ public class TtlockModule extends ReactContextBaseJavaModule {
         WirelessDoorSensorClient.getDefault().initialize(mCachedDoorSensor.get(doorSensorMac), lockData, new InitDoorSensorCallback() {
             @Override
             public void onInitSuccess(InitDoorSensorResult initDoorSensorResult) {
-              Log.e("tag","init doorsensor success");
-              Log.e("tag","doorsensor battery:" + initDoorSensorResult.getBatteryLevel());
-              Log.e("tag","doorsensor info:" + GsonUtil.toJson(initDoorSensorResult.getFirmwareInfo()));
+//              Log.e("tag","init doorsensor success");
+//              Log.e("tag","doorsensor battery:" + initDoorSensorResult.getBatteryLevel());
+//              Log.e("tag","doorsensor info:" + GsonUtil.toJson(initDoorSensorResult.getFirmwareInfo()));
                 WritableArray writableArray = Arguments.createArray();
                 writableArray.pushInt(initDoorSensorResult.getBatteryLevel());
                 writableArray.pushString(GsonUtil.toJson(initDoorSensorResult.getFirmwareInfo()));
@@ -379,8 +383,8 @@ public class TtlockModule extends ReactContextBaseJavaModule {
 
             @Override
             public void onFail(DoorSensorError doorSensorError) {
-              Log.e("tag","add door sensor to lock failed:" + doorSensorError.getDescription());
-                int errorCode = doorSensorError == DoorSensorError.CONNECT_FAIL ? 2 : 0;
+//              Log.e("tag","add door sensor to lock failed:" + doorSensorError.getDescription());
+                int errorCode = TTDoorSensorErrorConverter.native2RN(doorSensorError);
                 fail.invoke(errorCode, doorSensorError.getDescription());
             }
         });
@@ -429,7 +433,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
 
         @Override
         public void onFail(RemoteError remoteError) {
-          fail.invoke(remoteError.getErrorCode(), remoteError.getDescription());
+          fail.invoke(TTRemoteKeyErrorConverter.native2RN(remoteError), remoteError.getDescription());
         }
       });
   }
@@ -448,7 +452,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
 
         @Override
         public void onFail(RemoteError remoteError) {
-          fail.invoke(remoteError.getErrorCode(), remoteError.getDescription());
+          fail.invoke(TTRemoteKeyErrorConverter.native2RN(remoteError), remoteError.getDescription());
         }
       });
   }
@@ -586,7 +590,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
 
         @Override
         public void onFail(GatewayError gatewayError) {
-          fail.invoke(gatewayError.getErrorCode());
+          fail.invoke(TTGatewayErrorConverter.native2RN(gatewayError));
         }
       });
     }
@@ -605,7 +609,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
         @Override
         public void onFail(GatewayError error) {
           LogUtil.d("error:" + error.getDescription());
-          fail.invoke(error.getErrorCode());
+          fail.invoke(TTGatewayErrorConverter.native2RN(error));
         }
       });
     }
