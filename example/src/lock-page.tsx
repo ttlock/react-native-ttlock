@@ -52,7 +52,7 @@ const getLockSupportOperationList = (lockData: string) => {
     { lockOperation: "Get lock unlock direction", lockFuctionValue: null },
     { lockOperation: "Set lock unlock direction", lockFuctionValue: null },
     { lockOperation: "Set lock unlock direction automatic", lockFuctionValue: null },
-    
+
     { lockOperation: "Add passage mode", lockFuctionValue: LockFunction.PassageMode },
     { lockOperation: "Clear all passageModes", lockFuctionValue: LockFunction.PassageMode },
 
@@ -83,7 +83,7 @@ const getLockSupportOperationList = (lockData: string) => {
     { lockOperation: "Wifi lock get wifi info", lockFuctionValue: LockFunction.Wifi },
     { lockOperation: "Wifi lock config ip", lockFuctionValue: LockFunction.Wifi },
 
-    { lockOperation: "Lock upgrade", lockFuctionValue: null }
+//     { lockOperation: "Lock upgrade", lockFuctionValue: null }
   ]
 
   let supportOperationList: string[] = []
@@ -572,10 +572,10 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
     }, failedCallback);
   }
 
-  else if (lockOperation === "Lock upgrade") {
-    Toast.hidden()
-    navigation.navigate("LockUpgradePage", {lockData: lockData, lockMac: lockMac});
-  }
+//   else if (lockOperation === "Lock upgrade") {
+//     Toast.hidden()
+//     navigation.navigate("LockUpgradePage", {lockData: lockData, lockMac: lockMac});
+//   }
 
 }
 

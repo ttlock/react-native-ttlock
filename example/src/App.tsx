@@ -29,7 +29,7 @@ export default function App() {
           <Stack.Screen name="LockPage" component={LockPage} />
           <Stack.Screen name="GatewayPage" component={GatewayPage} />
           <Stack.Screen name="ScanWifiPage" component={ScanWifiPage} />
-          <Stack.Screen name="LockUpgradePage" component={LockUpgradePage} />
+{/*           <Stack.Screen name="LockUpgradePage" component={LockUpgradePage} /> */}
         </Stack.Navigator>
       </NavigationContainer>
 
