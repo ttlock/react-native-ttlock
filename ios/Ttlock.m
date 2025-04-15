@@ -596,6 +596,33 @@ RCT_EXPORT_METHOD(configWifi:(NSString *) wifiName wifiPassword:(NSString *) wif
     }];
 }
 
+RCT_EXPORT_METHOD(getWifiPowerSavingTime:(NSString *) lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    [TTLock getWifiPowerSavingTimeWithLockData:lockData success:^(NSString *timesJsonString) {
+      [Ttlock reseponseSuccess:timesJsonString success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+      [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+    }];
+}
+
+RCT_EXPORT_METHOD(configWifiPowerSavingTime:(NSArray *) weekDays startDate:(nonnull NSNumber *) startDate endDate:(nonnull NSNumber *) endDate lockData:(NSString *) lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+      [TTLock configWifiPowerSavingTimeWithWeekDays:weekDays startDate:startDate.intValue endDate:endDate.intValue lockData:lockData success:^{
+        [Ttlock reseponseSuccess:nil success:success];
+      } failure:^(TTError errorCode, NSString *errorMsg) {
+          [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+      }];
+}
+
+RCT_EXPORT_METHOD(clearWifiPowerSavingTime:(NSString *) lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    [TTLock clearAllFingerprintsWithLockData:lockData success:^{
+        [Ttlock reseponseSuccess:nil success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+    }];
+}
+
 
 RCT_EXPORT_METHOD(configServer:(NSString *) ip port:(NSString *) port lockData:(NSString *) lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {

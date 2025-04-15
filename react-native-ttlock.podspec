@@ -19,8 +19,8 @@ Pod::Spec.new do |s|
   s.dependency "React-Core"
 
   #TTLock 依赖
-  s.platform = :ios, '9.0'
-  s.dependency 'TTLock', '3.4.2'
+  s.platform = :ios, '10.0'
+  s.dependency 'TTLock', '3.4.8'
   s.static_framework = true
 
 

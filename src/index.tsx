@@ -861,6 +861,25 @@ class Ttlock {
   }
 
 
+  static getWifiPowerSavingTime(lockData: string, success: null | ((timesJsonString: string) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    ttlockModule.getWifiPowerSavingTime(lockData, success, fail);
+  }
+
+  static configWifiPowerSavingTime(weekDays: number[], startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    ttlockModule.configWifiPowerSavingTime(weekDays, startDate, endDate, lockData, success, fail);
+  }
+
+  static clearWifiPowerSavingTime(lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    ttlockModule.clearWifiPowerSavingTime(lockData, success, fail);
+  }
+
+
   static configIp(info:WifiLockServerInfo, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;

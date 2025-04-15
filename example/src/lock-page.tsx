@@ -82,6 +82,9 @@ const getLockSupportOperationList = (lockData: string) => {
     { lockOperation: "Wifi lock config server", lockFuctionValue: LockFunction.Wifi },
     { lockOperation: "Wifi lock get wifi info", lockFuctionValue: LockFunction.Wifi },
     { lockOperation: "Wifi lock config ip", lockFuctionValue: LockFunction.Wifi },
+    { lockOperation: "Wifi lock get power saving time", lockFuctionValue: LockFunction.Wifi },
+    { lockOperation: "Wifi lock set power saving time", lockFuctionValue: LockFunction.Wifi },
+    { lockOperation: "Wifi lock clear power saving time", lockFuctionValue: LockFunction.Wifi },
 
 //     { lockOperation: "Lock upgrade", lockFuctionValue: null }
   ]
@@ -571,6 +574,29 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
       successCallback(text);
     }, failedCallback);
   }
+
+  else if (lockOperation === "Wifi lock get power saving time") {
+    
+    Ttlock.getWifiPowerSavingTime(lockData, (configStr: string) => {
+      let text = "wifi get power saving time: " + configStr;
+      successCallback(text);
+    }, failedCallback);
+  }
+
+  else if (lockOperation === "Wifi lock set power saving time") {
+    Ttlock.configWifiPowerSavingTime([1,2,3], 0, 60, lockData, () => {
+      let text = "wifi set power saving time success";
+      successCallback(text);
+    }, failedCallback);
+  }
+
+  else if (lockOperation === "Wifi lock clear power saving time") {
+    Ttlock.clearWifiPowerSavingTime(lockData, () => {
+      let text = "wifi clear power saving time success";
+      successCallback(text);
+    }, failedCallback);
+  }
+  
 
 //   else if (lockOperation === "Lock upgrade") {
 //     Toast.hidden()
