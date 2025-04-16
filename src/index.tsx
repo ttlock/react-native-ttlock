@@ -861,7 +861,7 @@ class Ttlock {
   }
 
 
-  static getWifiPowerSavingTime(lockData: string, success: null | ((timesJsonString: string) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
+  static getWifiPowerSavingTime(lockData: string, success: ((timesJsonString: undefined | string) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
     ttlockModule.getWifiPowerSavingTime(lockData, success, fail);

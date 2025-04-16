@@ -577,7 +577,7 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
 
   else if (lockOperation === "Wifi lock get power saving time") {
     
-    Ttlock.getWifiPowerSavingTime(lockData, (configStr: string) => {
+    Ttlock.getWifiPowerSavingTime(lockData, (configStr: undefined | string) => {
       let text = "wifi get power saving time: " + configStr;
       successCallback(text);
     }, failedCallback);

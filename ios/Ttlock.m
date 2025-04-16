@@ -616,7 +616,7 @@ RCT_EXPORT_METHOD(configWifiPowerSavingTime:(NSArray *) weekDays startDate:(nonn
 
 RCT_EXPORT_METHOD(clearWifiPowerSavingTime:(NSString *) lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
-    [TTLock clearAllFingerprintsWithLockData:lockData success:^{
+    [TTLock clearWifiPowerSavingTimeWithLockData:lockData success:^{
         [Ttlock reseponseSuccess:nil success:success];
     } failure:^(TTError errorCode, NSString *errorMsg) {
         [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
