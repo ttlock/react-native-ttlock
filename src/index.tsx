@@ -867,6 +867,15 @@ class Ttlock {
     ttlockModule.getWifiPowerSavingTime(lockData, success, fail);
   }
 
+  /**
+   * config wifi power saving time
+   * @param weekDays 1~7,1 means Monday，2 means  Tuesday ,...,7 means Sunday， such as @[@1,@3,@6,@7]
+   * @param startDate The time when it becomes valid (minutes from 0 clock)
+   * @param endDate The time when it is expired (minutes from 0 clock)
+   * @param lockData 
+   * @param success 
+   * @param fail 
+   */
   static configWifiPowerSavingTime(weekDays: number[], startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
