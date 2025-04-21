@@ -720,8 +720,6 @@ class Ttlock {
     ttlockModule.setUnlockDirectionAutomatic(lockData, success, fail);
   }
 
-  
-
 
   /**
    * Set the lock always unlock.
