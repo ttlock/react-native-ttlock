@@ -14,6 +14,16 @@ import java.util.List;
  */
 public class Utils {
 
+    public static List<Integer> readableArray2IntList(ReadableArray readableArray) {
+      List<Integer> list = new ArrayList<>();
+      if (readableArray != null) {
+        for (int i=0;i<readableArray.size();i++) {
+          list.add(readableArray.getInt(i));
+        }
+      }
+      return list;
+    }
+
     public static String readableArray2IntJson(ReadableArray readableArray) {
         String json = "[]";
         if (readableArray != null) {
