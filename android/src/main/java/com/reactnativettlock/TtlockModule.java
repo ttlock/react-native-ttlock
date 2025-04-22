@@ -2256,6 +2256,70 @@ public class TtlockModule extends ReactContextBaseJavaModule {
     });
   }
 
+  @ReactMethod
+  public void getWifiPowerSavingTime(String lockData, Callback successCallback, Callback fail) {
+    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+      if (success) {
+        TTLockClient.getDefault().getWifiPowerSavingTimes(lockData, new GetWifiPowerSavingTimesCallback() {
+          @Override
+          public void onGetSuccess(String powerSavingData) {
+            successCallback.invoke(powerSavingData);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            lockErrorCallback(lockError, fail);
+          }
+        });
+      } else {
+        noPermissionCallback(fail);
+      }
+    });
+  }
+
+  @ReactMethod
+  public void configWifiPowerSavingTime(ReadableArray days, int startDate, int endDate, String lockData, Callback successCallback, Callback fail) {
+    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+      if (success) {
+        TTLockClient.getDefault().configWifiPowerSavingTimes(Utils.readableArray2IntList(days)), startDate, endDate, lockData, new ConfigWifiPowerSavingTimesCallback() {
+          @Override
+          public void onConfigSuccess() {
+            successCallback.invoke();
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            lockErrorCallback(lockError, fail);
+          }
+        });
+      } else {
+        noPermissionCallback(fail);
+      }
+    });
+  }
+
+  @ReactMethod
+  public void clearWifiPowerSavingTime(String lockData, Callback successCallback, Callback fail) {
+    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+      if (success) {
+        TTLockClient.getDefault().clearWifiPowerSavingTimes(lockData, new ClearWifiPowerSavingTimesCallback() {
+
+          @Override
+          public void onFail(LockError lockError) {
+            lockErrorCallback(lockError, fail);
+          }
+
+          @Override
+          public void onClearSuccess() {
+            successCallback.invoke();
+          }
+        });
+      } else {
+        noPermissionCallback(fail);
+      }
+    });
+  }
+
     @ReactMethod
     public void getBluetoothState(Callback callback) {
         boolean enable = TTLockClient.getDefault().isBLEEnabled(getCurrentActivity());
