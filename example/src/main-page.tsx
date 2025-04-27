@@ -22,7 +22,7 @@ const MainPage = ({ navigation }: {navigation: any}) => {
       <TouchableHighlight
         style={[styles.touchButton]}
         onPress={() => {
-          if(config.gatewayName === undefined || config.ttlockUid === undefined || config.ttlockLoginPassword === undefined){
+          if(config.gatewayName === undefined || config.ttLockUid === undefined || config.ttLockLoginPassword === undefined){
             let warnText = "Please fill in the configuration information";
             console.log(warnText);
             Toast.showToast(warnText);

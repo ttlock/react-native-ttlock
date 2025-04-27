@@ -20,7 +20,7 @@ export default function App() {
 
       <NavigationContainer>
         <Stack.Navigator initialRouteName="MainPage">
-          <Stack.Screen name="MainPage" component={MainPage} options={{ title: "Ttlock Demo" }} />
+          <Stack.Screen name="MainPage" component={MainPage} options={{ title: "TTLock Demo" }} />
           <Stack.Screen name="ScanLockPage" component={ScanLockPage} options={{ title: "Lock" }} />
           <Stack.Screen name="ScanGatewayPage" component={ScanGatewayPage} options={{ title: "Gateway" }} />
           <Stack.Screen name="ScanRemoteKeyPage" component={ScanRemoteKeyPage} options={{ title: "RemoteKey" }} />

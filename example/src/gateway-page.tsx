@@ -24,8 +24,8 @@ const GatewayPage = (props: { navigation: any; route: any; }) => {
       initGatewayParam = {
         type: type,
         gatewayName: config.gatewayName,
-        ttlockUid: config.ttlockUid,
-        ttlockLoginPassword: config.ttlockLoginPassword,
+        ttLockUid: config.ttLockUid,
+        ttLockLoginPassword: config.ttLockLoginPassword,
         wifi: wifi,
         wifiPassword: wifiPassword,
         serverIp: undefined,  //your gateway server ip address (The default is sciener's gateway server ip address)
@@ -50,8 +50,8 @@ const GatewayPage = (props: { navigation: any; route: any; }) => {
       initGatewayParam = {
         type: type,
         gatewayName: config.gatewayName,
-        ttlockUid: config.ttlockUid,
-        ttlockLoginPassword: config.ttlockLoginPassword,
+        ttLockUid: config.ttLockUid,
+        ttLockLoginPassword: config.ttLockLoginPassword,
         wifi: undefined,
         wifiPassword: undefined,
         serverIp: undefined,  //your gateway server ip address (The default is sciener's gateway server ip address)
