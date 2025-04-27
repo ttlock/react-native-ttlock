@@ -1,6 +1,6 @@
 {
   "name": "react-native-ttlock",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "description": "ttlock react native sdk",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -37,7 +37,7 @@
     "android"
   ],
   "repository": "https://www.npmjs.com/package/react-native-ttlock",
-  "author": "JLGB <ttlock-developers-email-list@googlegroups.com> (https://ttlock.com)",
+  "author": "TTLock <ttlock-developers-email-list@googlegroups.com> (https://ttlock.com)",
   "license": "MIT",
   "bugs": {
     "url": "https://www.npmjs.com/package/react-native-ttlock/issues"
