@@ -84,7 +84,7 @@ declare class Ttlock {
      */
     static resetEkey(lockData: string, success: null | ((lockData: string) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)): void;
     /**
-     * Controle the lock Unlock or lock or other operations
+     * Control the lock Unlock or lock or other operations
      * @param control  LockControlType
      * @param lockData string
      * @param success successful callback
@@ -332,7 +332,7 @@ declare class Ttlock {
        */
     static recoverCard(cardNumber: string, cycleList: null | CycleDateParam[], startDate: number, endDate: number, lockData: string, success: null | ((cardNumber: string) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)): void;
     static recoverPasscode(passcode: string, passcodeType: number, cycleType: number, startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)): void;
-    static scanWifi(lockData: string, callback: ((isFinihed: boolean, wifiList: []) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)): void;
+    static scanWifi(lockData: string, callback: ((isFinished: boolean, wifiList: []) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)): void;
     static configWifi(wifiName: string, wifiPassword: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)): void;
     static configServer(ip: string, port: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)): void;
     static getWifiInfo(lockData: string, success: null | ((wifiMac: string, wifiRssi: number) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)): void;
@@ -363,7 +363,7 @@ declare class Ttlock {
      * @param callback
      */
     static getBluetoothState(callback: (state: BluetoothState) => void): void;
-    static supportFunction(fuction: LockFunction, lockData: string, callback: (isSupport: boolean) => void): void;
+    static supportFunction(lockFunction: LockFunction, lockData: string, callback: (isSupport: boolean) => void): void;
 }
 declare enum BluetoothState {
     Unknown = 0,
@@ -413,7 +413,7 @@ declare enum LockFunction {
     SoundVolume = 43,
     QRCode = 44,
     SensorState = 45,
-    PassageModeAutoUn = 46,
+    PassageModeAutoUnlock = 46,
     DoorSensor = 50,
     DoorSensorAlert = 51,
     Sensitivity = 52,
@@ -510,10 +510,10 @@ declare enum LockErrorCode {
     resetPasscode = 10,
     updatePasscodeIndex = 11,
     invalidLockFlagPos = 12,
-    ekeyExpired = 13,
+    eKeyExpired = 13,
     passcodeLengthInvalid = 14,
     samePasscode = 15,
-    ekeyInactive = 16,
+    eKeyInactive = 16,
     aesKey = 17,
     fail = 18,
     passcodeExist = 19,
