@@ -1542,13 +1542,13 @@ public class TtlockModule extends ReactContextBaseJavaModule {
   /**
    *
    * @param soundVolumeValue
-   * On = -1,
+   *   On = -1,
    *   Off = 0,
-   *   Livel_1 = 1,
-   *   Livel_2 = 2,
-   *   Livel_3 = 3,
-   *   Livel_4 = 4,
-   *   Livel_5 = 5
+   *   Level_1 = 1,
+   *   Level_2 = 2,
+   *   Level_3 = 3,
+   *   Level_4 = 4,
+   *   Level_5 = 5
    * @param lockData
    * @param successCallback
    * @param fail
@@ -1597,13 +1597,13 @@ public class TtlockModule extends ReactContextBaseJavaModule {
         TTLockClient.getDefault().getLockSoundWithSoundVolume(lockData, new GetLockSoundWithSoundVolumeCallback() {
           @Override
           public void onGetLockSoundSuccess(boolean enable, SoundVolume soundVolume) {
-//            On = -1,
-//              Off = 0,
-//              Livel_1 = 1,
-//              Livel_2 = 2,
-//              Livel_3 = 3,
-//              Livel_4 = 4,
-//              Livel_5 = 5
+//      On = -1,
+//      Off = 0,
+//      Level_1 = 1,
+//      Level_2 = 2,
+//      Level_3 = 3,
+//      Level_4 = 4,
+//      Level_5 = 5
             int soundVolumeValue = 0;
             if (enable) {
               switch (soundVolume) {
@@ -2281,7 +2281,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
   public void configWifiPowerSavingTime(ReadableArray days, int startDate, int endDate, String lockData, Callback successCallback, Callback fail) {
     PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
       if (success) {
-        TTLockClient.getDefault().configWifiPowerSavingTimes(Utils.readableArray2IntList(days)), startDate, endDate, lockData, new ConfigWifiPowerSavingTimesCallback() {
+        TTLockClient.getDefault().configWifiPowerSavingTimes(Utils.readableArray2IntList(days), startDate, endDate, lockData, new ConfigWifiPowerSavingTimesCallback() {
           @Override
           public void onConfigSuccess() {
             successCallback.invoke();
