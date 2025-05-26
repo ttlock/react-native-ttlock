@@ -1002,7 +1002,7 @@ RCT_EXPORT_METHOD(initWirelessKeypad:(NSString *)mac lockMac:(NSString *) lockMa
     
     ];
     
-    NSInteger errorCode = TTGatewayFail;
+    NSInteger errorCode = 0;
     for (int i = 0; i < codeArray.count; i++) {
         if([codeArray[i] intValue] == status){
             errorCode = i;
