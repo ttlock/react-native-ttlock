@@ -943,6 +943,42 @@ class Ttlock {
   }
 
 
+
+  /**
+   * Activate Lift Floors
+   * @param floors   lift floors,connect with comma symbol,such as: @"1,2,3"
+   * @param lockData 
+   * @param success 
+   * @param fail 
+   */
+  static activateLiftFloors(floors: string, lockData: string, success: null | ((lockTime: number, electricQuantity: number, uniqueId: number) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    ttLockModule.activateLiftFloors(floors, lockData, (dataArray: any[]) => {
+      success!(dataArray[0], dataArray[1], dataArray[2]);
+    }, fail);
+  }
+
+  /**
+   * Set Lift Control Enable Floors
+   * @param floors lift floors,connect with comma symbol,such as: @"1,2,3"
+   * @param lockData 
+   * @param success 
+   * @param fail 
+   */
+  static setLiftControlEnableFloors(floors: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    ttLockModule.setLiftControlEnableFloors(floors, lockData, success, fail);
+  }
+
+    static setLiftWorkMode(workMode: LiftWorkMode, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    ttLockModule.setLiftWorkMode(workMode, lockData, success, fail);
+  }
+
+
   /**
    * Monitor phone's Bluetooth status
    * @param callback
@@ -1282,4 +1318,9 @@ enum GatewayIpSettingType {
   DHCP = 1
 }
 
-export { Ttlock, TtGateway, TtRemoteKey, TtDoorSensor, TtWirelessKeypad, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType, GatewayIpSettingType, LockSoundVolume, TtRemoteKeyEvent, TtDoorSensorEvent, LockUnlockDirection, LockAccessoryType, ScanLockModal, ScanRemoteKeyModal, ScanDoorSensorModal, DeviceSystemModal, WirelessKeypadEvent, ScanWirelessKeypadModal, WifiLockServerInfo, FaceState, FaceErrorCode, LockErrorCode, DoorSensorErrorCode, RemoteKeyErrorCode, RemoteKeyPadErrorCode, GatewayErrorCode, InitGatewayModal, InitGatewayParam};
+enum LiftWorkMode {
+  ACTIVATE_ALL_FLOORS = 0,
+  ACTIVATE_SPECIFIC_FLOORS = 1
+}
+
+export { Ttlock, TtGateway, TtRemoteKey, TtDoorSensor, TtWirelessKeypad, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType, GatewayIpSettingType, LockSoundVolume, TtRemoteKeyEvent, TtDoorSensorEvent, LockUnlockDirection, LockAccessoryType, ScanLockModal, ScanRemoteKeyModal, ScanDoorSensorModal, DeviceSystemModal, WirelessKeypadEvent, ScanWirelessKeypadModal, WifiLockServerInfo, FaceState, FaceErrorCode, LockErrorCode, DoorSensorErrorCode, RemoteKeyErrorCode, RemoteKeyPadErrorCode, GatewayErrorCode, InitGatewayModal, InitGatewayParam, LiftWorkMode};

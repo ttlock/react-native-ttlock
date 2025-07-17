@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { Ttlock, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, LockSoundVolume, LockUnlockDirection, WifiLockServerInfo, FaceState, FaceErrorCode, LockErrorCode } from 'react-native-ttlock';
+import { Ttlock, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, LockSoundVolume, LockUnlockDirection, WifiLockServerInfo, FaceState, FaceErrorCode, LockErrorCode, LiftWorkMode } from 'react-native-ttlock';
 import * as Toast from './toast-page';
 import { DeviceSystemModal } from 'lib/typescript';
 
@@ -85,6 +85,10 @@ const getLockSupportOperationList = (lockData: string) => {
     { lockOperation: "Wifi lock get power saving time", lockFunctionValue: LockFunction.Wifi },
     { lockOperation: "Wifi lock set power saving time", lockFunctionValue: LockFunction.Wifi },
     { lockOperation: "Wifi lock clear power saving time", lockFunctionValue: LockFunction.Wifi },
+
+    { lockOperation: "Activate lift floors", lockFunctionValue: null },
+    { lockOperation: "Set lift control enable floors", lockFunctionValue: null },
+    { lockOperation: "Set lift work mode", lockFunctionValue: null },
 
 //     { lockOperation: "Lock upgrade", lockFuctionValue: null }
   ]
@@ -597,7 +601,34 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
     }, failedCallback);
   }
   
+// { lockOperation: "", lockFunctionValue: null },
+//     { lockOperation: "", lockFunctionValue: null },
+//     { lockOperation: "", lockFunctionValue: null },
 
+else if (lockOperation === "Activate lift floors") {
+    Ttlock.activateLiftFloors("1,2", lockData, (lockTime: number, electricQuantity: number, uniqueId: number) => {
+      let text = "Activate lift floors success" + "\n" + "lockTime:" + lockTime + "\n" + "electricQuantity:" + electricQuantity + "\n" + "uniqueId:" + uniqueId;
+      successCallback(text);
+    }, failedCallback);
+}
+
+else if (lockOperation === "Set lift control enable floors") {
+    Ttlock.setLiftControlEnableFloors("3",lockData, () => {
+      let text = "Set lift control enable floors success";
+      successCallback(text);
+    }, failedCallback);
+}
+
+else if (lockOperation === "Set lift work mode") {
+    Ttlock.setLiftWorkMode(LiftWorkMode.ACTIVATE_SPECIFIC_FLOORS ,lockData, () => {
+      let text = "Set lift work mode success";
+      successCallback(text);
+    }, failedCallback);
+}
+
+
+
+    
 //   else if (lockOperation === "Lock upgrade") {
 //     Toast.hidden()
 //     navigation.navigate("LockUpgradePage", {lockData: lockData, lockMac: lockMac});

@@ -707,6 +707,36 @@ RCT_EXPORT_METHOD(clearFace:(NSString *)lockData success:(RCTResponseSenderBlock
 }
 
 
+RCT_EXPORT_METHOD(activateLiftFloors:(NSString *)floors lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+  [TTLock activateLiftFloors:floors lockData:lockData success:^(long long lockTime, NSInteger electricQuantity, long long uniqueId) {
+    [Ttlock reseponseSuccess:@[@(lockTime),@(electricQuantity), @(uniqueId)] success:success];
+  } failure:^(TTError errorCode, NSString *errorMsg) {
+    [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+  }];
+}
+
+
+RCT_EXPORT_METHOD(setLiftControlEnableFloors:(NSString *)floors lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+  [TTLock setLiftControlableFloors:floors lockData:lockData success:^{
+    [Ttlock reseponseSuccess:nil success:success];
+  } failure:^(TTError errorCode, NSString *errorMsg) {
+    [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+  }];
+}
+
+RCT_EXPORT_METHOD(setLiftWorkMode:(int) workMode lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+  TTLiftWorkMode liftWorkMode = workMode;
+  [TTLock setLiftWorkMode:liftWorkMode lockData:lockData success:^{
+    [Ttlock reseponseSuccess:nil success:success];
+  } failure:^(TTError errorCode, NSString *errorMsg) {
+    [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+  }];
+}
+
+
 RCT_EXPORT_METHOD(supportFunction:(int)fuction lockData:(NSString *)lockData callback:(RCTResponseSenderBlock)callback)
 {
     BOOL isSupport = [TTUtil lockFeatureValue:lockData suportFunction:fuction];
@@ -932,7 +962,6 @@ RCT_EXPORT_METHOD(initWirelessKeypad:(NSString *)mac lockMac:(NSString *) lockMa
             [Ttlock responseFail:REMOTE_KEY_PAD code:status errorMessage:nil fail:fail];
         }
     }];
-    
 }
 
 
