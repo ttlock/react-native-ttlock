@@ -1,88 +1,96 @@
 import * as React from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { Ttlock, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, LockSoundVolume, LockUnlockDirection, WifiLockServerInfo, FaceState, FaceErrorCode, DeviceSystemModal } from 'react-native-ttlock';
+import { Ttlock, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, LockSoundVolume, LockUnlockDirection, WifiLockServerInfo, FaceState, FaceErrorCode, LockErrorCode, LiftWorkMode } from 'react-native-ttlock';
 import * as Toast from './toast-page';
+import { DeviceSystemModal } from 'lib/typescript';
 
 const getLockSupportOperationList = (lockData: string) => {
 
   const functionAllList: LockFunctionItemData[] = [
-    { lockOperation: "Unlock", lockFuctionValue: null },
-    { lockOperation: "Lock", lockFuctionValue: LockFunction.Locking },
-    { lockOperation: "Get lock system", lockFuctionValue: null },
-    { lockOperation: "Get lock time", lockFuctionValue: null },
-    { lockOperation: "Set lock time", lockFuctionValue: null },
-    { lockOperation: "Get lock operate record", lockFuctionValue: null },
-    { lockOperation: "Get lock electric quantity", lockFuctionValue: null },
-    { lockOperation: "Create custom passcode 1122", lockFuctionValue: LockFunction.ManagePasscode },
-    { lockOperation: "Modify passcode 1122 -> 2233", lockFuctionValue: LockFunction.ManagePasscode },
-    { lockOperation: "Delete passcode 2233", lockFuctionValue: LockFunction.Passcode },
-    { lockOperation: "Recover passcode 2233", lockFuctionValue: LockFunction.Passcode },
-    { lockOperation: "Reset passcode", lockFuctionValue: LockFunction.Passcode },
-    { lockOperation: "Get lock switch state", lockFuctionValue: null },
+    { lockOperation: "Unlock", lockFunctionValue: null },
+    { lockOperation: "Lock", lockFunctionValue: LockFunction.Locking },
+    { lockOperation: "Get lock system", lockFunctionValue: null },
+    { lockOperation: "Get lock time", lockFunctionValue: null },
+    { lockOperation: "Set lock time", lockFunctionValue: null },
+    { lockOperation: "Get lock operate record", lockFunctionValue: null },
+    { lockOperation: "Get lock electric quantity", lockFunctionValue: null },
+    { lockOperation: "Create custom passcode 1122", lockFunctionValue: LockFunction.ManagePasscode },
+    { lockOperation: "Modify passcode 1122 -> 2233", lockFunctionValue: LockFunction.ManagePasscode },
+    { lockOperation: "Delete passcode 2233", lockFunctionValue: LockFunction.Passcode },
+    { lockOperation: "Recover passcode 2233", lockFunctionValue: LockFunction.Passcode },
+    { lockOperation: "Reset passcode", lockFunctionValue: LockFunction.Passcode },
+    { lockOperation: "Get lock switch state", lockFunctionValue: null },
 
-    { lockOperation: "Add IC card", lockFuctionValue: LockFunction.IcCard },
-    { lockOperation: "Modify IC card validity period", lockFuctionValue: LockFunction.IcCard },
-    { lockOperation: "Delete IC card", lockFuctionValue: LockFunction.IcCard },
-    { lockOperation: "Clear all IC cards", lockFuctionValue: LockFunction.IcCard },
-    { lockOperation: "Recover card", lockFuctionValue: LockFunction.IcCard },
+    { lockOperation: "Add IC card", lockFunctionValue: LockFunction.IcCard },
+    { lockOperation: "Modify IC card validity period", lockFunctionValue: LockFunction.IcCard },
+    { lockOperation: "Delete IC card", lockFunctionValue: LockFunction.IcCard },
+    { lockOperation: "Clear all IC cards", lockFunctionValue: LockFunction.IcCard },
+    { lockOperation: "Recover card", lockFunctionValue: LockFunction.IcCard },
 
-    { lockOperation: "Add fingerprint", lockFuctionValue: LockFunction.Fingerprint },
-    { lockOperation: "Modify fingerprint validity period", lockFuctionValue: LockFunction.Fingerprint },
-    { lockOperation: "Delete fingerprint", lockFuctionValue: LockFunction.Fingerprint },
-    { lockOperation: "Clear all fingerprints", lockFuctionValue: LockFunction.Fingerprint },
+    { lockOperation: "Add fingerprint", lockFunctionValue: LockFunction.Fingerprint },
+    { lockOperation: "Modify fingerprint validity period", lockFunctionValue: LockFunction.Fingerprint },
+    { lockOperation: "Delete fingerprint", lockFunctionValue: LockFunction.Fingerprint },
+    { lockOperation: "Clear all fingerprints", lockFunctionValue: LockFunction.Fingerprint },
 
-    { lockOperation: "Add face", lockFuctionValue: LockFunction.Face },
-    { lockOperation: "Modify face validity period", lockFuctionValue: LockFunction.Face },
-    { lockOperation: "Delete face", lockFuctionValue: LockFunction.Face },
-    { lockOperation: "Clear all face", lockFuctionValue: LockFunction.Face },
-
-
-    { lockOperation: "Get lock automatic locking periodic time", lockFuctionValue: LockFunction.AutoLock },
-    { lockOperation: "Set lock automatic locking periodic time", lockFuctionValue: LockFunction.AutoLock },
-
-    { lockOperation: "Set lock remote unlock switch state", lockFuctionValue: LockFunction.RemoteUnlockSwicth },
-
-    { lockOperation: "Get lock config", lockFuctionValue: null },
-    { lockOperation: "Set lock config", lockFuctionValue: null },
-
-    { lockOperation: "Get lock sound volume", lockFuctionValue: LockFunction.SoundVolume },
-    { lockOperation: "Set lock sound volume", lockFuctionValue: LockFunction.SoundVolume },
-
-    { lockOperation: "Get lock unlock direction", lockFuctionValue: null },
-    { lockOperation: "Set lock unlock direction", lockFuctionValue: null },
-    { lockOperation: "Set lock unlock direction automatic", lockFuctionValue: null },
-    
-    { lockOperation: "Add passage mode", lockFuctionValue: LockFunction.PassageMode },
-    { lockOperation: "Clear all passageModes", lockFuctionValue: LockFunction.PassageMode },
-
-    { lockOperation: "Init remote key", lockFuctionValue: null },
-
-    { lockOperation: "Add remote key to lock", lockFuctionValue: LockFunction.RemoteKey },
-    { lockOperation: "Modify remote key valid date", lockFuctionValue: LockFunction.RemoteKey },
-    { lockOperation: "Delete remote key from lock", lockFuctionValue: LockFunction.RemoteKey },
-    { lockOperation: "Clear all remote key from lock", lockFuctionValue: LockFunction.RemoteKey },
+    { lockOperation: "Add face", lockFunctionValue: LockFunction.Face },
+    { lockOperation: "Modify face validity period", lockFunctionValue: LockFunction.Face },
+    { lockOperation: "Delete face", lockFunctionValue: LockFunction.Face },
+    { lockOperation: "Clear all face", lockFunctionValue: LockFunction.Face },
 
 
-    { lockOperation: "Init door sensor", lockFuctionValue: null },
-    { lockOperation: "Add door sensor to lock", lockFuctionValue: LockFunction.DoorSensor },
-    { lockOperation: "Set door sensor alert time", lockFuctionValue: LockFunction.DoorSensorAlert },
-    { lockOperation: "Clear all door sensor from lock", lockFuctionValue: LockFunction.DoorSensor },
+    { lockOperation: "Get lock automatic locking periodic time", lockFunctionValue: LockFunction.AutoLock },
+    { lockOperation: "Set lock automatic locking periodic time", lockFunctionValue: LockFunction.AutoLock },
 
-    { lockOperation: "Init wireless keypad", lockFuctionValue: LockFunction.WirelessKeypad },
+    { lockOperation: "Set lock remote unlock switch state", lockFunctionValue: LockFunction.RemoteUnlockSwitch },
 
-    { lockOperation: "Modify admin passcode to 9999", lockFuctionValue: LockFunction.Passcode },
-    { lockOperation: "Reset ekey", lockFuctionValue: null },
-    { lockOperation: "Rest lock", lockFuctionValue: null },
-    { lockOperation: "Get lock version", lockFuctionValue: null },
+    { lockOperation: "Get lock config", lockFunctionValue: null },
+    { lockOperation: "Set lock config", lockFunctionValue: null },
 
-    { lockOperation: "scan wifi", lockFuctionValue: LockFunction.Wifi },
-    { lockOperation: "Wifi lock scan nearby wifi", lockFuctionValue: LockFunction.Wifi },
-    { lockOperation: "Wifi lock config wifi", lockFuctionValue: LockFunction.Wifi },
-    { lockOperation: "Wifi lock config server", lockFuctionValue: LockFunction.Wifi },
-    { lockOperation: "Wifi lock get wifi info", lockFuctionValue: LockFunction.Wifi },
-    { lockOperation: "Wifi lock config ip", lockFuctionValue: LockFunction.Wifi },
+    { lockOperation: "Get lock sound volume", lockFunctionValue: LockFunction.SoundVolume },
+    { lockOperation: "Set lock sound volume", lockFunctionValue: LockFunction.SoundVolume },
 
-    { lockOperation: "Lock upgrade", lockFuctionValue: null }
+    { lockOperation: "Get lock unlock direction", lockFunctionValue: null },
+    { lockOperation: "Set lock unlock direction", lockFunctionValue: null },
+    { lockOperation: "Set lock unlock direction automatic", lockFunctionValue: null },
+
+    { lockOperation: "Add passage mode", lockFunctionValue: LockFunction.PassageMode },
+    { lockOperation: "Clear all passageModes", lockFunctionValue: LockFunction.PassageMode },
+
+    { lockOperation: "Init remote key", lockFunctionValue: null },
+
+    { lockOperation: "Add remote key to lock", lockFunctionValue: LockFunction.RemoteKey },
+    { lockOperation: "Modify remote key valid date", lockFunctionValue: LockFunction.RemoteKey },
+    { lockOperation: "Delete remote key from lock", lockFunctionValue: LockFunction.RemoteKey },
+    { lockOperation: "Clear all remote key from lock", lockFunctionValue: LockFunction.RemoteKey },
+
+
+    { lockOperation: "Init door sensor", lockFunctionValue: null },
+    { lockOperation: "Add door sensor to lock", lockFunctionValue: LockFunction.DoorSensor },
+    { lockOperation: "Set door sensor alert time", lockFunctionValue: LockFunction.DoorSensorAlert },
+    { lockOperation: "Clear all door sensor from lock", lockFunctionValue: LockFunction.DoorSensor },
+
+    { lockOperation: "Init wireless keypad", lockFunctionValue: LockFunction.WirelessKeypad },
+
+    { lockOperation: "Modify admin passcode to 9999", lockFunctionValue: LockFunction.Passcode },
+    { lockOperation: "Reset eKey", lockFunctionValue: null },
+    { lockOperation: "Rest lock", lockFunctionValue: null },
+    { lockOperation: "Get lock version", lockFunctionValue: null },
+
+    { lockOperation: "scan wifi", lockFunctionValue: LockFunction.Wifi },
+    { lockOperation: "Wifi lock scan nearby wifi", lockFunctionValue: LockFunction.Wifi },
+    { lockOperation: "Wifi lock config wifi", lockFunctionValue: LockFunction.Wifi },
+    { lockOperation: "Wifi lock config server", lockFunctionValue: LockFunction.Wifi },
+    { lockOperation: "Wifi lock get wifi info", lockFunctionValue: LockFunction.Wifi },
+    { lockOperation: "Wifi lock config ip", lockFunctionValue: LockFunction.Wifi },
+    { lockOperation: "Wifi lock get power saving time", lockFunctionValue: LockFunction.Wifi },
+    { lockOperation: "Wifi lock set power saving time", lockFunctionValue: LockFunction.Wifi },
+    { lockOperation: "Wifi lock clear power saving time", lockFunctionValue: LockFunction.Wifi },
+
+    { lockOperation: "Activate lift floors", lockFunctionValue: null },
+    { lockOperation: "Set lift control enable floors", lockFunctionValue: null },
+    { lockOperation: "Set lift work mode", lockFunctionValue: null },
+
+//     { lockOperation: "Lock upgrade", lockFuctionValue: null }
   ]
 
   let supportOperationList: string[] = []
@@ -113,7 +121,7 @@ const progressCallback = function (text: string) {
   Toast.showToast(text);
 }
 
-const failedCallback = function (errorCode: number, errorMessage: string) {
+const failedCallback = function (errorCode: LockErrorCode, errorMessage: string) {
   let text = "errorCode:" + errorCode + "    errorMessage:" + errorMessage;
   console.log(text);
   Toast.showToast(text);
@@ -140,6 +148,14 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
     }, failedCallback)
   }
 
+  if (lockOperation === "Get lock system") {
+    Ttlock.getLockSystem(lockData, (lockSystemInfo: DeviceSystemModal) => {
+      console.log(lockSystemInfo);
+      let text = "get lock system success:";
+      successCallback(text);
+    }, failedCallback);
+  }
+
   if (lockOperation === "Get lock time") {
     Ttlock.getLockTime(lockData, (lockTimestamp: number) => {
       let text = "lockTimestamp:" + lockTimestamp;
@@ -150,12 +166,6 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
     let timestamp = new Date().getTime();
     Ttlock.setLockTime(timestamp, lockData, () => {
       successCallback("set lock time success");
-    }, failedCallback);
-  }
-  else if (lockOperation === "Get lock system") {
-    Ttlock.getLockSystem(lockData, (systemModel: DeviceSystemModal) => {
-      console.log(JSON.stringify(systemModel))
-      successCallback("get lock system success");
     }, failedCallback);
   }
   else if (lockOperation === "Get lock electric quantity") {
@@ -395,12 +405,12 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
   }
   else if (lockOperation === "Get lock sound volume") {
     Ttlock.getLockSoundVolume(lockData, (soundVolume: LockSoundVolume) => {
-      let text = "get lock sounde volume: " + soundVolume.toString();
+      let text = "get lock sound volume: " + soundVolume.toString();
       successCallback(text);
     }, failedCallback);
   }
   else if (lockOperation === "Set lock sound volume") {
-    Ttlock.setLockSoundVolume(LockSoundVolume.Livel_3, lockData, () => {
+    Ttlock.setLockSoundVolume(LockSoundVolume.Level_3, lockData, () => {
       let text = "set lock sound volume success";
       successCallback(text);
     }, failedCallback);
@@ -460,9 +470,9 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
   else if (lockOperation === "Set door sensor alert time") {
     let alertTime = 5 //secs
     Ttlock.setDoorSensorAlertTime(alertTime, lockData, () => {
-      Toast.showToast("ssuccess")
+      Toast.showToast("success")
       navigation.pop();
-    }, (errorCode: number, description: string) => {
+    }, (errorCode: LockErrorCode, description: string) => {
       Toast.showToast("set door sensor alert time fail " + errorCode.toString())
     })
   }
@@ -499,10 +509,10 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
       successCallback(text);
     }, failedCallback)
   }
-  else if (lockOperation === "Reset ekey") {
+  else if (lockOperation === "Reset eKey") {
     Ttlock.resetEkey(lockData, (lockDataNew) => {
-      //important: upload lockDataNew to ttlock server.
-      let text = "reset ekey success";
+      //important: upload lockDataNew to ttLock server.
+      let text = "Reset eKey success";
       successCallback(text);
       console.log(lockDataNew);
     }, failedCallback)
@@ -528,7 +538,9 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
     }, failedCallback);
   }
   else if (lockOperation === "Wifi lock config wifi") {
-    Ttlock.configWifi("sciener", "sciener.com", lockData, () => {
+    let wifi = "wifiName"
+    let wifiPassword = "wifiPassword"
+    Ttlock.configWifi(wifi, wifiPassword, lockData, () => {
       let text = "config lock wifi success";
       successCallback(text);
     }, failedCallback)
@@ -568,10 +580,60 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
     }, failedCallback);
   }
 
-  else if (lockOperation === "Lock upgrade") {
-    Toast.hidden()
-    navigation.navigate("LockUpgradePage", {lockData: lockData, lockMac: lockMac});
+  else if (lockOperation === "Wifi lock get power saving time") {
+    
+    Ttlock.getWifiPowerSavingTime(lockData, (configStr: undefined | string) => {
+      let text = "wifi get power saving time: " + configStr;
+      successCallback(text);
+    }, failedCallback);
   }
+
+  else if (lockOperation === "Wifi lock set power saving time") {
+    Ttlock.configWifiPowerSavingTime([1,2,3], 0, 60, lockData, () => {
+      let text = "wifi set power saving time success";
+      successCallback(text);
+    }, failedCallback);
+  }
+
+  else if (lockOperation === "Wifi lock clear power saving time") {
+    Ttlock.clearWifiPowerSavingTime(lockData, () => {
+      let text = "wifi clear power saving time success";
+      successCallback(text);
+    }, failedCallback);
+  }
+  
+// { lockOperation: "", lockFunctionValue: null },
+//     { lockOperation: "", lockFunctionValue: null },
+//     { lockOperation: "", lockFunctionValue: null },
+
+else if (lockOperation === "Activate lift floors") {
+    Ttlock.activateLiftFloors("1,2", lockData, (lockTime: number, electricQuantity: number, uniqueId: number) => {
+      let text = "Activate lift floors success" + "\n" + "lockTime:" + lockTime + "\n" + "electricQuantity:" + electricQuantity + "\n" + "uniqueId:" + uniqueId;
+      successCallback(text);
+    }, failedCallback);
+}
+
+else if (lockOperation === "Set lift control enable floors") {
+    Ttlock.setLiftControlEnableFloors("3",lockData, () => {
+      let text = "Set lift control enable floors success";
+      successCallback(text);
+    }, failedCallback);
+}
+
+else if (lockOperation === "Set lift work mode") {
+    Ttlock.setLiftWorkMode(LiftWorkMode.ACTIVATE_SPECIFIC_FLOORS ,lockData, () => {
+      let text = "Set lift work mode success";
+      successCallback(text);
+    }, failedCallback);
+}
+
+
+
+    
+//   else if (lockOperation === "Lock upgrade") {
+//     Toast.hidden()
+//     navigation.navigate("LockUpgradePage", {lockData: lockData, lockMac: lockMac});
+//   }
 
 }
 
@@ -613,7 +675,7 @@ const styles = StyleSheet.create({
 
 interface LockFunctionItemData {
   lockOperation: string,
-  lockFuctionValue: null | LockFunction
+  lockFunctionValue: null | LockFunction
 }
 
 export default LockPage;
