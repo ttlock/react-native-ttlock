@@ -1303,7 +1303,9 @@ enum WirelessKeypadEvent {
 enum GatewayType {
   G2 = 2,
   G3 = 3,
-  G4 = 4
+  G4 = 4,
+  G5 = 5,
+  G6 = 6
 }
 
 
