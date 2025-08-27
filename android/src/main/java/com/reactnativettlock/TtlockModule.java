@@ -629,7 +629,7 @@ public class TtlockModule extends ReactContextBaseJavaModule {
             ConfigureGatewayInfo gatewayInfo = new ConfigureGatewayInfo();
             gatewayInfo.plugName = readableMap.getString(TTGatewayFieldConstant.GATEWAY_NAME);
             gatewayInfo.plugVersion = readableMap.getInt(TTGatewayFieldConstant.TYPE);
-            if (gatewayInfo.plugVersion == GatewayType.G2) {//G2网关才有WIFI跟WIFI 密码
+            if (gatewayInfo.plugVersion == GatewayType.G2 || gatewayInfo.plugVersion == GatewayType.G5 || gatewayInfo.plugVersion == GatewayType.G6) {//G2网关才有WIFI跟WIFI 密码
                 gatewayInfo.ssid = readableMap.getString(TTGatewayFieldConstant.WIFI);
                 gatewayInfo.wifiPwd = readableMap.getString(TTGatewayFieldConstant.WIFI_PASSWORD);
             }
