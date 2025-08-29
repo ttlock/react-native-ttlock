@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react';
 import React, { useEffect } from 'react';
 import { FlatList, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { TtWirelessKeypad, ScanWirelessKeypadModal, RemoteKeyPadErrorCode } from 'react-native-ttlock';
+import { TtWirelessKeypad,type ScanWirelessKeypadModal, RemoteKeyPadErrorCode } from 'react-native-ttlock';
 import * as Toast from './toast-page';
 import store from './store'
 

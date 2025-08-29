@@ -1,6 +1,6 @@
 
 import { makeAutoObservable, runInAction } from "mobx"
-import { Ttlock, TtGateway, TtRemoteKey, ScanLockModal, ScanGatewayModal, ScanWifiModal, ScanRemoteKeyModal, ScanDoorSensorModal, TtDoorSensor, TtWirelessKeypad, ScanWirelessKeypadModal } from 'react-native-ttlock';
+import { Ttlock, TtGateway, TtRemoteKey, type ScanLockModal, type ScanGatewayModal, type ScanWifiModal, type ScanRemoteKeyModal, type ScanDoorSensorModal, TtDoorSensor, TtWirelessKeypad, type ScanWirelessKeypadModal } from 'react-native-ttlock';
 
 
 class Store {

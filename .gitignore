@@ -63,3 +63,5 @@ example/ios/Podfile.lock
 yarn.lock
 example/ios/Podfile.lock
 example/yarn.lock
+**/.yarn
+example/vendor

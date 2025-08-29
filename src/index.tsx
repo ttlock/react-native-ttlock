@@ -1,262 +1,40 @@
-import {
-  NativeModules,
-  NativeEventEmitter,
-  // EmitterSubscription,
-} from 'react-native';
+import NativeTTLock from './NativeTtlock';
 
-import type { ScanGatewayModal, ScanLockModal, InitGatewayParam, CycleDateParam, ScanWifiModal, InitGatewayModal, LockVersion, ScanRemoteKeyModal, ScanDoorSensorModal, DeviceSystemModal, ScanWirelessKeypadModal, WifiLockServerInfo } from './types'
+import { NativeEventEmitter, NativeModules } from 'react-native';
 
-const ttLockModule = NativeModules.Ttlock;
-const ttLockEventEmitter = new NativeEventEmitter(ttLockModule);
+const eventEmitter = new NativeEventEmitter(NativeModules.Ttlock);
 
-const subscriptionMap = new Map();
-
-class TtWirelessKeypad {
+export class Ttlock {
 
   static defaultCallback = function () { };
-  static startScan(callback: ((scanModal: ScanWirelessKeypadModal) => void)) {
-
-    let subscription = subscriptionMap.get(WirelessKeypadEvent.ScanWirelessKeypad)
-    if (subscription !== undefined) {
-      subscription.remove()
-    }
-    subscription = ttLockEventEmitter.addListener(WirelessKeypadEvent.ScanWirelessKeypad, callback);
-    subscriptionMap.set(WirelessKeypadEvent.ScanWirelessKeypad, subscription);
-    ttLockModule.startScanWirelessKeypad();
-  }
-
-  static stopScan() {
-    ttLockModule.stopScanWirelessKeypad();
-    let subscription = subscriptionMap.get(WirelessKeypadEvent.ScanWirelessKeypad)
-    if (subscription !== undefined) {
-      subscription.remove();
-    }
-    subscriptionMap.delete(WirelessKeypadEvent.ScanWirelessKeypad);
-  }
-
-  static init(mac: string, lockMac: string, success: ((electricQuantity: number, wirelessKeypadFeatureValue: string) => void), fail: null | ((errorCode: RemoteKeyPadErrorCode, description: string) => void)) {
-    success = success || this.defaultCallback;
-    fail = fail || this.defaultCallback;
-    ttLockModule.initWirelessKeypad(mac, lockMac, (dataArray: any[]) => {
-      success!(dataArray[0], dataArray[1]);
-    }, (errorCode: RemoteKeyPadErrorCode) => {
-      let description = "Init wireless keypad fail.";
-      if (errorCode === RemoteKeyPadErrorCode.wrongCRC) {
-        description += "Wrong crc";
-      } else if (errorCode === RemoteKeyPadErrorCode.connectTimeout) {
-        description += "Connect timeout";
-      } else if (errorCode === RemoteKeyPadErrorCode.wrongFactoryDate) {
-        description += "Wrong factory date";
+  static getBluetoothState(callback: (state: BluetoothState) => void) {
+    NativeTTLock.getBluetoothState(
+      (state: number) => {
+        var bluetoothState = [
+          BluetoothState.Unknown,
+          BluetoothState.Resetting,
+          BluetoothState.Unsupported,
+          BluetoothState.Unauthorized,
+          BluetoothState.On,
+          BluetoothState.Off
+        ][state] ?? BluetoothState.Unknown;
+        callback(bluetoothState);
       }
-      fail!(errorCode, description);
-    });
-  }
-}
-
-class TtDoorSensor {
-
-  static defaultCallback = function () { };
-
-  static startScan(callback: ((scanModal: ScanDoorSensorModal) => void)) {
-    let subscription = subscriptionMap.get(TtDoorSensorEvent.ScanDoorSensor)
-    if (subscription !== undefined) {
-      subscription.remove()
-    }
-    subscription = ttLockEventEmitter.addListener(TtDoorSensorEvent.ScanDoorSensor, callback);
-    subscriptionMap.set(TtDoorSensorEvent.ScanDoorSensor, subscription);
-    ttLockModule.startScanDoorSensor();
+    );
   }
 
-  static stopScan() {
-    ttLockModule.stopScanDoorSensor();
-    let subscription = subscriptionMap.get(TtDoorSensorEvent.ScanDoorSensor)
-    if (subscription !== undefined) {
-      subscription.remove();
-    }
-    subscriptionMap.delete(TtDoorSensorEvent.ScanDoorSensor);
-  }
-
-  static init(mac: string, lockData: string, success: ((electricQuantity: number, systemModel: DeviceSystemModal) => void), fail: null | ((errorCode: DoorSensorErrorCode, description: string) => void)) {
-    success = success || this.defaultCallback;
-    fail = fail || this.defaultCallback;
-    ttLockModule.initDoorSensor(mac, lockData, (dataArray: any[]) => {
-      success!(dataArray[0], dataArray[1]);
-    }, (errorCode: DoorSensorErrorCode) => {
-      let description = "Init door sensor fail.";
-      if (errorCode === DoorSensorErrorCode.bluetoothPowerOff) {
-        description += "Bluetooth is power off";
-      } else if (errorCode === DoorSensorErrorCode.connectTimeout) {
-        description += "Connect timeout";
-      } else if (errorCode === DoorSensorErrorCode.wrongCRC) {
-        description += "Wrong crc";
-      }
-      fail!(errorCode, description);
-    });
-  }
-}
-
-
-
-class TtRemoteKey {
-
-  static defaultCallback = function () { };
-
-  static startScan(callback: ((scanModal: ScanRemoteKeyModal) => void)) {
-    let subscription = subscriptionMap.get(TtRemoteKeyEvent.ScanRemoteKey)
-    if (subscription !== undefined) {
-      subscription.remove()
-    }
-    subscription = ttLockEventEmitter.addListener(TtRemoteKeyEvent.ScanRemoteKey, callback);
-    subscriptionMap.set(TtRemoteKeyEvent.ScanRemoteKey, subscription);
-    ttLockModule.startScanRemoteKey();
-  }
-
-  static stopScan() {
-    ttLockModule.stopScanRemoteKey();
-    let subscription = subscriptionMap.get(TtRemoteKeyEvent.ScanRemoteKey)
-    if (subscription !== undefined) {
-      subscription.remove();
-    }
-    subscriptionMap.delete(TtRemoteKeyEvent.ScanRemoteKey);
-  }
-
-  static init(mac: string, lockData: string, success: ((electricQuantity: number, systemModel: DeviceSystemModal) => void), fail: null | ((errorCode: RemoteKeyErrorCode, description: string) => void)) {
-    success = success || this.defaultCallback;
-    fail = fail || this.defaultCallback;
-    ttLockModule.initRemoteKey(mac, lockData, (dataArray: any[]) => {
-      success!(dataArray[0], dataArray[1]);
-    }, (errorCode: RemoteKeyErrorCode) => {
-      let description = "Init remote key fail.";
-      if (errorCode === RemoteKeyErrorCode.wrongCRC) {
-        description += "Wrong CRC";
-      } else if (errorCode === RemoteKeyErrorCode.connectTimeout) {
-        description += "Connect timeout";
-      }
-      fail!(errorCode, description);
-    });
-  }
-}
-
-class TtGateway {
-  static defaultCallback = function () { };
-
-  /**
-   * Scan for nearby gateways （Only newly powered gateways can be scanned）
-   * @param callback  If there is a reenergized gateway nearby, the callback will be performed multiple times
-   */
-  static startScan(callback: ((scanGatewayModal: ScanGatewayModal) => void)) {
-    let subscription = subscriptionMap.get(GatewayEvent.ScanGateway)
-    if (subscription !== undefined) {
-      subscription.remove()
-    }
-    subscription = ttLockEventEmitter.addListener(GatewayEvent.ScanGateway, callback);
-    subscriptionMap.set(GatewayEvent.ScanGateway, subscription);
-    ttLockModule.startScanGateway();
-  }
-
-  /**
-   * Stop scanning nearby Bluetooth locks
-   */
-  static stopScan() {
-    ttLockModule.stopScanGateway();
-    let subscription = subscriptionMap.get(GatewayEvent.ScanGateway)
-    if (subscription !== undefined) {
-      subscription.remove();
-    }
-    subscriptionMap.delete(GatewayEvent.ScanGateway);
-  }
-
-  /**
-   * Connected to the gateway Only newly powered gateways can be connected）
-   * @param mac
-   * @param callback
-   */
-  static connect(mac: string, callback: ((state: ConnectState) => void)) {
+  static startScan(callback: (scanLockModal: ScanLockModal) => void) {
+    this.stopScan();
     callback = callback || this.defaultCallback;
-    ttLockModule.connect(mac, (state: number) => {
-      let connectState = [ConnectState.Timeout, ConnectState.Success, ConnectState.Fail][state];
-      callback!(connectState);
-    });
+    eventEmitter.addListener(TTLockEvent.SCAN_LOCK, callback);
+    NativeTTLock.startScan();
   }
 
-  /**
-   * Read wifi near the gateway
-   * @param progress
-   * @param finish
-   * @param fail
-   */
-  static getNearbyWifi(progress: ((scanWifiModalList: ScanWifiModal[]) => void), finish: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
-    progress = progress || this.defaultCallback;
-    finish = finish || this.defaultCallback;
-    fail = fail || this.defaultCallback;
-
-    let subscription = ttLockEventEmitter.addListener(GatewayEvent.ScanWifi, (responseData: ScanWifiModal[]) => {
-      progress(responseData);
-    });
-
-    ttLockModule.getNearbyWifi((state: number) => {
-      subscription.remove();
-      if (state === 0) {
-        finish!();
-      } else {
-        fail!(1, "Failed to get nearby wifi. Please confirm whether there is wifi nearby or reconnect to the gateway try again");
-      }
-    });
-  }
-
-  /**
-   * Initialize gateway
-   * @param object
-   * @param success
-   * @param fail
-   */
-  static initGateway(object: InitGatewayParam, success: ((initGatewayModal: InitGatewayModal) => void), fail: null | ((errorCode: GatewayErrorCode, description: string) => void)) {
-    success = success || this.defaultCallback;
-    fail = fail || this.defaultCallback;
-    ttLockModule.initGateway(object, success, (errorCode: GatewayErrorCode) => {
-      let description = "Init gateway fail.";
-      if (errorCode === 3) {
-        description += "Wrong wifi";
-      } else if (errorCode === 4) {
-        description += "Wrong wifi password";
-      }
-      fail!(errorCode, description);
-    });
-  }
-
-}
-
-
-class Ttlock {
-
-  static defaultCallback = function () { };
-
-  /**
-   * Scan for nearby Bluetooth locks
-   * @param callback  The Callback will be executed multiple times if there is a Bluetooth lock nearby
-   */
-  static startScan(callback: null | ((scanLockModal: ScanLockModal) => void)) {
-    let subscription = subscriptionMap.get(TTLockEvent.ScanLock)
-    if (subscription !== undefined) {
-      subscription.remove()
-    }
-    callback = callback || this.defaultCallback;
-    subscription = ttLockEventEmitter.addListener(TTLockEvent.ScanLock, callback);
-    subscriptionMap.set(TTLockEvent.ScanLock, subscription);
-    ttLockModule.startScan();
-  }
-
-  /**
-   * Stop scanning nearby Bluetooth locks
-   */
   static stopScan() {
-    ttLockModule.stopScan();
-    let subscription = subscriptionMap.get(TTLockEvent.ScanLock)
-    if (subscription !== undefined) {
-      subscription.remove();
-    }
-    subscriptionMap.delete(TTLockEvent.ScanLock);
+    NativeTTLock.stopScan();
+    eventEmitter.removeAllListeners(TTLockEvent.SCAN_LOCK);
   }
+
 
   /**
    * Initialize lock
@@ -264,23 +42,25 @@ class Ttlock {
    * @param success
    * @param fail
    */
-  static initLock(object: object, success: null | ((lockData: string) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
+  static initLock(object: Object, success: null | ((lockData: string) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.initLock(object, success, fail);
+    NativeTTLock.initLock(object, success, fail);
   }
 
 
   static getLockVersionWithLockMac(lockMac: string, success: null | ((lockVersion: LockVersion) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.getLockVersionWithLockMac(lockMac, success, fail);
+    NativeTTLock.getLockVersionWithLockMac(lockMac, (data: Object) => {
+      success!(data as LockVersion);
+    }, fail);
   }
 
   static getAccessoryElectricQuantity(accessoryType: LockAccessoryType, accessoryMac: string, lockData: string, success: ((electricQuantity: number, updateDate: number) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.getAccessoryElectricQuantity(accessoryType, accessoryMac, lockData, (dataArray: number[]) => {
+    NativeTTLock.getAccessoryElectricQuantity(accessoryType, accessoryMac, lockData, (dataArray: any[]) => {
       success!(dataArray[0], dataArray[1]);
     }, fail);
   }
@@ -295,7 +75,7 @@ class Ttlock {
   static resetLock(lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.resetLock(lockData, success, fail);
+    NativeTTLock.resetLock(lockData, success, fail);
   }
 
   /**
@@ -307,7 +87,7 @@ class Ttlock {
   static resetEkey(lockData: string, success: null | ((lockData: string) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.resetEkey(lockData, success, fail);
+    NativeTTLock.resetEkey(lockData, success, fail);
   }
 
   /**
@@ -320,7 +100,7 @@ class Ttlock {
   static controlLock(control: LockControlType, lockData: string, success: null | ((lockTime: number, electricQuantity: number, uniqueId: number) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     fail = fail || this.defaultCallback;
     success = success || this.defaultCallback;
-    ttLockModule.controlLock(control, lockData, (dataArray: number[]) => {
+    NativeTTLock.controlLock(control, lockData, (dataArray: any[]) => {
       success!(dataArray[0], dataArray[1], dataArray[2]);
     }, fail);
   }
@@ -337,7 +117,7 @@ class Ttlock {
   static createCustomPasscode(passcode: string, startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.createCustomPasscode(passcode, startDate, endDate, lockData, success, fail);
+    NativeTTLock.createCustomPasscode(passcode, startDate, endDate, lockData, success, fail);
   }
 
   /**
@@ -353,7 +133,7 @@ class Ttlock {
   static modifyPasscode(passcodeOrigin: string, passcodeNew: string, startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.modifyPasscode(passcodeOrigin, passcodeNew, startDate, endDate, lockData, success, fail);
+    NativeTTLock.modifyPasscode(passcodeOrigin, passcodeNew, startDate, endDate, lockData, success, fail);
   }
 
   /**
@@ -366,7 +146,7 @@ class Ttlock {
   static deletePasscode(passcode: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.deletePasscode(passcode, lockData, success, fail);
+    NativeTTLock.deletePasscode(passcode, lockData, success, fail);
   }
 
   /**
@@ -378,7 +158,7 @@ class Ttlock {
   static resetPasscode(lockData: string, success: null | ((lockData: string) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.resetPasscode(lockData, success, fail);
+    NativeTTLock.resetPasscode(lockData, success, fail);
   }
 
   /**
@@ -391,13 +171,13 @@ class Ttlock {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
 
-    ttLockModule.getLockSwitchState(lockData, (state: number) => {
+    NativeTTLock.getLockSwitchState(lockData, (state: number) => {
       let lockState = [
         LockState.Locked,
         LockState.Unlock,
         LockState.Unknown,
         LockState.CarOnLock
-      ][state];
+      ][state] ?? LockState.Unknown;
       success!(lockState);
     }, fail);
   }
@@ -418,14 +198,15 @@ class Ttlock {
     fail = fail || this.defaultCallback;
     cycleList = cycleList || [];
 
-    let subscription = ttLockEventEmitter.addListener(TTLockEvent.AddCardProgress, () => {
+    eventEmitter.removeAllListeners(TTLockEvent.ADD_CARD_PROGRESS);
+    eventEmitter.addListener(TTLockEvent.ADD_CARD_PROGRESS, () => {
       progress();
     });
-    ttLockModule.addCard(cycleList, startDate, endDate, lockData, (cardNumber: string) => {
-      subscription.remove();
+    NativeTTLock.addCard(cycleList, startDate, endDate, lockData, (cardNumber: string) => {
+      eventEmitter.removeAllListeners(TTLockEvent.ADD_CARD_PROGRESS);
       success!(cardNumber);
     }, (errorCode: LockErrorCode, errorDesc: string) => {
-      subscription.remove();
+      eventEmitter.removeAllListeners(TTLockEvent.ADD_CARD_PROGRESS);
       fail!(errorCode, errorDesc);
     });
   }
@@ -444,7 +225,7 @@ class Ttlock {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
     cycleList = cycleList || [];
-    ttLockModule.modifyCardValidityPeriod(cardNumber, cycleList, startDate, endDate, lockData, success, fail);
+    NativeTTLock.modifyCardValidityPeriod(cardNumber, cycleList, startDate, endDate, lockData, success, fail);
   }
 
   /**
@@ -457,7 +238,7 @@ class Ttlock {
   static deleteCard(cardNumber: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.deleteCard(cardNumber, lockData, success, fail);
+    NativeTTLock.deleteCard(cardNumber, lockData, success, fail);
   }
 
   /**
@@ -469,7 +250,7 @@ class Ttlock {
   static clearAllCards(lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.clearAllCards(lockData, success, fail);
+    NativeTTLock.clearAllCards(lockData, success, fail);
   }
 
   /**
@@ -488,14 +269,14 @@ class Ttlock {
     fail = fail || this.defaultCallback;
     cycleList = cycleList || [];
 
-    let subscription = ttLockEventEmitter.addListener(TTLockEvent.AddFingerprintProgress, (dataArray: number[]) => {
+    eventEmitter.addListener(TTLockEvent.ADD_FINGERPRINT_PROGRESS, (dataArray: any[]) => {
       progress!(dataArray[0], dataArray[1]);
     });
-    ttLockModule.addFingerprint(cycleList, startDate, endDate, lockData, (fingerprintNumber: string) => {
-      subscription.remove();
+    NativeTTLock.addFingerprint(cycleList, startDate, endDate, lockData, (fingerprintNumber: string) => {
+      eventEmitter.removeAllListeners(TTLockEvent.ADD_FINGERPRINT_PROGRESS);
       success!(fingerprintNumber);
     }, (errorCode: LockErrorCode, errorDesc: string) => {
-      subscription.remove();
+      eventEmitter.removeAllListeners(TTLockEvent.ADD_FINGERPRINT_PROGRESS);
       fail!(errorCode, errorDesc);
     });
   }
@@ -514,7 +295,7 @@ class Ttlock {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
     cycleList = cycleList || [];
-    ttLockModule.modifyFingerprintValidityPeriod(fingerprintNumber, cycleList, startDate, endDate, lockData, success, fail);
+    NativeTTLock.modifyFingerprintValidityPeriod(fingerprintNumber, cycleList, startDate, endDate, lockData, success, fail);
   }
 
   /**
@@ -527,7 +308,7 @@ class Ttlock {
   static deleteFingerprint(fingerprintNumber: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.deleteFingerprint(fingerprintNumber, lockData, success, fail);
+    NativeTTLock.deleteFingerprint(fingerprintNumber, lockData, success, fail);
   }
 
   /**
@@ -539,7 +320,7 @@ class Ttlock {
   static clearAllFingerprints(lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.clearAllFingerprints(lockData, success, fail);
+    NativeTTLock.clearAllFingerprints(lockData, success, fail);
   }
 
   /**
@@ -552,7 +333,7 @@ class Ttlock {
   static modifyAdminPasscode(adminPasscode: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.modifyAdminPasscode(adminPasscode, lockData, success, fail);
+    NativeTTLock.modifyAdminPasscode(adminPasscode, lockData, success, fail);
   }
 
   /**
@@ -565,7 +346,7 @@ class Ttlock {
   static setLockTime(timestamp: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.setLockTime(timestamp, lockData, success, fail);
+    NativeTTLock.setLockTime(timestamp, lockData, success, fail);
   }
 
   /**
@@ -577,19 +358,21 @@ class Ttlock {
   static getLockTime(lockData: string, success: null | ((lockTimestamp: number) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.getLockTime(lockData, success, fail);
+    NativeTTLock.getLockTime(lockData, success, fail);
   }
 
   static getLockSystem(lockData: string, success: null | ((systemModel: DeviceSystemModal) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.getLockSystem(lockData, success, fail);
+    NativeTTLock.getLockSystem(lockData, (data: Object) => {
+      success!(data as DeviceSystemModal);
+    }, fail);
   }
 
   static getLockElectricQuantity(lockData: string, success: null | ((electricQuantity: number) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     fail = fail || this.defaultCallback;
     success = success || this.defaultCallback;
-    ttLockModule.getLockElectricQuantity(lockData, success, fail);
+    NativeTTLock.getLockElectricQuantity(lockData, success, fail);
   }
 
   /**
@@ -602,7 +385,7 @@ class Ttlock {
   static getLockOperationRecord(type: LockRecordType, lockData: string, success: null | ((records: string) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.getLockOperationRecord(type, lockData, success, fail);
+    NativeTTLock.getLockOperationRecord(type, lockData, success, fail);
   }
 
   /**
@@ -614,7 +397,7 @@ class Ttlock {
   static getLockAutomaticLockingPeriodicTime(lockData: string, success: null | ((currentTime: number, maxTime: number, minTime: number) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.getLockAutomaticLockingPeriodicTime(lockData, (data: number[]) => {
+    NativeTTLock.getLockAutomaticLockingPeriodicTime(lockData, (data: any[]) => {
       success!(data[0], data[1], data[2]);
     }, fail);
   }
@@ -629,7 +412,7 @@ class Ttlock {
   static setLockAutomaticLockingPeriodicTime(seconds: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.setLockAutomaticLockingPeriodicTime(seconds, lockData, success, fail);
+    NativeTTLock.setLockAutomaticLockingPeriodicTime(seconds, lockData, success, fail);
   }
 
   /**
@@ -641,7 +424,7 @@ class Ttlock {
   static getLockRemoteUnlockSwitchState(lockData: string, success: null | ((isOn: boolean) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.getLockRemoteUnlockSwitchState(lockData, success, fail);
+    NativeTTLock.getLockRemoteUnlockSwitchState(lockData, success, fail);
   }
 
   /**
@@ -654,7 +437,7 @@ class Ttlock {
   static setLockRemoteUnlockSwitchState(isOn: boolean, lockData: string, success: null | ((lockData: string) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.setLockRemoteUnlockSwitchState(isOn, lockData, success, fail);
+    NativeTTLock.setLockRemoteUnlockSwitchState(isOn, lockData, success, fail);
   }
 
   /**
@@ -667,7 +450,7 @@ class Ttlock {
   static getLockConfig(config: LockConfigType, lockData: string, success: null | ((type: number, isOn: boolean) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.getLockConfig(config, lockData, (data: any[]) => {
+    NativeTTLock.getLockConfig(config, lockData, (data: any[]) => {
       success!(data[0], data[1]);
     }, fail);
   }
@@ -683,41 +466,41 @@ class Ttlock {
   static setLockConfig(config: LockConfigType, isOn: boolean, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.setLockConfig(config, isOn, lockData, success, fail);
+    NativeTTLock.setLockConfig(config, isOn, lockData, success, fail);
   }
 
 
   static setLockSoundVolume(soundVolume: LockSoundVolume, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.setLockSoundVolume(soundVolume, lockData, success, fail);
+    NativeTTLock.setLockSoundVolume(soundVolume, lockData, success, fail);
   }
 
   static getLockSoundVolume(lockData: string, success: null | ((lockSoundVolume: LockSoundVolume) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.getLockSoundVolume(lockData, success, fail);
+    NativeTTLock.getLockSoundVolume(lockData, success, fail);
   }
 
 
   static getUnlockDirection(lockData: string, success: null | ((direction: LockUnlockDirection) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.getUnlockDirection(lockData, success, fail);
+    NativeTTLock.getUnlockDirection(lockData, success, fail);
   }
 
 
   static setUnlockDirection(direction: LockUnlockDirection, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.setUnlockDirection(direction, lockData, success, fail);
+    NativeTTLock.setUnlockDirection(direction, lockData, success, fail);
   }
 
 
   static setUnlockDirectionAutomatic(lockData: string, success: null | ((direction: LockUnlockDirection) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.setUnlockDirectionAutomatic(lockData, success, fail);
+    NativeTTLock.setUnlockDirectionAutomatic(lockData, success, fail);
   }
 
 
@@ -740,7 +523,7 @@ class Ttlock {
     let weekly = LockPassageMode.Weekly === mode ? days : [];
     let monthly = LockPassageMode.Monthly === mode ? days : [];
 
-    ttLockModule.addPassageMode(mode, weekly, monthly, startDate, endDate, lockData, success, fail);
+    NativeTTLock.addPassageMode(mode, weekly, monthly, startDate, endDate, lockData, success, fail);
   }
 
 
@@ -753,53 +536,53 @@ class Ttlock {
   static clearAllPassageModes(lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.clearAllPassageModes(lockData, success, fail);
+    NativeTTLock.clearAllPassageModes(lockData, success, fail);
   }
 
   static addRemoteKey(remoteKeyMac: string, cycleDateList: null | CycleDateParam[], startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
     cycleDateList = cycleDateList || [];
-    ttLockModule.addRemoteKey(remoteKeyMac, cycleDateList, startDate, endDate, lockData, success, fail);
+    NativeTTLock.addRemoteKey(remoteKeyMac, cycleDateList, startDate, endDate, lockData, success, fail);
   }
 
   static modifyRemoteKey(remoteKeyMac: string, cycleDateList: null | CycleDateParam[], startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
     cycleDateList = cycleDateList || [];
-    ttLockModule.modifyRemoteKey(remoteKeyMac, cycleDateList, startDate, endDate, lockData, success, fail);
+    NativeTTLock.modifyRemoteKey(remoteKeyMac, cycleDateList, startDate, endDate, lockData, success, fail);
   }
 
   static deleteRemoteKey(remoteKeyMac: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.deleteRemoteKey(remoteKeyMac, lockData, success, fail);
+    NativeTTLock.deleteRemoteKey(remoteKeyMac, lockData, success, fail);
   }
 
   static clearAllRemoteKey(lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.clearAllRemoteKey(lockData, success, fail);
+    NativeTTLock.clearAllRemoteKey(lockData, success, fail);
   }
 
 
   static addDoorSensor(doorSensorMac: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.addDoorSensor(doorSensorMac, lockData, success, fail);
+    NativeTTLock.addDoorSensor(doorSensorMac, lockData, success, fail);
   }
 
   static clearAllDoorSensor(lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.clearAllDoorSensor(lockData, success, fail);
+    NativeTTLock.clearAllDoorSensor(lockData, success, fail);
   }
 
 
   static setDoorSensorAlertTime(time: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.setDoorSensorAlertTime(time, lockData, success, fail);
+    NativeTTLock.setDoorSensorAlertTime(time, lockData, success, fail);
   }
 
   /**
@@ -816,44 +599,40 @@ class Ttlock {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
     cycleList = cycleList || [];
-    ttLockModule.recoverCard(cardNumber, cycleList, startDate, endDate, lockData, success, fail);
+    NativeTTLock.recoverCard(cardNumber, cycleList, startDate, endDate, lockData, success, fail);
   }
 
   static recoverPasscode(passcode: string, passcodeType: number, cycleType: number, startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.recoverPasscode(passcode, passcodeType, cycleType, startDate, endDate, lockData, success, fail);
+    NativeTTLock.recoverPasscode(passcode, passcodeType, cycleType, startDate, endDate, lockData, success, fail);
   }
 
   static scanWifi(lockData: string, callback: ((isFinished: boolean, wifiList: []) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
-    let subscription = subscriptionMap.get(TTLockEvent.ScanLockWifi)
-    if (subscription !== undefined) {
-      subscription.remove()
-    }
-    subscription = ttLockEventEmitter.addListener(TTLockEvent.ScanLockWifi, (data: any[]) => {
+    eventEmitter.removeAllListeners(TTLockEvent.SCAN_LOCK_WIFI);
+    eventEmitter.addListener(TTLockEvent.SCAN_LOCK_WIFI, (data: any[]) => {
       callback!(data[0], data[1]);
     });
-    subscriptionMap.set(TTLockEvent.ScanLockWifi, subscription);
-    ttLockModule.scanWifi(lockData, fail);
+    NativeTTLock.scanWifi(lockData, fail);
   }
 
   static configWifi(wifiName: string, wifiPassword: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.configWifi(wifiName, wifiPassword, lockData, success, fail);
+    NativeTTLock.configWifi(wifiName, wifiPassword, lockData, success, fail);
   }
 
 
   static configServer(ip: string, port: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.configServer(ip, port, lockData, success, fail);
+    NativeTTLock.configServer(ip, port, lockData, success, fail);
   }
 
   static getWifiInfo(lockData: string, success: null | ((wifiMac: string, wifiRssi: number) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.getWifiInfo(lockData, (data: any[]) => {
+    NativeTTLock.getWifiInfo(lockData, (data: any[]) => {
       success!(data[0], data[1]);
     }, fail);
   }
@@ -862,7 +641,7 @@ class Ttlock {
   static getWifiPowerSavingTime(lockData: string, success: ((timesJsonString: undefined | string) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.getWifiPowerSavingTime(lockData, success, fail);
+    NativeTTLock.getWifiPowerSavingTime(lockData, success, fail);
   }
 
   /**
@@ -877,20 +656,20 @@ class Ttlock {
   static configWifiPowerSavingTime(weekDays: number[], startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.configWifiPowerSavingTime(weekDays, startDate, endDate, lockData, success, fail);
+    NativeTTLock.configWifiPowerSavingTime(weekDays, startDate, endDate, lockData, success, fail);
   }
 
   static clearWifiPowerSavingTime(lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.clearWifiPowerSavingTime(lockData, success, fail);
+    NativeTTLock.clearWifiPowerSavingTime(lockData, success, fail);
   }
 
 
-  static configIp(info:WifiLockServerInfo, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
+  static configIp(info: WifiLockServerInfo, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.configIp(info,lockData, success, fail);
+    NativeTTLock.configIp(info, lockData, success, fail);
   }
 
 
@@ -900,14 +679,16 @@ class Ttlock {
     fail = fail || this.defaultCallback;
     cycleList = cycleList || [];
 
-    let subscription = ttLockEventEmitter.addListener(TTLockEvent.AddFaceProgress, (dataArray: number[]) => {
+    eventEmitter.removeAllListeners(TTLockEvent.ADD_FACE_PROGRESS);
+    eventEmitter.addListener(TTLockEvent.ADD_FACE_PROGRESS, (dataArray: any[]) => {
       progress(dataArray[0], dataArray[1]);
     });
-    ttLockModule.addFace(cycleList, startDate, endDate, lockData, (cardNumber: string) => {
-      subscription.remove();
+    NativeTTLock.addFace(cycleList, startDate, endDate, lockData, (cardNumber: string) => {
+      eventEmitter.removeAllListeners(TTLockEvent.ADD_FACE_PROGRESS);
       success!(cardNumber);
     }, (errorCode: LockErrorCode, errorDesc: string) => {
-      subscription.remove();
+      console.log("addFace errorCode:" + errorCode + "      errorDesc:" + errorDesc);
+      eventEmitter.removeAllListeners(TTLockEvent.ADD_FACE_PROGRESS);
       fail!(errorCode, errorDesc);
     });
   }
@@ -916,30 +697,30 @@ class Ttlock {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
     cycleList = cycleList || [];
-    ttLockModule.addFaceFeatureData(faceFeatureData, cycleList, startDate, endDate, lockData, (faceNumber: string) => {
+    NativeTTLock.addFaceFeatureData(faceFeatureData, cycleList, startDate, endDate, lockData, (faceNumber: string) => {
       success!(faceNumber);
     }, (errorCode: LockErrorCode, errorDesc: string) => {
       fail!(errorCode, errorDesc);
     });
   }
 
-  static modifyFaceValidityPeriod(cycleList: null | CycleDateParam[], startDate: number, endDate: number, faceNumber:string, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
+  static modifyFaceValidityPeriod(cycleList: null | CycleDateParam[], startDate: number, endDate: number, faceNumber: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
     cycleList = cycleList || [];
-    ttLockModule.modifyFaceValidityPeriod(cycleList, startDate, endDate, faceNumber, lockData, success, fail);
+    NativeTTLock.modifyFaceValidityPeriod(cycleList, startDate, endDate, faceNumber, lockData, success, fail);
   }
 
-  static deleteFace(faceNumber:string, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
+  static deleteFace(faceNumber: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.deleteFace(faceNumber, lockData, success, fail);
+    NativeTTLock.deleteFace(faceNumber, lockData, success, fail);
   }
 
   static clearAllFace(lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.clearFace(lockData, success, fail);
+    NativeTTLock.clearFace(lockData, success, fail);
   }
 
 
@@ -954,7 +735,7 @@ class Ttlock {
   static activateLiftFloors(floors: string, lockData: string, success: null | ((lockTime: number, electricQuantity: number, uniqueId: number) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.activateLiftFloors(floors, lockData, (dataArray: any[]) => {
+    NativeTTLock.activateLiftFloors(floors, lockData, (dataArray: any[]) => {
       success!(dataArray[0], dataArray[1], dataArray[2]);
     }, fail);
   }
@@ -969,13 +750,17 @@ class Ttlock {
   static setLiftControlEnableFloors(floors: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.setLiftControlEnableFloors(floors, lockData, success, fail);
+    NativeTTLock.setLiftControlEnableFloors(floors, lockData, success, fail);
   }
 
-    static setLiftWorkMode(workMode: LiftWorkMode, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
+  static setLiftWorkMode(workMode: LiftWorkMode, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
-    ttLockModule.setLiftWorkMode(workMode, lockData, success, fail);
+    NativeTTLock.setLiftWorkMode(workMode, lockData, success, fail);
+  }
+
+    static supportFunction(lockFunction: LockFunction, lockData: string, callback: (isSupport: boolean) => void) {
+    NativeTTLock.supportFunction(lockFunction, lockData, callback);
   }
 
 
@@ -1014,33 +799,225 @@ class Ttlock {
 
 */
 
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+export class TtWirelessKeypad {
+
+  static defaultCallback = function () { };
+  static startScan(callback: ((scanModal: ScanWirelessKeypadModal) => void)) {
+
+    eventEmitter.removeAllListeners(WirelessKeypadEvent.ScanWirelessKeypad);
+    eventEmitter.addListener(WirelessKeypadEvent.ScanWirelessKeypad, callback);
+    NativeTTLock.startScanWirelessKeypad();
+    
+  }
+
+  static stopScan() {
+    NativeTTLock.stopScanWirelessKeypad();
+    eventEmitter.removeAllListeners(WirelessKeypadEvent.ScanWirelessKeypad);
+  }
+
+  static init(mac: string, lockMac: string, success: ((electricQuantity: number, wirelessKeypadFeatureValue: string) => void), fail: null | ((errorCode: RemoteKeyPadErrorCode, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    NativeTTLock.initWirelessKeypad(mac, lockMac, (dataArray: any[]) => {
+      success!(dataArray[0], dataArray[1]);
+    }, (errorCode: RemoteKeyPadErrorCode) => {
+      let description = "Init wireless keypad fail.";
+      if (errorCode === RemoteKeyPadErrorCode.wrongCRC) {
+        description += "Wrong crc";
+      } else if (errorCode === RemoteKeyPadErrorCode.connectTimeout) {
+        description += "Connect timeout";
+      } else if (errorCode === RemoteKeyPadErrorCode.wrongFactoryDate) {
+        description += "Wrong factory date";
+      }
+      fail!(errorCode, description);
+    });
+  }
+}
+
+export class TtDoorSensor {
+
+  static defaultCallback = function () { };
+
+  static startScan(callback: ((scanModal: ScanDoorSensorModal) => void)) {
+    eventEmitter.removeAllListeners(TtDoorSensorEvent.ScanDoorSensor);
+    eventEmitter.addListener(TtDoorSensorEvent.ScanDoorSensor, callback);
+    NativeTTLock.startScanDoorSensor();
+  }
+
+  static stopScan() {
+    NativeTTLock.stopScanDoorSensor();
+    eventEmitter.removeAllListeners(TtDoorSensorEvent.ScanDoorSensor);
+  }
+
+  static init(mac: string, lockData: string, success: ((electricQuantity: number, systemModel: DeviceSystemModal) => void), fail: null | ((errorCode: DoorSensorErrorCode, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    NativeTTLock.initDoorSensor(mac, lockData, (dataArray: any[]) => {
+      success!(dataArray[0], dataArray[1]);
+    }, (errorCode: DoorSensorErrorCode) => {
+      let description = "Init door sensor fail.";
+      if (errorCode === DoorSensorErrorCode.bluetoothPowerOff) {
+        description += "Bluetooth is power off";
+      } else if (errorCode === DoorSensorErrorCode.connectTimeout) {
+        description += "Connect timeout";
+      } else if (errorCode === DoorSensorErrorCode.wrongCRC) {
+        description += "Wrong crc";
+      }
+      fail!(errorCode, description);
+    });
+  }
+}
+
+
+
+export class TtRemoteKey {
+
+  static defaultCallback = function () { };
+
+  static startScan(callback: ((scanModal: ScanRemoteKeyModal) => void)) {
+    eventEmitter.removeAllListeners(TtRemoteKeyEvent.ScanRemoteKey);
+    eventEmitter.addListener(TtRemoteKeyEvent.ScanRemoteKey, callback);
+    NativeTTLock.startScanRemoteKey();
+  }
+
+  static stopScan() {
+    NativeTTLock.stopScanRemoteKey();
+    eventEmitter.removeAllListeners(TtRemoteKeyEvent.ScanRemoteKey);
+  }
+
+  static init(mac: string, lockData: string, success: ((electricQuantity: number, systemModel: DeviceSystemModal) => void), fail: null | ((errorCode: RemoteKeyErrorCode, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    NativeTTLock.initRemoteKey(mac, lockData, (dataArray: any[]) => {
+      success!(dataArray[0], dataArray[1]);
+    }, (errorCode: RemoteKeyErrorCode) => {
+      let description = "Init remote key fail.";
+      if (errorCode === RemoteKeyErrorCode.wrongCRC) {
+        description += "Wrong CRC";
+      } else if (errorCode === RemoteKeyErrorCode.connectTimeout) {
+        description += "Connect timeout";
+      }
+      fail!(errorCode, description);
+    });
+  }
+}
+
+export class TtGateway {
+  static defaultCallback = function () { };
 
   /**
-   *
+   * Scan for nearby gateways （Only newly powered gateways can be scanned）
+   * @param callback  If there is a reenergized gateway nearby, the callback will be performed multiple times
+   */
+  static startScan(callback: ((scanGatewayModal: ScanGatewayModal) => void)) {
+    eventEmitter.removeAllListeners(GatewayEvent.ScanGateway);
+    eventEmitter.addListener(GatewayEvent.ScanGateway, callback);
+    NativeTTLock.startScanGateway();
+  }
+
+  /**
+   * Stop scanning nearby Bluetooth locks
+   */
+  static stopScan() {
+    NativeTTLock.stopScanGateway();
+    eventEmitter.removeAllListeners(GatewayEvent.ScanGateway);
+  }
+
+  /**
+   * Connected to the gateway Only newly powered gateways can be connected）
+   * @param mac
    * @param callback
    */
-  static getBluetoothState(callback: (state: BluetoothState) => void) {
+  static connect(mac: string, callback: ((state: ConnectState) => void)) {
     callback = callback || this.defaultCallback;
-    ttLockModule.getBluetoothState((state: number) => {
-      var bluetoothState = [
-        BluetoothState.Unknown,
-        BluetoothState.Resetting,
-        BluetoothState.Unsupported,
-        BluetoothState.Unauthorized,
-        BluetoothState.On,
-        BluetoothState.Off
-      ][state];
-      callback(bluetoothState);
+    NativeTTLock.connect(mac, (state: number) => {
+      let connectState = [ConnectState.Timeout, ConnectState.Success, ConnectState.Fail][state] ?? ConnectState.Fail;
+      callback!(connectState);
     });
   }
 
-  static supportFunction(lockFunction: LockFunction, lockData: string, callback: (isSupport: boolean) => void) {
-    ttLockModule.supportFunction(lockFunction, lockData, callback);
+  /**
+   * Read wifi near the gateway
+   * @param progress
+   * @param finish
+   * @param fail
+   */
+  static getNearbyWifi(progress: ((scanWifiModalList: ScanWifiModal[]) => void), finish: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
+    progress = progress || this.defaultCallback;
+    finish = finish || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+
+    eventEmitter.addListener(GatewayEvent.ScanWifi, (responseData: ScanWifiModal[]) => {
+      progress(responseData);
+    });
+
+    NativeTTLock.getNearbyWifi((state: number) => {
+      eventEmitter.removeAllListeners(GatewayEvent.ScanWifi);
+      if (state === 0) {
+        finish!();
+      } else {
+        fail!(1, "Failed to get nearby wifi. Please confirm whether there is wifi nearby or reconnect to the gateway try again");
+      }
+    });
+  }
+
+  /**
+   * Initialize gateway
+   * @param object
+   * @param success
+   * @param fail
+   */
+  static initGateway(object: InitGatewayParam, success: ((initGatewayModal: InitGatewayModal) => void), fail: null | ((errorCode: GatewayErrorCode, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    NativeTTLock.initGateway(object, (data: Object) => {
+      success!(data as InitGatewayModal);
+    }, (errorCode: GatewayErrorCode) => {
+      let description = "Init gateway fail.";
+      if (errorCode === 3) {
+        description += "Wrong wifi";
+      } else if (errorCode === 4) {
+        description += "Wrong wifi password";
+      }
+      fail!(errorCode, description);
+    });
   }
 
 }
 
-enum BluetoothState {
+
+
+
+
+
+
+
+
+
+
+
+
+export enum BluetoothState {
   Unknown = 0,
   Resetting = 1,
   Unsupported = 2,
@@ -1049,7 +1026,9 @@ enum BluetoothState {
   Off = 5
 }
 
-enum LockFunction {
+
+
+export enum LockFunction {
   Passcode = 0,
   IcCard = 1,
   Fingerprint = 2,
@@ -1101,13 +1080,13 @@ enum LockFunction {
   AutoSetUnlockDirection = 81
 }
 
-enum LockRecordType {
+export enum LockRecordType {
   Latest = 0,
   All = 1
 }
 
 
-enum LockConfigType {
+export enum LockConfigType {
   Audio = 0,
   PasscodeVisible = 1,
   Freeze = 2,
@@ -1121,7 +1100,7 @@ enum LockConfigType {
   LowBatteryAutoUnlock = 10
 }
 
-enum LockSoundVolume {
+export enum LockSoundVolume {
   On = -1,
   Off = 0,
   Level_1 = 1,
@@ -1132,35 +1111,35 @@ enum LockSoundVolume {
 }
 
 
-enum LockUnlockDirection {
+export enum LockUnlockDirection {
   Unknown = 0,
   Left = 1,
   Right = 2
 }
 
-enum LockPassageMode {
+export enum LockPassageMode {
   Weekly = 0,
   Monthly = 1
 }
 
-enum LockControlType {
+export enum LockControlType {
   Unlock = 0,
   Lock = 1
 }
 
-enum LockState {
+export enum LockState {
   Locked = 0,
   Unlock = 1,
   Unknown = 2,
   CarOnLock
 }
 
-enum FaceState {
+export enum FaceState {
   canAddFace = 0,
   addFail = 1
 }
 
-enum FaceErrorCode {
+export enum FaceErrorCode {
   normal = 0,
   noFaceDetected = 1,
   tooCloseToTheTop = 2,
@@ -1185,7 +1164,7 @@ enum FaceErrorCode {
 };
 
 
-enum LockErrorCode{
+export enum LockErrorCode {
   hadReset = 0,
   crcError = 1,
   noPermission = 2,
@@ -1227,20 +1206,20 @@ enum LockErrorCode{
   invalidParameter = 38
 }
 
-enum DoorSensorErrorCode {
+export enum DoorSensorErrorCode {
   bluetoothPowerOff = 0,
   connectTimeout = 1,
   fail = 2,
   wrongCRC = 3
 }
 
-enum RemoteKeyErrorCode {
+export enum RemoteKeyErrorCode {
   fail = 0,
   wrongCRC = 1,
   connectTimeout = 2
 }
 
-enum RemoteKeyPadErrorCode {
+export enum RemoteKeyPadErrorCode {
   fail = 0,
   wrongCRC = 1,
   connectTimeout = 2,
@@ -1248,7 +1227,7 @@ enum RemoteKeyPadErrorCode {
 }
 
 
-enum GatewayErrorCode {
+export enum GatewayErrorCode {
   fail = 0,
   wrongSSID = 1,
   wrongWifiPassword = 2,
@@ -1266,61 +1245,177 @@ enum GatewayErrorCode {
 }
 
 
-enum ConnectState {
+export enum ConnectState {
   Timeout = 0,
   Success = 1,
   Fail = 2
 }
 
-enum TTLockEvent {
-  ScanLock = "EventScanLock",
-  AddCardProgress = "EventAddCardProgrress",
-  AddFingerprintProgress = "EventAddFingerprintProgrress",
-  AddFaceProgress = "EventAddFaceProgrress",
-  ListenBluetoothState = "EventBluetoothState",
-  ScanLockWifi = "EventScanLockWifi",
-}
 
-enum TtRemoteKeyEvent {
+export enum TtRemoteKeyEvent {
   ScanRemoteKey = "EventScanRemoteKey"
 }
 
-enum TtDoorSensorEvent {
+export enum TtDoorSensorEvent {
   ScanDoorSensor = "EventScanDoorSensor"
 }
 
-enum GatewayEvent {
+export enum GatewayEvent {
   ScanGateway = "EventScanGateway",
   ScanWifi = "EventScanWifi"
 }
 
 
-enum WirelessKeypadEvent {
+export enum WirelessKeypadEvent {
   ScanWirelessKeypad = "EventWirelessKeypad"
 }
 
 
-enum GatewayType {
+export enum GatewayType {
   G2 = 2,
   G3 = 3,
-  G4 = 4
+  G4 = 4,
+  G5 = 5,
+  G6 = 6
 }
 
 
-enum LockAccessoryType {
+export enum LockAccessoryType {
   KEYPAD = 1,
   REMOTE_KEY = 2,
   DOOR_SENSOR = 3
 }
 
-enum GatewayIpSettingType {
+export enum GatewayIpSettingType {
   STATIC_IP = 0,
   DHCP = 1
 }
 
-enum LiftWorkMode {
+export enum LiftWorkMode {
   ACTIVATE_ALL_FLOORS = 0,
   ACTIVATE_SPECIFIC_FLOORS = 1
 }
 
-export { Ttlock, TtGateway, TtRemoteKey, TtDoorSensor, TtWirelessKeypad, BluetoothState, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, ConnectState, GatewayType, GatewayIpSettingType, LockSoundVolume, TtRemoteKeyEvent, TtDoorSensorEvent, LockUnlockDirection, LockAccessoryType, ScanLockModal, ScanRemoteKeyModal, ScanDoorSensorModal, DeviceSystemModal, WirelessKeypadEvent, ScanWirelessKeypadModal, WifiLockServerInfo, FaceState, FaceErrorCode, LockErrorCode, DoorSensorErrorCode, RemoteKeyErrorCode, RemoteKeyPadErrorCode, GatewayErrorCode, InitGatewayModal, InitGatewayParam, LiftWorkMode};
+
+enum TTLockEvent {
+  SCAN_LOCK = "EventScanLock",
+  ADD_CARD_PROGRESS = "EventAddCardProgrress",
+  ADD_FINGERPRINT_PROGRESS = "EventAddFingerprintProgrress",
+  ADD_PASSCODE_PROGRESS = "EventAddPasscodeProgrress",
+  ADD_FACE_PROGRESS = "EventAddFaceProgrress",
+  LISTEN_BLUETOOTH_STATE = "EventBluetoothState",
+  SCAN_LOCK_WIFI = "EventScanLockWifi",
+}
+
+
+
+export interface ScanLockModal {
+  lockName: string,
+  lockMac: string,
+  isInited: boolean,
+  isKeyboardActivated: boolean,
+  electricQuantity: number,
+  lockVersion: string,
+  lockSwitchState: number,
+  rssi: number
+  oneMeterRSSI: number
+}
+
+
+export interface ScanGatewayModal {
+  gatewayName: string,
+  gatewayMac: string,
+  isDfuMode: boolean,
+  rssi: number,
+  type: number
+}
+
+export interface WifiLockServerInfo {
+  type: number,  // staticIp: 0, dhcp: 1
+  ipAddress: string | undefined,
+  subnetMask: string | undefined,
+  router: string | undefined,
+  preferredDns: string | undefined,
+  alternateDns: string | undefined,
+}
+
+export interface ScanRemoteKeyModal {
+  remoteKeyName: string,
+  remoteKeyMac: string,
+  rssi: number
+}
+
+export interface ScanDoorSensorModal {
+  name: string,
+  mac: string,
+  rssi: number,
+  scanTime: number
+}
+
+export interface ScanWirelessKeypadModal {
+  name: string,
+  mac: string,
+  rssi: number
+}
+
+
+export interface LockVersion {
+  protocolVersion: string,
+  protocolType: string,
+  groupId: string,
+  orgId: string,
+  scene: string
+}
+
+
+export interface ScanWifiModal {
+  wifi: string,
+  rssi: number
+}
+
+export interface InitGatewayParam {
+  type: number,
+  gatewayName: string,
+  wifi: string | undefined,
+  wifiPassword: string | undefined,
+  ttLockUid: number,
+  ttLockLoginPassword: string,
+  serverIp: string | undefined,
+  serverPort: number | undefined,
+
+  ipSettingType: number | undefined,
+  ipAddress: string | undefined,
+  subnetMask: string | undefined,
+  router: string | undefined,
+  preferredDns: string | undefined,
+  alternateDns: string | undefined
+}
+
+export interface InitGatewayModal {
+  modelNum: string,
+  hardwareRevision: string,
+  firmwareRevision: string,
+}
+
+export interface DeviceSystemModal {
+  modelNum: string,
+  hardwareRevision: string,
+  firmwareRevision: string,
+
+  //NB IOT LOCK
+  nbOperator: string,
+  nbNodeId: string,
+  nbCardNumber: string,
+  nbRssi: string,
+  //support TTLockFeatureValuePasscodeKeyNumber
+  passcodeKeyNumber: string,
+  lockData: string,
+
+}
+
+
+export interface CycleDateParam {
+  weekDay: number,
+  startTime: number,
+  endTime: number
+}

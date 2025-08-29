@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import { View, FlatList, StyleSheet, Text, Button } from 'react-native';
-import { Ttlock, ScanLockModal, BluetoothState } from 'react-native-ttlock';
+import { Ttlock,  type ScanLockModal, BluetoothState } from 'react-native-ttlock';
 import { observer } from 'mobx-react';
 import * as Toast from './toast-page';
 import store from './store'

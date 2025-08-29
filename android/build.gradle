@@ -1,59 +1,42 @@
 buildscript {
-  ext {
-    agp_version = '7.4.2'
+  ext.getExtOrDefault = {name ->
+    return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties['Ttlock_' + name]
   }
 
-  // Buildscript is evaluated before everything else so we can't use getExtOrDefault
-//  def kotlin_version = rootProject.ext.has('kotlinVersion') ? rootProject.ext.get('kotlinVersion') : project.properties['Ttlock_kotlinVersion']
-
   repositories {
-    mavenCentral()
     google()
-    jcenter()
+    mavenCentral()
   }
 
   dependencies {
-    classpath "com.android.tools.build:gradle:$agp_version"
+    classpath "com.android.tools.build:gradle:8.7.2"
     // noinspection DifferentKotlinGradleVersion
-//    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${getExtOrDefault('kotlinVersion')}"
   }
 }
 
-apply plugin: 'com.android.library'
-//apply plugin: 'kotlin-android'
 
-def getExtOrDefault(name) {
-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties['Ttlock_' + name]
-}
+apply plugin: "com.android.library"
+apply plugin: "kotlin-android"
+
+apply plugin: "com.facebook.react"
 
 def getExtOrIntegerDefault(name) {
-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties['Ttlock_' + name]).toInteger()
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties["Ttlock_" + name]).toInteger()
 }
 
 android {
-  compileSdkVersion getExtOrIntegerDefault('compileSdkVersion')
-  buildToolsVersion getExtOrDefault('buildToolsVersion')
+  namespace "com.ttlock"
+
+  compileSdkVersion getExtOrIntegerDefault("compileSdkVersion")
+
   defaultConfig {
-    minSdkVersion 21
-    targetSdkVersion getExtOrIntegerDefault('targetSdkVersion')
-    versionCode 1
-    versionName "1.0"
-//    ndk {
-//      // ����֧�ֵ� SO �⹹��
-//      abiFilters 'armeabi', 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'//, 'mips', 'mips64'
-//    }
+    minSdkVersion getExtOrIntegerDefault("minSdkVersion")
+    targetSdkVersion getExtOrIntegerDefault("targetSdkVersion")
   }
 
-  packagingOptions {
-    pickFirst "lib/armeabi-v7a/libfbjni.so"
-    pickFirst "lib/arm64-v8a/libc++_shared.so"
-    pickFirst "lib/arm64-v8a/libfbjni.so"
-    pickFirst "lib/x86_64/libfbjni.so"
-    pickFirst "lib/x86/libfbjni.so"
-    pickFirst "lib/x86/libc++_shared.so"
-    pickFirst "lib/x86_64/libc++_shared.so"
-    pickFirst "lib/armeabi-v7a/libc++_shared.so"
-//    exclude "lib/arm64-v8a/librealm-jni.so"
+  buildFeatures {
+    buildConfig true
   }
 
   buildTypes {
@@ -61,109 +44,34 @@ android {
       minifyEnabled false
     }
   }
+
   lintOptions {
-    disable 'GradleCompatible'
-  }
-  sourceSets {
-    main {
-      jniLibs.srcDirs = ['libs']
-    }
-  }
-  compileOptions {
-    targetCompatibility JavaVersion.VERSION_1_8
-    sourceCompatibility JavaVersion.VERSION_1_8
+    disable "GradleCompatible"
   }
 
-  //��ӱ��زֿ⣬����libsĿ¼��Ϊ�ֿ��ַ
-  repositories {
-    flatDir {
-      dirs 'libs'
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+  }
+
+  sourceSets {
+    main {
+      java.srcDirs += [
+        "generated/java",
+        "generated/jni"
+      ]
     }
   }
 }
 
 repositories {
   mavenCentral()
-  jcenter()
   google()
-//  flatDir {
-////    dirs 'libs'
-//    dirs "D:\\Users\\Administrator\\Repository\\github\\react-native-ttlock\\android\\libs"
-//  }
-  def found = false
-  def defaultDir = null
-  def androidSourcesName = 'React Native sources'
-
-  if (rootProject.ext.has('reactNativeAndroidRoot')) {
-    defaultDir = rootProject.ext.get('reactNativeAndroidRoot')
-  } else {
-    defaultDir = new File(
-            projectDir,
-            '/../../../node_modules/react-native/android'
-    )
-  }
-
-  if (defaultDir.exists()) {
-    maven {
-      url defaultDir.toString()
-      name androidSourcesName
-    }
-
-    logger.info(":${project.name}:reactNativeAndroidRoot ${defaultDir.canonicalPath}")
-    found = true
-  } else {
-    def parentDir = rootProject.projectDir
-
-    1.upto(5, {
-      if (found) return true
-      parentDir = parentDir.parentFile
-
-      def androidSourcesDir = new File(
-              parentDir,
-              'node_modules/react-native'
-      )
-
-      def androidPrebuiltBinaryDir = new File(
-              parentDir,
-              'node_modules/react-native/android'
-      )
-
-      if (androidPrebuiltBinaryDir.exists()) {
-        maven {
-          url androidPrebuiltBinaryDir.toString()
-          name androidSourcesName
-        }
-
-        logger.info(":${project.name}:reactNativeAndroidRoot ${androidPrebuiltBinaryDir.canonicalPath}")
-        found = true
-      } else if (androidSourcesDir.exists()) {
-        maven {
-          url androidSourcesDir.toString()
-          name androidSourcesName
-        }
-
-        logger.info(":${project.name}:reactNativeAndroidRoot ${androidSourcesDir.canonicalPath}")
-        found = true
-      }
-    })
-  }
-
-  if (!found) {
-    throw new GradleException(
-            "${project.name}: unable to locate React Native android sources. " +
-                    "Ensure you have you installed React Native as a dependency in your project and try again."
-    )
-  }
 }
 
-def kotlin_version = getExtOrDefault('kotlinVersion')
+def kotlin_version = getExtOrDefault("kotlinVersion")
 
 dependencies {
-  implementation fileTree(dir: 'libs', include: ['*.jar'])
-  // noinspection GradleDynamicVersion
-  api 'com.facebook.react:react-native:0.63.4'
-//  implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-  implementation 'com.ttlock:ttlock:3.5.4'
-//  implementation(name: 'ttlock-release', ext: 'aar')
-  implementation 'com.google.code.gson:gson:2.6.1'
+  implementation "com.facebook.react:react-android"
+  implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
