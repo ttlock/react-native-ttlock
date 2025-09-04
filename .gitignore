@@ -67,3 +67,5 @@ example/vendor
 **/cache
 **/.yarn/install-state.gz
 
+example/ios/.xcode.env.local
+example/ios/TtlockExample.xcworkspace/contents.xcworkspacedata
