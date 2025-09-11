@@ -807,7 +807,7 @@ RCT_EXPORT_METHOD(initGateway:(NSDictionary *)dict success:(RCTResponseSenderBlo
     paramDict[@"serverAddress"] = dict[@"serverIp"];
     paramDict[@"portNumber"] = dict[@"serverPort"];
     paramDict[@"gatewayVersion"] = @(gatewayType);
-    if (gatewayType > TTGateWayTypeG2) {
+    if (gatewayType == TTGateWayTypeG3 || gatewayType == TTGateWayTypeG4) {
         paramDict[@"SSID"] = @"1";
         paramDict[@"wifiPwd"] = @"1";
     }

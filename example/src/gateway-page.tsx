@@ -14,7 +14,7 @@ const GatewayPage = (props: { navigation: any; route: any; }) => {
 
   const initGateway = () => {
     let initGatewayParam: InitGatewayParam;
-    if (type == GatewayType.G2) {
+    if (type == GatewayType.G2 || type == GatewayType.G5) {
       if (wifiPassword === undefined || wifiPassword.length === 0) {
         Toast.showToast("please input wifi password");
         return;
