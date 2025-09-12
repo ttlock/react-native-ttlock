@@ -92,7 +92,7 @@ const GatewayPage = (props: { navigation: any; route: any; }) => {
 
 
   let WifiView = <View></View>;
-  if(type === GatewayType.G2){
+  if(type === GatewayType.G2 || type === GatewayType.G5){
     WifiView = (
       <View>
         <Text style={{ fontSize: 40 }}>Wifi: {wifi}</Text>

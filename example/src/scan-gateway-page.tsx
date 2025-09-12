@@ -7,6 +7,7 @@ import store from './store';
 
 
 const connectGateway = (item: ScanGatewayModal, navigation: any) => {
+  console.log("网关类型：" + JSON.stringify(item))
   Toast.showToastLoad("connect...")
   TtGateway.stopScan();
   TtGateway.connect(item.gatewayMac, (state: ConnectState)=> {
