@@ -22,20 +22,20 @@ echo "在example目录执行yarn..."
 cd ./example || { echo "无法进入example目录"; exit 1; }
 yarn
 cd .. || exit 1  # 返回上级目录
-
-# 在example/ios目录执行pod install
-echo "在example/ios目录执行pod install..."
-if [ -d "./example/ios" ]; then
-  cd ./example/ios || { echo "无法进入example/ios目录"; exit 1; }
-  rm Podfile.lock
-  rm -rf Pods
-  rm -rf TtlockExample.xcworkspace
-  rm -rf build
-  bundle install
-  bundle exec pod install
-  cd ../../ || exit 1  # 返回初始目录
-else
-  echo "警告: ./example/ios目录不存在，跳过pod install"
-fi
+#
+## 在example/ios目录执行pod install
+#echo "在example/ios目录执行pod install..."
+#if [ -d "./example/ios" ]; then
+#  cd ./example/ios || { echo "无法进入example/ios目录"; exit 1; }
+#  rm Podfile.lock
+#  rm -rf Pods
+#  rm -rf TtlockExample.xcworkspace
+#  rm -rf build
+#  bundle install
+#  bundle exec pod install
+#  cd ../../ || exit 1  # 返回初始目录
+#else
+#  echo "警告: ./example/ios目录不存在，跳过pod install"
+#fi
 
 echo "所有操作完成"
