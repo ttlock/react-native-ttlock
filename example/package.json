@@ -11,18 +11,18 @@
   },
   "dependencies": {
     "@react-native-community/cli-platform-android": "^12.3.3",
-    "@react-native-community/masked-view": "^0.1.10",
+    "@react-native-community/masked-view": "latest",
     "@react-navigation/native": "^7.1.17",
     "@react-navigation/stack": "^7.4.7",
     "mobx": "^6.0.4",
     "mobx-react": "^7.0.5",
     "react": "19.1.0",
     "react-native": "0.81.0",
-    "react-native-gesture-handler": "^1.9.0",
-    "react-native-reanimated": "^1.13.1",
+    "react-native-gesture-handler": "latest",
+    "react-native-reanimated": "^3.7.2",
     "react-native-root-toast": "^3.2.1",
-    "react-native-safe-area-context": "^3.1.8",
-    "react-native-screens": "^2.14.0"
+    "react-native-safe-area-context": "latest",
+    "react-native-screens": "latest"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

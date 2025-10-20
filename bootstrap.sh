@@ -23,7 +23,7 @@ cd ./example || { echo "无法进入example目录"; exit 1; }
 yarn
 cd .. || exit 1  # 返回上级目录
 #
-## 在example/ios目录执行pod install
+## 在example/ios目录执行pod installf
 #echo "在example/ios目录执行pod install..."
 #if [ -d "./example/ios" ]; then
 #  cd ./example/ios || { echo "无法进入example/ios目录"; exit 1; }
