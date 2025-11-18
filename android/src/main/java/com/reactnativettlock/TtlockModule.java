@@ -235,13 +235,15 @@ public class TtlockModule extends ReactContextBaseJavaModule {
 //    }
 
     @ReactMethod
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, ReadableArray permissions, ReadableArray grantResults) {
         switch (requestCode) {
             case PERMISSIONS_REQUEST_CODE: {
                 // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0) {
-                    for (int i=0;i<permissions.length;i++) {
-                        if (Manifest.permission.ACCESS_FINE_LOCATION.equals(permissions[i]) && grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+              if (grantResults.size() > 0) {
+                    for (int i=0;i<permissions.size();i++) {
+                        String permission = permissions.getString(i);
+                        int grantResult = grantResults.getInt(i);
+                        if (Manifest.permission.ACCESS_FINE_LOCATION.equals(permission) && grantResult == PackageManager.PERMISSION_GRANTED) {
                             // permission was granted, yay! Do the
                             // contacts-related task you need to do.
                           switch (scanType) {
