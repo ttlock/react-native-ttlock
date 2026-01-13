@@ -72,6 +72,12 @@ def enableProguardInReleaseBuilds = false
  */
 def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 
+repositories {
+    flatDir {
+        dirs 'libs', "${rootDir}/../../android/libs"
+    }
+}
+
 android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
@@ -79,7 +85,7 @@ android {
 
     namespace "ttlock.example"
     defaultConfig {
-        applicationId "ttlock.example"
+        applicationId "com.justfor.test"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

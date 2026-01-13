@@ -60,6 +60,7 @@ android {
         "generated/java",
         "generated/jni"
       ]
+      jniLibs.srcDirs = ['libs']
     }
   }
 }
@@ -67,6 +68,9 @@ android {
 repositories {
   mavenCentral()
   google()
+  flatDir {
+    dirs 'libs'
+  }
 }
 
 def kotlin_version = getExtOrDefault("kotlinVersion")
@@ -75,7 +79,6 @@ dependencies {
   implementation 'com.facebook.react:react-native:0.81.0'
   implementation "com.facebook.react:react-android"
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-  implementation 'com.ttlock:ttlock:3.5.5'
-//  implementation(name: 'ttlock-release', ext: 'aar')
+  implementation(name: 'TTLockOnPremise', ext: 'aar')
   implementation 'com.google.code.gson:gson:2.6.1'
 }

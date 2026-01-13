@@ -788,7 +788,7 @@ public class TtlockModule extends NativeTtlockSpec {
         }
         PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
           if (success) {
-            TTLockClient.getDefault().resetLock(lockData, null, new ResetLockCallback() {
+            TTLockClient.getDefault().resetLock(lockData, new ResetLockCallback() {
               @Override
               public void onResetLockSuccess() {
                 successCallback.invoke();
@@ -813,7 +813,7 @@ public class TtlockModule extends NativeTtlockSpec {
         }
         PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
           if (success) {
-            TTLockClient.getDefault().resetEkey(lockData, null, new ResetKeyCallback() {
+            TTLockClient.getDefault().resetEkey(lockData, new ResetKeyCallback() {
               @Override
               public void onResetKeySuccess(String lockData) {
                 successCallback.invoke(lockData);
@@ -838,7 +838,7 @@ public class TtlockModule extends NativeTtlockSpec {
         }
         PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
           if (success) {
-            TTLockClient.getDefault().controlLock(RNControlAction.RN2Native(controlAction), lockData, null, new ControlLockCallback() {
+            TTLockClient.getDefault().controlLock(RNControlAction.RN2Native(controlAction), lockData, new ControlLockCallback() {
               @Override
               public void onControlLockSuccess(ControlLockResult controlLockResult) {
                 WritableArray writableArray = Arguments.createArray();
@@ -869,7 +869,7 @@ public class TtlockModule extends NativeTtlockSpec {
         LogUtil.d("startDate:" + startDate);
         PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
           if (success) {
-            TTLockClient.getDefault().createCustomPasscode(passcode, (long)startDate, (long)endDate, lockData, null, new CreateCustomPasscodeCallback() {
+            TTLockClient.getDefault().createCustomPasscode(passcode, (long)startDate, (long)endDate, lockData, new CreateCustomPasscodeCallback() {
               @Override
               public void onCreateCustomPasscodeSuccess(String passcode) {
                 successCallback.invoke();
@@ -911,7 +911,7 @@ public class TtlockModule extends NativeTtlockSpec {
         }
         PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
           if (success) {
-            TTLockClient.getDefault().modifyPasscode(passcodeOrigin, passcodeNew, (long)startDate, (long)endDate, lockData, null, new ModifyPasscodeCallback() {
+            TTLockClient.getDefault().modifyPasscode(passcodeOrigin, passcodeNew, (long)startDate, (long)endDate, lockData, new ModifyPasscodeCallback() {
               @Override
               public void onModifyPasscodeSuccess() {
                 successCallback.invoke();
@@ -936,7 +936,7 @@ public class TtlockModule extends NativeTtlockSpec {
         }
         PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
           if (success) {
-            TTLockClient.getDefault().deletePasscode(passcode, lockData, null, new DeletePasscodeCallback() {
+            TTLockClient.getDefault().deletePasscode(passcode, lockData, new DeletePasscodeCallback() {
               @Override
               public void onDeletePasscodeSuccess() {
                 successCallback.invoke();
@@ -961,7 +961,7 @@ public class TtlockModule extends NativeTtlockSpec {
         }
         PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
           if (success) {
-            TTLockClient.getDefault().resetPasscode(lockData, null, new ResetPasscodeCallback() {
+            TTLockClient.getDefault().resetPasscode(lockData, new ResetPasscodeCallback() {
               @Override
               public void onResetPasscodeSuccess(String lockData) {
                 successCallback.invoke(lockData);
@@ -986,7 +986,7 @@ public class TtlockModule extends NativeTtlockSpec {
         }
         PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
           if (success) {
-            TTLockClient.getDefault().getLockStatus(lockData, null, new GetLockStatusCallback() {
+            TTLockClient.getDefault().getLockStatus(lockData, new GetLockStatusCallback() {
               @Override
               public void onGetLockStatusSuccess(int status) {
                 successCallback.invoke(status);
@@ -1062,7 +1062,7 @@ public class TtlockModule extends NativeTtlockSpec {
   private void recoverLockData(String recoveryDataJson, double recoveryType, String lockData, Callback successCallback, Callback fail) {
     PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
       if (success) {
-        TTLockClient.getDefault().recoverLockData(recoveryDataJson, (int) recoveryType, lockData, null, new RecoverLockDataCallback() {
+        TTLockClient.getDefault().recoverLockData(recoveryDataJson, (int) recoveryType, lockData, new RecoverLockDataCallback() {
           @Override
           public void onRecoveryDataSuccess(int type) {
             successCallback.invoke();
@@ -1119,7 +1119,7 @@ public class TtlockModule extends NativeTtlockSpec {
         }
         PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
           if (success) {
-            TTLockClient.getDefault().deleteICCard(cardNumber, lockData, null, new DeleteICCardCallback() {
+            TTLockClient.getDefault().deleteICCard(cardNumber, lockData, new DeleteICCardCallback() {
               @Override
               public void onDeleteICCardSuccess() {
                 successCallback.invoke();
@@ -1140,7 +1140,7 @@ public class TtlockModule extends NativeTtlockSpec {
     public void clearAllCards(String lockData, Callback successCallback, Callback fail) {
       PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
         if (success) {
-          TTLockClient.getDefault().clearAllICCard(lockData, null, new ClearAllICCardCallback() {
+          TTLockClient.getDefault().clearAllICCard(lockData, new ClearAllICCardCallback() {
             @Override
             public void onClearAllICCardSuccess() {
               successCallback.invoke();
@@ -1243,7 +1243,7 @@ public class TtlockModule extends NativeTtlockSpec {
         }
         PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
           if (success) {
-            TTLockClient.getDefault().deleteFingerprint(fingerprintNumber, lockData, null, new DeleteFingerprintCallback() {
+            TTLockClient.getDefault().deleteFingerprint(fingerprintNumber, lockData, new DeleteFingerprintCallback() {
               @Override
               public void onDeleteFingerprintSuccess() {
                 successCallback.invoke();
@@ -1264,7 +1264,7 @@ public class TtlockModule extends NativeTtlockSpec {
     public void clearAllFingerprints(String lockData, Callback successCallback, Callback fail) {
       PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
         if (success) {
-          TTLockClient.getDefault().clearAllFingerprints(lockData, null, new ClearAllFingerprintCallback() {
+          TTLockClient.getDefault().clearAllFingerprints(lockData, new ClearAllFingerprintCallback() {
             @Override
             public void onClearAllFingerprintSuccess() {
               successCallback.invoke();
@@ -1289,7 +1289,7 @@ public class TtlockModule extends NativeTtlockSpec {
         }
         PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
           if (success) {
-            TTLockClient.getDefault().modifyAdminPasscode(adminPasscode, lockData, null, new ModifyAdminPasscodeCallback() {
+            TTLockClient.getDefault().modifyAdminPasscode(adminPasscode, lockData, new ModifyAdminPasscodeCallback() {
               @Override
               public void onModifyAdminPasscodeSuccess(String passcode) {
                 successCallback.invoke(passcode);
@@ -1310,7 +1310,7 @@ public class TtlockModule extends NativeTtlockSpec {
     public void setLockTime(double timestamp, String lockData, Callback successCallback, Callback fail) {
       PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
         if (success) {
-          TTLockClient.getDefault().setLockTime((long) timestamp, lockData, null, new SetLockTimeCallback() {
+          TTLockClient.getDefault().setLockTime((long) timestamp, lockData, new SetLockTimeCallback() {
             @Override
             public void onSetTimeSuccess() {
               successCallback.invoke();
@@ -1331,7 +1331,7 @@ public class TtlockModule extends NativeTtlockSpec {
     public void getLockTime(String lockData, Callback successCallback, Callback fail) {
       PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
         if (success) {
-          TTLockClient.getDefault().getLockTime(lockData, null, new GetLockTimeCallback() {
+          TTLockClient.getDefault().getLockTime(lockData, new GetLockTimeCallback() {
             @Override
             public void onGetLockTimeSuccess(long lockTimestamp) {
               successCallback.invoke(String.valueOf(lockTimestamp));
@@ -1352,7 +1352,7 @@ public class TtlockModule extends NativeTtlockSpec {
     public void getLockOperationRecord(double type, String lockData, Callback successCallback, Callback fail) {
       PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
         if (success) {
-          TTLockClient.getDefault().getOperationLog(((int) type) == 0 ? LogType.NEW : LogType.ALL, lockData, null, new GetOperationLogCallback() {
+          TTLockClient.getDefault().getOperationLog(((int) type) == 0 ? LogType.NEW : LogType.ALL, lockData, new GetOperationLogCallback() {
             @Override
             public void onGetLogSuccess(String log) {
               successCallback.invoke(log);
@@ -1398,7 +1398,7 @@ public class TtlockModule extends NativeTtlockSpec {
     public void setLockAutomaticLockingPeriodicTime(double seconds, String lockData, Callback successCallback, Callback fail) {
       PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
         if (success) {
-          TTLockClient.getDefault().setAutomaticLockingPeriod((int) seconds, lockData, null, new SetAutoLockingPeriodCallback() {
+          TTLockClient.getDefault().setAutomaticLockingPeriod((int) seconds, lockData, new SetAutoLockingPeriodCallback() {
             @Override
             public void onSetAutoLockingPeriodSuccess() {
               successCallback.invoke();
@@ -1419,7 +1419,7 @@ public class TtlockModule extends NativeTtlockSpec {
     public void getLockRemoteUnlockSwitchState(String lockData, Callback successCallback, Callback fail) {
       PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
         if (success) {
-          TTLockClient.getDefault().getRemoteUnlockSwitchState(lockData, null, new GetRemoteUnlockStateCallback() {
+          TTLockClient.getDefault().getRemoteUnlockSwitchState(lockData, new GetRemoteUnlockStateCallback() {
             @Override
             public void onGetRemoteUnlockSwitchStateSuccess(boolean enabled) {
               successCallback.invoke(enabled);
@@ -1440,7 +1440,7 @@ public class TtlockModule extends NativeTtlockSpec {
     public void setLockRemoteUnlockSwitchState(boolean isOn, String lockData, Callback successCallback, Callback fail) {
       PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
         if (success) {
-          TTLockClient.getDefault().setRemoteUnlockSwitchState(isOn, lockData, null, new SetRemoteUnlockSwitchCallback() {
+          TTLockClient.getDefault().setRemoteUnlockSwitchState(isOn, lockData, new SetRemoteUnlockSwitchCallback() {
             @Override
             public void onSetRemoteUnlockSwitchSuccess(String lockData) {
               successCallback.invoke(lockData);
@@ -1525,7 +1525,7 @@ public class TtlockModule extends NativeTtlockSpec {
 //
 //          LogUtil.d("weekdays:" + passageModeConfig.getRepeatWeekOrDays());
 //
-//          TTLockClient.getDefault().setPassageMode(passageModeConfig, lockData, null, new SetPassageModeCallback() {
+//          TTLockClient.getDefault().setPassageMode(passageModeConfig, lockData, new SetPassageModeCallback() {
 //            @Override
 //            public void onSetPassageModeSuccess() {
 //              successCallback.invoke();
@@ -1546,7 +1546,7 @@ public class TtlockModule extends NativeTtlockSpec {
     public void clearAllPassageModes(String lockData, Callback successCallback, Callback fail) {
       PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
         if (success) {
-          TTLockClient.getDefault().clearPassageMode(lockData, null, new ClearPassageModeCallback() {
+          TTLockClient.getDefault().clearPassageMode(lockData, new ClearPassageModeCallback() {
             @Override
             public void onClearPassageModeSuccess() {
               successCallback.invoke();
@@ -1838,7 +1838,7 @@ public class TtlockModule extends NativeTtlockSpec {
   public void getLockElectricQuantity(String lockData, Callback successCallback, Callback fail) {
     PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
       if (success) {
-        TTLockClient.getDefault().getBatteryLevel(lockData, null, new GetBatteryLevelCallback() {
+        TTLockClient.getDefault().getBatteryLevel(lockData, new GetBatteryLevelCallback() {
           @Override
           public void onGetBatteryLevelSuccess(int battery) {
             successCallback.invoke(battery);
@@ -2279,7 +2279,7 @@ public class TtlockModule extends NativeTtlockSpec {
   public void getLockSystem(String lockData, Callback successCallback, Callback fail) {
     PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
       if (success) {
-        TTLockClient.getDefault().getLockSystemInfo(lockData, null, new GetLockSystemInfoCallback() {
+        TTLockClient.getDefault().getLockSystemInfo(lockData, new GetLockSystemInfoCallback() {
           @Override
           public void onGetLockSystemInfoSuccess(com.ttlock.bl.sdk.entity.DeviceInfo deviceInfo) {
             WritableMap map = Arguments.createMap();
@@ -2376,7 +2376,7 @@ public class TtlockModule extends NativeTtlockSpec {
               list.add(Integer.valueOf(s));
             }
         }
-        TTLockClient.getDefault().activateLiftFloors(list, 0, lockData, new ActivateLiftFloorsCallback() {
+        TTLockClient.getDefault().activateLiftFloors(list, 0L, lockData, new ActivateLiftFloorsCallback() {
           @Override
           public void onActivateLiftFloorsSuccess(ActivateLiftFloorsResult activateLiftFloorsResult) {
             WritableArray writableArray = Arguments.createArray();

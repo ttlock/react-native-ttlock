@@ -18,4 +18,14 @@ buildscript {
     }
 }
 
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        flatDir {
+            dirs "${rootDir}/../../android/libs"
+        }
+    }
+}
+
 apply plugin: "com.facebook.react.rootproject"
