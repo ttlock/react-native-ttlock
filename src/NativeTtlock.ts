@@ -156,7 +156,7 @@ interface Spec extends TurboModule {
     clearFace(lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) : void;
     activateLiftFloors(floors: string, lockData: string, success: null | ((dataArray: any[]) => void), fail: null | ((errorCode: number, description: string) => void)) : void;
     setLiftControlEnableFloors(floors: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) : void;
-    setLiftWorkMode(workMode: Object, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) : void;
+    setLiftWorkMode(workMode: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) : void;
     supportFunction(lockFunction: number, lockData: string, callback: (isSupport: boolean) => void) : void;
 
 

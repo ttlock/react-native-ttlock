@@ -2420,32 +2420,32 @@ public class TtlockModule extends NativeTtlockSpec {
 
   //todo:
   @ReactMethod
-  public void setLiftWorkMode(ReadableMap workMode, String lockData, Callback successCallback, Callback fail) {
-//    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
-//      if (success) {
-////        enum LiftWorkMode {
-////          ACTIVATE_ALL_FLOORS = 0,
-////          ACTIVATE_SPECIFIC_FLOORS = 1
-////        }
-//        TTLiftWorkMode liftWorkMode = TTLiftWorkMode.ActivateAllFloors;
-//        if (workMode == 1) {
-//          liftWorkMode = TTLiftWorkMode.ActivateSpecificFloors;
+  public void setLiftWorkMode(double workMode, String lockData, Callback successCallback, Callback fail) {
+    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+      if (success) {
+//        enum LiftWorkMode {
+//          ACTIVATE_ALL_FLOORS = 0,
+//          ACTIVATE_SPECIFIC_FLOORS = 1
 //        }
-//        TTLockClient.getDefault().setLiftWorkMode(liftWorkMode, lockData, new SetLiftWorkModeCallback() {
-//          @Override
-//          public void onSetLiftWorkModeSuccess() {
-//            successCallback.invoke();
-//          }
-//
-//          @Override
-//          public void onFail(LockError lockError) {
-//            lockErrorCallback(lockError, fail);
-//          }
-//        });
-//      } else {
-//        noPermissionCallback(fail);
-//      }
-//    });
+        TTLiftWorkMode liftWorkMode = TTLiftWorkMode.ActivateAllFloors;
+        if ((int)workMode == 1) {
+          liftWorkMode = TTLiftWorkMode.ActivateSpecificFloors;
+        }
+        TTLockClient.getDefault().setLiftWorkMode(liftWorkMode, lockData, new SetLiftWorkModeCallback() {
+          @Override
+          public void onSetLiftWorkModeSuccess() {
+            successCallback.invoke();
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            lockErrorCallback(lockError, fail);
+          }
+        });
+      } else {
+        noPermissionCallback(fail);
+      }
+    });
   }
 
     @ReactMethod
