@@ -282,7 +282,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = ttlock.example;
+				PRODUCT_BUNDLE_IDENTIFIER = com.justfor.test;
 				PRODUCT_NAME = TtlockExample;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;

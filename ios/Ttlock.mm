@@ -1,5 +1,5 @@
 #import "Ttlock.h"
-#import <TTLock/TTLock.h>
+#import <TTLockOnPremise/TTLock.h>
 #import <objc/message.h>
 
 
@@ -350,11 +350,11 @@ RCT_EXPORT_METHOD(clearAllFingerprints:(NSString *)lockData success:(RCTResponse
 
 RCT_EXPORT_METHOD(modifyAdminPasscode:(NSString *)adminPasscode  lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
-    [TTLock modifyAdminPasscode:adminPasscode lockData:lockData success:^{
-        [Ttlock reseponseSuccess:nil success:success];
-    } failure:^(TTError errorCode, NSString *errorMsg) {
-        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
-    }];
+  [TTLock modifyAdminPasscode:adminPasscode lockData:lockData success:^(NSString *lockData) {
+    [Ttlock reseponseSuccess:nil success:success];
+} failure:^(TTError errorCode, NSString *errorMsg) {
+    [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+}];
 }
 
 
