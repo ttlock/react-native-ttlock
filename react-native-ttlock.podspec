@@ -20,7 +20,7 @@ Pod::Spec.new do |s|
 
   #TTLock 依赖
   s.platform = :ios, '10.0'
-  s.dependency 'TTLock', '3.5.4'
+  s.dependency 'TTLock', '3.6.0'
   s.static_framework = true
 
 

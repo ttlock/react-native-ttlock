@@ -8,6 +8,7 @@
 # VSCode
 .vscode/
 jsconfig.json
+.yarn
 
 # Xcode
 #
@@ -63,3 +64,4 @@ example/ios/Podfile.lock
 yarn.lock
 example/ios/Podfile.lock
 example/yarn.lock
+example/vendor/bundle
