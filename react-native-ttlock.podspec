@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
 
 
 #TTLock 依赖
-  s.dependency 'TTLock', '3.4.8'
+  s.dependency 'TTLock', '3.6.0'
 
 
   install_modules_dependencies(s)
