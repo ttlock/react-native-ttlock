@@ -802,12 +802,14 @@ RCT_EXPORT_METHOD(initGateway:(NSDictionary *)dict success:(RCTResponseSenderBlo
     paramDict[@"SSID"] = dict[@"wifi"];
     paramDict[@"wifiPwd"] = dict[@"wifiPassword"];
     paramDict[@"uid"] = dict[@"ttlockUid"];
-    paramDict[@"userPwd"] = dict[@"ttLockLoginPassword"];
+    paramDict[@"userPwd"] = dict[@"ttlockLoginPassword"];
     paramDict[@"gatewayName"] = dict[@"gatewayName"];
     paramDict[@"serverAddress"] = dict[@"serverIp"];
     paramDict[@"portNumber"] = dict[@"serverPort"];
     paramDict[@"gatewayVersion"] = @(gatewayType);
-    if (gatewayType == TTGateWayTypeG3 || gatewayType == TTGateWayTypeG4) {
+    
+    NSString  *wifiPwd = paramDict[@"wifiPwd"];
+    if (wifiPwd == nil || [wifiPwd length] == 0) {
         paramDict[@"SSID"] = @"1";
         paramDict[@"wifiPwd"] = @"1";
     }
