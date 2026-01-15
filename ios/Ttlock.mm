@@ -801,8 +801,8 @@ RCT_EXPORT_METHOD(initGateway:(NSDictionary *)dict success:(RCTResponseSenderBlo
     NSMutableDictionary *paramDict = @{}.mutableCopy;
     paramDict[@"SSID"] = dict[@"wifi"];
     paramDict[@"wifiPwd"] = dict[@"wifiPassword"];
-    paramDict[@"uid"] = dict[@"ttLockUid"];
-    paramDict[@"userPwd"] = dict[@"ttLockLoginPassword"];
+    paramDict[@"uid"] = dict[@"ttLockUid"] == nil ? dict[@"ttlockUid"] : dict[@"ttLockUid"];
+    paramDict[@"userPwd"] = dict[@"ttLockLoginPassword"] == nil ? dict[@"ttlockLoginPassword"] : dict[@"ttLockLoginPassword"];
     paramDict[@"gatewayName"] = dict[@"gatewayName"];
     paramDict[@"serverAddress"] = dict[@"serverIp"];
     paramDict[@"portNumber"] = dict[@"serverPort"];
