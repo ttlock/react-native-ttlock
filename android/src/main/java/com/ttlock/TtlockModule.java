@@ -669,7 +669,12 @@ public class TtlockModule extends NativeTtlockSpec {
                 gatewayInfo.ssid = readableMap.getString(TTGatewayFieldConstant.WIFI);
                 gatewayInfo.wifiPwd = readableMap.getString(TTGatewayFieldConstant.WIFI_PASSWORD);
             }
-            gatewayInfo.uid = readableMap.getInt(TTGatewayFieldConstant.TTLOCK_UID);
+            // 兼容 ttLockUid 和 ttlockUid 两种字段名
+            if (readableMap.hasKey(TTGatewayFieldConstant.TTLOCK_UID)) {
+                gatewayInfo.uid = readableMap.getInt(TTGatewayFieldConstant.TTLOCK_UID);
+            } else if (readableMap.hasKey("ttlockUid")) {
+                gatewayInfo.uid = readableMap.getInt("ttlockUid");
+            }
             gatewayInfo.userPwd = readableMap.getString(TTGatewayFieldConstant.TTLOCK_LOGIN_PASSWORD);
             if (readableMap.hasKey(TTGatewayFieldConstant.IP_SETTING_TYPE)) {
               int ipSettingType = readableMap.getInt(TTGatewayFieldConstant.IP_SETTING_TYPE);
