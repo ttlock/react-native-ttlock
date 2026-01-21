@@ -5,6 +5,8 @@ import android.os.Bundle;
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactInstanceManager;
 import com.reactnativettlock.TtlockModule;
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.WritableArray;
 
 public class MainActivity extends ReactActivity {
   /**
@@ -27,7 +29,18 @@ public class MainActivity extends ReactActivity {
     ReactInstanceManager mReactInstanceManager = getReactNativeHost().getReactInstanceManager();
 
     TtlockModule ttlockModule = mReactInstanceManager.getCurrentReactContext().getNativeModule(TtlockModule.class);
-    ttlockModule.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    WritableArray permissionsArray = Arguments.createArray();
+    for (String permission : permissions) {
+      permissionsArray.pushString(permission);
+    }
+    
+    // Convert int[] to WritableArray for Turbo Module compatibilityAdd commentMore actions
+    WritableArray grantResultsArray = Arguments.createArray();
+    for (int result : grantResults) {
+      grantResultsArray.pushInt(result);
+    }
+    
+    ttlockModule.onRequestPermissionsResult(requestCode, permissionsArray, grantResults);
   }
 
 }
