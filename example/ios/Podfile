@@ -33,5 +33,15 @@ target 'TtlockExample' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+
+  
+    # Xcode 26 toolchain has compatibility issues when fmt is compiled as C++20.
+    installer.pods_project.targets.each do |target|
+      next unless target.name == 'fmt'
+
+      target.build_configurations.each do |build_config|
+        build_config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'gnu++17'
+      end
+    end 
   end
 end
