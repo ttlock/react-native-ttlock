@@ -400,7 +400,7 @@ Ttlock.scanWifi(lockData, (isFinished: boolean, wifiList: []) => {
 
 ``` js
 const wifiName = 'sciener'
-const wifiPassword = 'sciener.com'
+const wifiPassword = 'xxxxxx'
 Ttlock.configWifi(wifiName, wifiPassword, lockData, () => {
       let text = "config lock wifi success";
 
