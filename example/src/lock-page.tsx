@@ -398,11 +398,11 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
       successCallback("Get all valid palm veins success: " + data);
     }, failedCallback);
   }
-  else if (lockOperation === "Get all valid QR codes") {
-    Ttlock.getAllValidQRCodes(lockData, (data: string) => {
-      successCallback("Get all valid QR codes success: " + data);
-    }, failedCallback);
-  }
+  // else if (lockOperation === "Get all valid QR codes") {
+  //   Ttlock.getAllValidQRCodes(lockData, (data: string) => {
+  //     successCallback("Get all valid QR codes success: " + data);
+  //   }, failedCallback);
+  // }
 
   else if (lockOperation === "Get lock automatic locking periodic time") {
     Ttlock.getLockAutomaticLockingPeriodicTime(lockData, (currentTime: number, maxTime: number, minTime: number) => {
