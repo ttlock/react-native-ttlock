@@ -580,7 +580,7 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
     }, failedCallback)
   }
   else if (lockOperation === "Wifi lock config server") {
-    Ttlock.configServer("121.196.45.100", "4999", lockData, () => {
+    Ttlock.configServer("121.196.45.xxxx", "xx99", lockData, () => {
       let text = "config lock wifi ip address success";
       successCallback(text);
     }, failedCallback)
