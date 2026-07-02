@@ -22,6 +22,11 @@ public class TTLockFieldConstant {
 
     public static final String LOCK_DATA = "lockData";
 
+    // 未授权报警字段 / unauthorized attempt alert fields
+    public static final String ATTEMPT_ALERT_COUNT = "attemptAlertCount";
+    public static final String LOCKOUT_DURATION = "lockoutDuration";
+    public static final String UNLOCK_MODES = "unlockModes";
+
 //    public static final String ERROR_CODE = "errorCode";
 //    public static final String DESCRIPTION = "description";
 //    public static final String ERROR_DESCRIPTION = "errorDesc";

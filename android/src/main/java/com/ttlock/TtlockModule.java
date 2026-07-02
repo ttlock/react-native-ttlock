@@ -30,6 +30,7 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.Arguments;
 import com.reactnativettlock.model.IpSettingConverter;
+import com.reactnativettlock.model.PowerSaverWorkModeConverter;
 import com.reactnativettlock.model.RNControlAction;
 import com.reactnativettlock.model.ScanRemoteModal;
 import com.reactnativettlock.model.TTBaseFieldConstant;
@@ -49,6 +50,7 @@ import com.reactnativettlock.model.TTLockFieldConstant;
 import com.reactnativettlock.model.TTRemoteEvent;
 import com.reactnativettlock.model.TTRemoteFieldConstant;
 import com.reactnativettlock.model.TTRemoteKeyErrorConverter;
+import com.reactnativettlock.model.UnlockModeConverter;
 import com.reactnativettlock.util.PermissionUtils;
 import com.reactnativettlock.util.Utils;
 import com.ttlock.bl.sdk.api.ExtendedBluetoothDevice;
@@ -120,6 +122,11 @@ import com.ttlock.bl.sdk.callback.SetLockTimeCallback;
 import com.ttlock.bl.sdk.callback.SetPassageModeCallback;
 import com.ttlock.bl.sdk.callback.SetRemoteUnlockSwitchCallback;
 import com.ttlock.bl.sdk.callback.SetUnlockDirectionCallback;
+// power saver & unauthorized attempt alert callbacks
+import com.ttlock.bl.sdk.callback.GetUnauthorizedAttemptAlertCallback;
+import com.ttlock.bl.sdk.callback.SetPowerSaverControlableLockCallback;
+import com.ttlock.bl.sdk.callback.SetPowerSaverWorkModeCallback;
+import com.ttlock.bl.sdk.callback.SetUnauthorizedAttemptAlertCallback;
 import com.ttlock.bl.sdk.constant.LogType;
 import com.ttlock.bl.sdk.constant.RecoveryData;
 import com.ttlock.bl.sdk.device.Remote;
@@ -142,6 +149,10 @@ import com.ttlock.bl.sdk.entity.TTLockConfigType;
 import com.ttlock.bl.sdk.entity.UnlockDirection;
 import com.ttlock.bl.sdk.entity.ValidityInfo;
 import com.ttlock.bl.sdk.entity.WifiLockInfo;
+// power saver & unauthorized attempt alert entities
+import com.ttlock.bl.sdk.entity.PowerSaverWorkMode;
+import com.ttlock.bl.sdk.entity.UnauthorizedAttemptAlertData;
+import com.ttlock.bl.sdk.entity.UnlockMode;
 import com.ttlock.bl.sdk.gateway.api.GatewayClient;
 import com.ttlock.bl.sdk.gateway.callback.ConfigIpCallback;
 import com.ttlock.bl.sdk.gateway.callback.ConnectCallback;
@@ -2441,6 +2452,143 @@ public class TtlockModule extends NativeTtlockSpec {
           @Override
           public void onSetLiftWorkModeSuccess() {
             successCallback.invoke();
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            lockErrorCallback(lockError, fail);
+          }
+        });
+      } else {
+        noPermissionCallback(fail);
+      }
+    });
+  }
+
+  // 设置省电取电方式（单个）/ Set power saver work mode (single).
+  @ReactMethod
+  public void setPowerSaverWorkMode(double powerSaverWorkMode, String lockData, Callback successCallback, Callback fail) {
+    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+      if (success) {
+        PowerSaverWorkMode workMode = PowerSaverWorkModeConverter.RN2Native(powerSaverWorkMode);
+        TTLockClient.getDefault().setPowerSaverWorkMode(workMode, lockData, new SetPowerSaverWorkModeCallback() {
+          @Override
+          public void onSetPowerSaverWorkModeSuccess() {
+            successCallback.invoke();
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            lockErrorCallback(lockError, fail);
+          }
+        });
+      } else {
+        noPermissionCallback(fail);
+      }
+    });
+  }
+
+  // 设置省电取电方式（多个，空列表表示关闭）/ Set power saver work modes (empty list disables all).
+  @ReactMethod
+  public void setPowerSaverWorkModes(ReadableArray powerSaverWorkModes, String lockData, Callback successCallback, Callback fail) {
+    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+      if (success) {
+        List<PowerSaverWorkMode> workModeList = new ArrayList<>();
+        for (int i = 0; i < powerSaverWorkModes.size(); i++) {
+          PowerSaverWorkMode workMode = PowerSaverWorkModeConverter.RN2Native(powerSaverWorkModes.getInt(i));
+          if (workMode != null) {
+            workModeList.add(workMode);
+          }
+        }
+        TTLockClient.getDefault().setPowerSaverWorkModes(workModeList, lockData, new SetPowerSaverWorkModeCallback() {
+          @Override
+          public void onSetPowerSaverWorkModeSuccess() {
+            successCallback.invoke();
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            lockErrorCallback(lockError, fail);
+          }
+        });
+      } else {
+        noPermissionCallback(fail);
+      }
+    });
+  }
+
+  // 设置省电关联的可控锁（controlableLockMac 空串表示取消关联）/ Set power saver controlable lock (empty mac means disassociate).
+  @ReactMethod
+  public void setPowerSaverControlableLock(String controlableLockMac, String lockData, Callback successCallback, Callback fail) {
+    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+      if (success) {
+        TTLockClient.getDefault().setPowerSaverControlableLock(controlableLockMac, lockData, new SetPowerSaverControlableLockCallback() {
+          @Override
+          public void onSetPowerSaverControlableLockSuccess() {
+            successCallback.invoke();
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            lockErrorCallback(lockError, fail);
+          }
+        });
+      } else {
+        noPermissionCallback(fail);
+      }
+    });
+  }
+
+  // 设置未授权报警（attemptAlertCount 传 0 关闭）/ Set unauthorized attempt alert (attemptAlertCount=0 disables).
+  @ReactMethod
+  public void setUnauthorizedAttemptAlert(double attemptAlertCount, double lockoutDuration, ReadableArray unlockModes, String lockData, Callback successCallback, Callback fail) {
+    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+      if (success) {
+        List<UnlockMode> unlockModeList = new ArrayList<>();
+        for (int i = 0; i < unlockModes.size(); i++) {
+          UnlockMode mode = UnlockModeConverter.RN2Native(unlockModes.getInt(i));
+          if (mode != null) {
+            unlockModeList.add(mode);
+          }
+        }
+        UnauthorizedAttemptAlertData alertData = new UnauthorizedAttemptAlertData(
+            (int) attemptAlertCount, (int) lockoutDuration, unlockModeList);
+        TTLockClient.getDefault().setUnauthorizedAttemptAlert(alertData, lockData, new SetUnauthorizedAttemptAlertCallback() {
+          @Override
+          public void onSetSuccess() {
+            successCallback.invoke();
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            lockErrorCallback(lockError, fail);
+          }
+        });
+      } else {
+        noPermissionCallback(fail);
+      }
+    });
+  }
+
+  // 获取未授权报警配置 / Get unauthorized attempt alert config.
+  @ReactMethod
+  public void getUnauthorizedAttemptAlert(String lockData, Callback successCallback, Callback fail) {
+    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+      if (success) {
+        TTLockClient.getDefault().getUnauthorizedAttemptAlert(lockData, new GetUnauthorizedAttemptAlertCallback() {
+          @Override
+          public void onGetSuccess(UnauthorizedAttemptAlertData data) {
+            WritableMap map = Arguments.createMap();
+            map.putInt(TTLockFieldConstant.ATTEMPT_ALERT_COUNT, data.getAttemptAlertCount());
+            map.putInt(TTLockFieldConstant.LOCKOUT_DURATION, data.getLockoutDuration());
+            WritableArray modeArray = Arguments.createArray();
+            if (data.getUnlockModes() != null) {
+              for (UnlockMode mode : data.getUnlockModes()) {
+                modeArray.pushInt(UnlockModeConverter.native2RN(mode));
+              }
+            }
+            map.putArray(TTLockFieldConstant.UNLOCK_MODES, modeArray);
+            successCallback.invoke(map);
           }
 
           @Override
