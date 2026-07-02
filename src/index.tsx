@@ -759,6 +759,76 @@ export class Ttlock {
     NativeTTLock.setLiftWorkMode(workMode, lockData, success, fail);
   }
 
+  /**
+   * Set power saver work mode (single).
+   * @param powerSaverWorkMode power saver work mode
+   * @param lockData
+   * @param success
+   * @param fail
+   */
+  static setPowerSaverWorkMode(powerSaverWorkMode: PowerSaverWorkMode, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    NativeTTLock.setPowerSaverWorkMode(powerSaverWorkMode, lockData, success, fail);
+  }
+
+  /**
+   * Set power saver work modes (empty array disables all).
+   * @param powerSaverWorkModes power saver work mode list
+   * @param lockData
+   * @param success
+   * @param fail
+   */
+  static setPowerSaverWorkModes(powerSaverWorkModes: PowerSaverWorkMode[], lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    NativeTTLock.setPowerSaverWorkModes(powerSaverWorkModes, lockData, success, fail);
+  }
+
+  /**
+   * Set power saver controlable lock (empty mac means disassociate).
+   * @param controlableLockMac controlable lock mac
+   * @param lockData
+   * @param success
+   * @param fail
+   */
+  static setPowerSaverControlableLock(controlableLockMac: string, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    NativeTTLock.setPowerSaverControlableLock(controlableLockMac, lockData, success, fail);
+  }
+
+  /**
+   * Set unauthorized attempt alert. The lock locks for `lockoutDuration` seconds
+   * after `attemptAlertCount` failed unlocks of the given unlock modes;
+   * `attemptAlertCount=0` disables the feature.
+   * @param attemptAlertCount max failed attempts (0~50, 0=disable)
+   * @param lockoutDuration lockout duration in seconds (0~900)
+   * @param unlockModes unlock modes that trigger lockout
+   * @param lockData
+   * @param success
+   * @param fail
+   */
+  static setUnauthorizedAttemptAlert(attemptAlertCount: number, lockoutDuration: number, unlockModes: UnlockMode[], lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    NativeTTLock.setUnauthorizedAttemptAlert(attemptAlertCount, lockoutDuration, unlockModes, lockData, success, fail);
+  }
+
+  /**
+   * Get unauthorized attempt alert config.
+   * @param lockData
+   * @param success returns { attemptAlertCount, lockoutDuration, unlockModes }
+   * @param fail
+   */
+  static getUnauthorizedAttemptAlert(lockData: string, success: null | ((alert: UnauthorizedAttemptAlert) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    NativeTTLock.getUnauthorizedAttemptAlert(lockData, (data: Object) => {
+      success!(data as UnauthorizedAttemptAlert);
+    }, fail);
+  }
+
     static supportFunction(lockFunction: LockFunction, lockData: string, callback: (isSupport: boolean) => void) {
     NativeTTLock.supportFunction(lockFunction, lockData, callback);
   }
@@ -1294,6 +1364,32 @@ export enum GatewayIpSettingType {
 export enum LiftWorkMode {
   ACTIVATE_ALL_FLOORS = 0,
   ACTIVATE_SPECIFIC_FLOORS = 1
+}
+
+export enum PowerSaverWorkMode {
+  ALL_CARDS = 0,
+  ID_CARD = 1,
+  HOTEL_CARD = 2,
+  ROOM_CARD = 3,
+  AUTO_GET_POWER = 4
+}
+
+export enum UnlockMode {
+  FINGERPRINT = 0,
+  CARD = 1,
+  PASSCODE = 2
+}
+
+/**
+ * Unauthorized attempt alert config.
+ */
+export interface UnauthorizedAttemptAlert {
+  /** Max failed attempts (0~50; 0 means disabled). */
+  attemptAlertCount: number;
+  /** Lockout duration in seconds (0~900). */
+  lockoutDuration: number;
+  /** Unlock modes that trigger lockout (values of the UnlockMode enum). */
+  unlockModes: number[];
 }
 
 
