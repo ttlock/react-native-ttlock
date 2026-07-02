@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { Ttlock, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, LockSoundVolume, LockUnlockDirection, type WifiLockServerInfo, type DeviceSystemModal, FaceState, FaceErrorCode, LockErrorCode, LiftWorkMode } from 'react-native-ttlock';
+import { Ttlock, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, LockSoundVolume, LockUnlockDirection, type WifiLockServerInfo, type DeviceSystemModal, FaceState, FaceErrorCode, LockErrorCode, LiftWorkMode, PowerSaverWorkMode, UnlockMode } from 'react-native-ttlock';
 import * as Toast from './toast-page';
 
 const getLockSupportOperationList = (lockData: string) => {
@@ -95,6 +95,11 @@ const getLockSupportOperationList = (lockData: string) => {
     { lockOperation: "Activate lift floors", lockFunctionValue: null },
     { lockOperation: "Set lift control enable floors", lockFunctionValue: null },
     { lockOperation: "Set lift work mode", lockFunctionValue: null },
+    { lockOperation: "Set power saver work mode", lockFunctionValue: null },
+    { lockOperation: "Set power saver work modes", lockFunctionValue: null },
+    { lockOperation: "Set power saver controlable lock", lockFunctionValue: null },
+    { lockOperation: "Set unauthorized attempt alert", lockFunctionValue: null },
+    { lockOperation: "Get unauthorized attempt alert", lockFunctionValue: null },
 
 //     { lockOperation: "Lock upgrade", lockFuctionValue: null }
   ]
@@ -657,6 +662,41 @@ else if (lockOperation === "Set lift control enable floors") {
 else if (lockOperation === "Set lift work mode") {
     Ttlock.setLiftWorkMode(LiftWorkMode.ACTIVATE_SPECIFIC_FLOORS ,lockData, () => {
       let text = "Set lift work mode success";
+      successCallback(text);
+    }, failedCallback);
+}
+
+else if (lockOperation === "Set power saver work mode") {
+    Ttlock.setPowerSaverWorkMode(PowerSaverWorkMode.ALL_CARDS, lockData, () => {
+      let text = "Set power saver work mode success";
+      successCallback(text);
+    }, failedCallback);
+}
+
+else if (lockOperation === "Set power saver work modes") {
+    Ttlock.setPowerSaverWorkModes([PowerSaverWorkMode.ALL_CARDS, PowerSaverWorkMode.ROOM_CARD], lockData, () => {
+      let text = "Set power saver work modes success";
+      successCallback(text);
+    }, failedCallback);
+}
+
+else if (lockOperation === "Set power saver controlable lock") {
+    Ttlock.setPowerSaverControlableLock(lockMac, lockData, () => {
+      let text = "Set power saver controlable lock success";
+      successCallback(text);
+    }, failedCallback);
+}
+
+else if (lockOperation === "Set unauthorized attempt alert") {
+    Ttlock.setUnauthorizedAttemptAlert(5, 300, [UnlockMode.CARD, UnlockMode.PASSCODE], lockData, () => {
+      let text = "Set unauthorized attempt alert success";
+      successCallback(text);
+    }, failedCallback);
+}
+
+else if (lockOperation === "Get unauthorized attempt alert") {
+    Ttlock.getUnauthorizedAttemptAlert(lockData, (alert) => {
+      let text = "attemptAlertCount:" + alert.attemptAlertCount + "\nlockoutDuration:" + alert.lockoutDuration + "\nunlockModes:" + alert.unlockModes;
       successCallback(text);
     }, failedCallback);
 }
