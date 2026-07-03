@@ -338,6 +338,16 @@ RCT_EXPORT_METHOD(deleteFingerprint:(NSString *)fingerprintNumber lockData:(NSSt
     }];
 }
 
+RCT_EXPORT_METHOD(getAllValidFingerprints:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    
+  [TTLock getAllValidFingerprintsWithLockData:lockData success:^(NSString *allFingerprintsJsonString) {
+    [Ttlock reseponseSuccess:allFingerprintsJsonString success:success];
+  } failure:^(TTError errorCode, NSString *errorMsg) {
+    [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+  }];
+}
+
 RCT_EXPORT_METHOD(clearAllFingerprints:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     
