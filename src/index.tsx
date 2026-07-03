@@ -2,7 +2,9 @@ import NativeTTLock from './NativeTtlock';
 
 import { NativeEventEmitter, NativeModules } from 'react-native';
 
-const eventEmitter = new NativeEventEmitter(NativeModules.Ttlock);
+const eventEmitter = new NativeEventEmitter(NativeModules.Ttlock) as NativeEventEmitter & {
+  addListener: (event: string, callback: (...args: any[]) => void) => void;
+};
 
 export class Ttlock {
 
@@ -899,11 +901,11 @@ export class Ttlock {
    * @param success
    * @param fail
    */
-  static getAllValidQRCodes(lockData: string, success: null | ((data: string) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
-    success = success || this.defaultCallback;
-    fail = fail || this.defaultCallback;
-    NativeTTLock.getAllValidQRCodes(lockData, success, fail);
-  }
+  // static getAllValidQRCodes(lockData: string, success: null | ((data: string) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
+  //   success = success || this.defaultCallback;
+  //   fail = fail || this.defaultCallback;
+  //   NativeTTLock.getAllValidQRCodes(lockData, success, fail);
+  // }
 
 
   /**

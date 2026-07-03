@@ -185,7 +185,7 @@ interface Spec extends TurboModule {
 
     getAllValidPalmVeins(lockData: string, success: null | ((data: string) => void), fail: null | ((errorCode: number, description: string) => void)) : void;
 
-//     getAllValidQRCodes(lockData: string, success: null | ((data: string) => void), fail: null | ((errorCode: number, description: string) => void)) : void;
+   //  getAllValidQRCodes(lockData: string, success: null | ((data: string) => void), fail: null | ((errorCode: number, description: string) => void)) : void;
 
 
 
