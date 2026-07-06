@@ -747,6 +747,81 @@ RCT_EXPORT_METHOD(setLiftWorkMode:(int) workMode lockData:(NSString *)lockData s
 }
 
 
+RCT_EXPORT_METHOD(setPowerSaverWorkMode:(int)powerSaverWorkMode lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+  NSNumber *workModeNumber = [Ttlock powerSaverWorkModeFromRN:powerSaverWorkMode];
+  if (workModeNumber == nil) {
+    [Ttlock responseFail:LOCK code:TTErrorInvalidParameter errorMessage:nil fail:fail];
+    return;
+  }
+  [TTLock setPowerSaverWorkMode:(TTPowerSaverWorkMode)workModeNumber.intValue lockData:lockData success:^{
+    [Ttlock reseponseSuccess:nil success:success];
+  } failure:^(TTError errorCode, NSString *errorMsg) {
+    [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+  }];
+}
+
+
+RCT_EXPORT_METHOD(setPowerSaverWorkModes:(NSArray *)powerSaverWorkModes lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+  NSMutableArray *workModes = [NSMutableArray array];
+  for (NSNumber *mode in powerSaverWorkModes) {
+    NSNumber *workModeNumber = [Ttlock powerSaverWorkModeFromRN:mode.intValue];
+    if (workModeNumber != nil) {
+      [workModes addObject:workModeNumber];
+    }
+  }
+  [TTLock setPowerSaverWorkModes:workModes lockData:lockData success:^{
+    [Ttlock reseponseSuccess:nil success:success];
+  } failure:^(TTError errorCode, NSString *errorMsg) {
+    [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+  }];
+}
+
+
+RCT_EXPORT_METHOD(setPowerSaverControlableLock:(NSString *)controlableLockMac lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+  [TTLock setPowerSaverControlableLockWithLockMac:controlableLockMac lockData:lockData success:^{
+    [Ttlock reseponseSuccess:nil success:success];
+  } failure:^(TTError errorCode, NSString *errorMsg) {
+    [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+  }];
+}
+
+
+RCT_EXPORT_METHOD(setUnauthorizedAttemptAlert:(int)attemptAlertCount lockoutDuration:(int)lockoutDuration unlockModes:(NSArray *)unlockModes lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+  NSMutableArray *modes = [NSMutableArray array];
+  for (NSNumber *mode in unlockModes) {
+    [modes addObject:@(mode.intValue)];
+  }
+  [TTLock setUnauthorizedAttemptAlertWithUnlockModes:modes attemptAlertCount:attemptAlertCount lockoutDuration:lockoutDuration lockData:lockData success:^{
+    [Ttlock reseponseSuccess:nil success:success];
+  } failure:^(TTError errorCode, NSString *errorMsg) {
+    [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+  }];
+}
+
+
+RCT_EXPORT_METHOD(getUnauthorizedAttemptAlert:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+  [TTLock getUnauthorizedAttemptAlertWithLockData:lockData success:^(NSArray<NSNumber *> *types, int attemptAlertCount, int lockoutDuration) {
+    NSMutableArray *unlockModes = [NSMutableArray array];
+    for (NSNumber *type in types) {
+      [unlockModes addObject:@(type.intValue)];
+    }
+    NSDictionary *result = @{
+      @"attemptAlertCount": @(attemptAlertCount),
+      @"lockoutDuration": @(lockoutDuration),
+      @"unlockModes": unlockModes
+    };
+    [Ttlock reseponseSuccess:result success:success];
+  } failure:^(TTError errorCode, NSString *errorMsg) {
+    [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+  }];
+}
+
+
 RCT_EXPORT_METHOD(supportFunction:(int)fuction lockData:(NSString *)lockData callback:(RCTResponseSenderBlock)callback)
 {
     BOOL isSupport = [TTUtil lockFeatureValue:lockData suportFunction:(TTLockFeatureValue)fuction];
@@ -979,6 +1054,22 @@ RCT_EXPORT_METHOD(initWirelessKeypad:(NSString *)mac lockMac:(NSString *) lockMa
 
 
 #pragma mark - private method
++ (NSNumber *)powerSaverWorkModeFromRN:(int)mode {
+  switch (mode) {
+    case 0:
+      return @(TTPowerSaverWorkModeAllCards);
+    case 2:
+      return @(TTPowerSaverWorkModeHotelCard);
+    case 3:
+      return @(TTPowerSaverWorkModeRoomCard);
+    case 4:
+      return @(TTPowerSaverWorkModeAutoGetPower);
+    default:
+      return nil;
+  }
+}
+
+
 + (void)reseponseSuccess:(NSObject *)data success:(RCTResponseSenderBlock)success{
     NSArray *responseData = data ? @[data] : nil;
     success(responseData);
