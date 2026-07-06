@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
 
 
 #TTLock 依赖
-  s.dependency 'TTLockOnPremise', '2.1.7'
+  s.dependency 'TTLockOnPremise', '2.2.4'
 
 
   install_modules_dependencies(s)
