@@ -107,6 +107,11 @@ RCT_EXPORT_METHOD(stopScan)
     [TTLock stopScan];
 }
 
+RCT_EXPORT_METHOD(cancelOperationsWithLockMac:(NSString *)lockMac)
+{
+    [TTLock cancelOperationsWithLockMac:lockMac];
+}
+
 
 
 RCT_EXPORT_METHOD(initLock:(NSDictionary *)dict success:(RCTResponseSenderBlock)successfulBlock fail:(RCTResponseSenderBlock)faile)

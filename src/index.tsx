@@ -37,6 +37,15 @@ export class Ttlock {
     eventEmitter.removeAllListeners(TTLockEvent.SCAN_LOCK);
   }
 
+  /**
+   * Cancel an active or pending connection to the lock.
+   * This is non-blocking; pending BLE commands may or may not complete.
+   * @param lockMac
+   */
+  static cancelOperationsWithLockMac(lockMac: string) {
+    NativeTTLock.cancelOperationsWithLockMac(lockMac);
+  }
+
 
   /**
    * Initialize lock

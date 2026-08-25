@@ -7,6 +7,7 @@ interface Spec extends TurboModule {
   getBluetoothState(callback: (state: number) => void): void;
   startScan(): void;
   stopScan(): void;
+  cancelOperationsWithLockMac(lockMac: string): void;
 
 
   initLock(object: Object, success: ((lockData: string) => void), fail: ((errorCode: number, description: string) => void)) : void;

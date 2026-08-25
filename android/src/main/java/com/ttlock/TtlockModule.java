@@ -765,6 +765,11 @@ public class TtlockModule extends NativeTtlockSpec {
     }
 
     @ReactMethod
+    public void cancelOperationsWithLockMac(String lockMac) {
+        TTLockClient.getDefault().disconnect();
+    }
+
+    @ReactMethod
     public void initLock(ReadableMap readableMap, Callback success, Callback fail) {
         String lockmac = readableMap.getString(TTLockFieldConstant.LOCK_MAC);
         if (TextUtils.isEmpty(lockmac)) {

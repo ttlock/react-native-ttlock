@@ -22,7 +22,7 @@
     "react-native-reanimated": "^3.7.2",
     "react-native-root-toast": "^3.2.1",
     "react-native-safe-area-context": "latest",
-    "react-native-screens": "latest"
+    "react-native-screens": "4.25.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
