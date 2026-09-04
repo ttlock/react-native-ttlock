@@ -101,6 +101,9 @@ const getLockSupportOperationList = (lockData: string) => {
     { lockOperation: "Set unauthorized attempt alert", lockFunctionValue: null },
     { lockOperation: "Get unauthorized attempt alert", lockFunctionValue: null },
 
+    { lockOperation: "Wifi lock get wifi firmware version", lockFunctionValue: LockFunction.WifiFirmwareVersion },
+    { lockOperation: "Get motor drive board firmware version", lockFunctionValue: LockFunction.MotorDriveBoardFirmwareVersion },
+
 //     { lockOperation: "Lock upgrade", lockFuctionValue: null }
   ]
 
@@ -697,6 +700,20 @@ else if (lockOperation === "Set unauthorized attempt alert") {
 else if (lockOperation === "Get unauthorized attempt alert") {
     Ttlock.getUnauthorizedAttemptAlert(lockData, (alert) => {
       let text = "attemptAlertCount:" + alert.attemptAlertCount + "\nlockoutDuration:" + alert.lockoutDuration + "\nunlockModes:" + alert.unlockModes;
+      successCallback(text);
+    }, failedCallback);
+}
+
+else if (lockOperation === "Wifi lock get wifi firmware version") {
+    Ttlock.getWifiFirmwareVersion(lockData, (firmwareVersion: string) => {
+      let text = `wifi firmware version:${firmwareVersion}`;
+      successCallback(text);
+    }, failedCallback);
+}
+
+else if (lockOperation === "Get motor drive board firmware version") {
+    Ttlock.getMotorDriveBoardFirmwareVersion(lockData, (firmwareVersion: string) => {
+      let text = `motor drive board firmware version:${firmwareVersion}`;
       successCallback(text);
     }, failedCallback);
 }

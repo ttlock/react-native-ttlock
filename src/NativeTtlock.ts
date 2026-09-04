@@ -132,8 +132,6 @@ interface Spec extends TurboModule {
 
     getWifiInfo(lockData: string, success: null | ((data: any[]) => void), fail: null | ((errorCode: number, description: string) => void)) : void;
 
-
-
     getWifiPowerSavingTime(lockData: string, success: ((timesJsonString: undefined | string) => void), fail: null | ((errorCode: number, description: string) => void)) : void;
 
 
@@ -173,6 +171,10 @@ interface Spec extends TurboModule {
 
     // Get unauthorized attempt alert config.
     getUnauthorizedAttemptAlert(lockData: string, success: null | ((alert: Object) => void), fail: null | ((errorCode: number, description: string) => void)) : void;
+
+    getWifiFirmwareVersion(lockData: string, success: null | ((firmwareVersion: string) => void), fail: null | ((errorCode: number, description: string) => void)) : void;
+
+    getMotorDriveBoardFirmwareVersion(lockData: string, success: null | ((firmwareVersion: string) => void), fail: null | ((errorCode: number, description: string) => void)) : void;
 
     supportFunction(lockFunction: number, lockData: string, callback: (isSupport: boolean) => void) : void;
 

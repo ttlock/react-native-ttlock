@@ -826,6 +826,24 @@ RCT_EXPORT_METHOD(getUnauthorizedAttemptAlert:(NSString *)lockData success:(RCTR
   }];
 }
 
+RCT_EXPORT_METHOD(getWifiFirmwareVersion:(NSString *) lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    [TTLock getWifiFirmwareVersionWithLockData:lockData success:^(NSString *firmwareVersion) {
+        [Ttlock reseponseSuccess:firmwareVersion success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+    }];
+}
+
+RCT_EXPORT_METHOD(getMotorDriveBoardFirmwareVersion:(NSString *) lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    [TTLock getMotorDriveBoardFirmwareVersionWithLockData:lockData success:^(NSString *firmwareVersion) {
+        [Ttlock reseponseSuccess:firmwareVersion success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+    }];
+}
+
 
 RCT_EXPORT_METHOD(supportFunction:(int)fuction lockData:(NSString *)lockData callback:(RCTResponseSenderBlock)callback)
 {

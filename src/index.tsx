@@ -648,7 +648,6 @@ export class Ttlock {
     }, fail);
   }
 
-
   static getWifiPowerSavingTime(lockData: string, success: ((timesJsonString: undefined | string) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
@@ -838,6 +837,18 @@ export class Ttlock {
     NativeTTLock.getUnauthorizedAttemptAlert(lockData, (data: Object) => {
       success!(data as UnauthorizedAttemptAlert);
     }, fail);
+  }
+
+  static getWifiFirmwareVersion(lockData: string, success: null | ((firmwareVersion: string) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    NativeTTLock.getWifiFirmwareVersion(lockData, success, fail);
+  }
+
+  static getMotorDriveBoardFirmwareVersion(lockData: string, success: null | ((firmwareVersion: string) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    NativeTTLock.getMotorDriveBoardFirmwareVersion(lockData, success, fail);
   }
 
     static supportFunction(lockFunction: LockFunction, lockData: string, callback: (isSupport: boolean) => void) {
@@ -1230,7 +1241,9 @@ export enum LockFunction {
   Wifi = 56,
   WifiStaticIP = 58,
   PasscodeKeyNumber = 60,
-  AutoSetUnlockDirection = 81
+  AutoSetUnlockDirection = 81,
+  WifiFirmwareVersion = 104,
+  MotorDriveBoardFirmwareVersion = 122
 }
 
 export enum LockRecordType {

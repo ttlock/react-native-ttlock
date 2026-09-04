@@ -2607,6 +2607,22 @@ public class TtlockModule extends NativeTtlockSpec {
     });
   }
 
+  @ReactMethod
+  public void getWifiFirmwareVersion(String lockData, Callback successCallback, Callback fail) {
+    // TODO: Android SDK (current 3.5.7) does not expose this API yet
+    if (fail != null) {
+      fail.invoke(-1, "getWifiFirmwareVersion is not supported on Android SDK yet");
+    }
+  }
+
+  @ReactMethod
+  public void getMotorDriveBoardFirmwareVersion(String lockData, Callback successCallback, Callback fail) {
+    // TODO: Android SDK (current 3.5.7) does not expose this API yet
+    if (fail != null) {
+      fail.invoke(-1, "getMotorDriveBoardFirmwareVersion is not supported on Android SDK yet");
+    }
+  }
+
     @ReactMethod
     public void getBluetoothState(Callback callback) {
         boolean enable = TTLockClient.getDefault().isBLEEnabled(getCurrentActivity());
