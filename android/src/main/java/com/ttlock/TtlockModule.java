@@ -93,6 +93,8 @@ import com.ttlock.bl.sdk.callback.GetRemoteUnlockStateCallback;
 import com.ttlock.bl.sdk.callback.GetUnlockDirectionCallback;
 import com.ttlock.bl.sdk.callback.GetWifiInfoCallback;
 import com.ttlock.bl.sdk.callback.GetWifiPowerSavingTimesCallback;
+import com.ttlock.bl.sdk.callback.GetWifiFirmwareVersionCallback;
+import com.ttlock.bl.sdk.callback.GetMotorDriveBoardFirmwareVersionCallback;
 import com.ttlock.bl.sdk.callback.InitLockCallback;
 import com.ttlock.bl.sdk.callback.GetAllFacesCallback;
 import com.ttlock.bl.sdk.callback.GetAllPalmVeinsCallback;
@@ -2609,18 +2611,44 @@ public class TtlockModule extends NativeTtlockSpec {
 
   @ReactMethod
   public void getWifiFirmwareVersion(String lockData, Callback successCallback, Callback fail) {
-    // TODO: Android SDK (current 3.5.7) does not expose this API yet
-    if (fail != null) {
-      fail.invoke(-1, "getWifiFirmwareVersion is not supported on Android SDK yet");
-    }
+    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+      if (success) {
+        TTLockClient.getDefault().getWifiFirmwareVersion(lockData, new GetWifiFirmwareVersionCallback() {
+          @Override
+          public void onGetSuccess(String firmwareVersion) {
+            successCallback.invoke(firmwareVersion);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            lockErrorCallback(lockError, fail);
+          }
+        });
+      } else {
+        noPermissionCallback(fail);
+      }
+    });
   }
 
   @ReactMethod
   public void getMotorDriveBoardFirmwareVersion(String lockData, Callback successCallback, Callback fail) {
-    // TODO: Android SDK (current 3.5.7) does not expose this API yet
-    if (fail != null) {
-      fail.invoke(-1, "getMotorDriveBoardFirmwareVersion is not supported on Android SDK yet");
-    }
+    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+      if (success) {
+        TTLockClient.getDefault().getMotorDriveBoardFirmwareVersion(lockData, new GetMotorDriveBoardFirmwareVersionCallback() {
+          @Override
+          public void onGetSuccess(String firmwareVersion) {
+            successCallback.invoke(firmwareVersion);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            lockErrorCallback(lockError, fail);
+          }
+        });
+      } else {
+        noPermissionCallback(fail);
+      }
+    });
   }
 
     @ReactMethod
