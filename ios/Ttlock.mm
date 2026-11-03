@@ -343,11 +343,47 @@ RCT_EXPORT_METHOD(deleteFingerprint:(NSString *)fingerprintNumber lockData:(NSSt
     }];
 }
 
+RCT_EXPORT_METHOD(getAllValidPasscodes:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+  [TTLock getAllValidPasscodesWithLockData:lockData success:^(NSString *passcodes) {
+    [Ttlock reseponseSuccess:passcodes success:success];
+  } failure:^(TTError errorCode, NSString *errorMsg) {
+    [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+  }];
+}
+
+RCT_EXPORT_METHOD(getAllValidCards:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+  [TTLock getAllValidICCardsWithLockData:lockData success:^(NSString *allICCardsJsonString) {
+    [Ttlock reseponseSuccess:allICCardsJsonString success:success];
+  } failure:^(TTError errorCode, NSString *errorMsg) {
+    [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+  }];
+}
+
 RCT_EXPORT_METHOD(getAllValidFingerprints:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     
   [TTLock getAllValidFingerprintsWithLockData:lockData success:^(NSString *allFingerprintsJsonString) {
     [Ttlock reseponseSuccess:allFingerprintsJsonString success:success];
+  } failure:^(TTError errorCode, NSString *errorMsg) {
+    [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+  }];
+}
+
+RCT_EXPORT_METHOD(getAllValidFaces:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+  [TTLock getAllValidFacesWithLockData:lockData success:^(NSString *allFacesJsonString) {
+    [Ttlock reseponseSuccess:allFacesJsonString success:success];
+  } failure:^(TTError errorCode, NSString *errorMsg) {
+    [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+  }];
+}
+
+RCT_EXPORT_METHOD(getAllValidPalmVeins:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+  [TTLock getAllValidPalmVeinsWithLockData:lockData success:^(NSString *allPalmVeinsJsonString) {
+    [Ttlock reseponseSuccess:allPalmVeinsJsonString success:success];
   } failure:^(TTError errorCode, NSString *errorMsg) {
     [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
   }];
