@@ -2,7 +2,9 @@ import NativeTTLock from './NativeTtlock';
 
 import { NativeEventEmitter, NativeModules } from 'react-native';
 
-const eventEmitter = new NativeEventEmitter(NativeModules.Ttlock);
+const eventEmitter = new NativeEventEmitter(NativeModules.Ttlock) as NativeEventEmitter & {
+  addListener: (event: string, callback: (...args: any[]) => void) => void;
+};
 
 export class Ttlock {
 
@@ -33,6 +35,15 @@ export class Ttlock {
   static stopScan() {
     NativeTTLock.stopScan();
     eventEmitter.removeAllListeners(TTLockEvent.SCAN_LOCK);
+  }
+
+  /**
+   * Cancel an active or pending connection to the lock.
+   * This is non-blocking; pending BLE commands may or may not complete.
+   * @param lockMac
+   */
+  static cancelOperationsWithLockMac(lockMac: string) {
+    NativeTTLock.cancelOperationsWithLockMac(lockMac);
   }
 
 
@@ -637,7 +648,6 @@ export class Ttlock {
     }, fail);
   }
 
-
   static getWifiPowerSavingTime(lockData: string, success: ((timesJsonString: undefined | string) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
     success = success || this.defaultCallback;
     fail = fail || this.defaultCallback;
@@ -829,9 +839,124 @@ export class Ttlock {
     }, fail);
   }
 
+  static getWifiFirmwareVersion(lockData: string, success: null | ((firmwareVersion: string) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    NativeTTLock.getWifiFirmwareVersion(lockData, success, fail);
+  }
+
+  static getMotorDriveBoardFirmwareVersion(lockData: string, success: null | ((firmwareVersion: string) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    NativeTTLock.getMotorDriveBoardFirmwareVersion(lockData, success, fail);
+  }
+
     static supportFunction(lockFunction: LockFunction, lockData: string, callback: (isSupport: boolean) => void) {
     NativeTTLock.supportFunction(lockFunction, lockData, callback);
   }
+
+  /**
+   * Set lock working mode (based on freeze/unfreeze and working time commands, requires feature 98).
+   * @param workingMode see LockWorkingMode
+   * @param cyclicConfigs custom working times; startTime/endTime are minutes of day, weekDays are 1-7.
+   *                      Pass null or an empty array for LockWorkingMode.ALL_DAY_NOT_WORK
+   * @param lockData
+   * @param success
+   * @param fail
+   */
+  static setWorkingMode(workingMode: LockWorkingMode, cyclicConfigs: null | WorkingTimesConfig[], lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    cyclicConfigs = cyclicConfigs || [];
+    NativeTTLock.setWorkingMode(workingMode, cyclicConfigs, lockData, success, fail);
+  }
+
+  /**
+   * Set the allowed working time period of the lock (requires feature 107).
+   * Once enabled, the lock only works within the allowed period, e.g. it stops working when the user has not renewed.
+   * @param startDate Timestamp millisecond. The allowed start time of the lock.
+   * @param endDate Timestamp millisecond. The allowed end time of the lock.
+   * @param lockData
+   * @param success
+   * @param fail
+   */
+  static setLockWorkingTime(startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    NativeTTLock.setLockWorkingTime(startDate, endDate, lockData, success, fail);
+  }
+
+  /**
+   * Get all valid passcodes
+   * @param lockData
+   * @param success
+   * @param fail
+   */
+  static getAllValidPasscodes(lockData: string, success: null | ((data: string) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    NativeTTLock.getAllValidPasscodes(lockData, success, fail);
+  }
+
+  /**
+   * Get all valid cards
+   * @param lockData
+   * @param success
+   * @param fail
+   */
+  static getAllValidCards(lockData: string, success: null | ((data: string) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    NativeTTLock.getAllValidCards(lockData, success, fail);
+  }
+
+  /**
+   * Get all valid fingerprints
+   * @param lockData
+   * @param success
+   * @param fail
+   */
+  static getAllValidFingerprints(lockData: string, success: null | ((data: string) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    NativeTTLock.getAllValidFingerprints(lockData, success, fail);
+  }
+
+  /**
+   * Get all valid faces
+   * @param lockData
+   * @param success
+   * @param fail
+   */
+  static getAllValidFaces(lockData: string, success: null | ((data: string) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    NativeTTLock.getAllValidFaces(lockData, success, fail);
+  }
+
+  /**
+   * Get all valid palm veins
+   * @param lockData
+   * @param success
+   * @param fail
+   */
+  static getAllValidPalmVeins(lockData: string, success: null | ((data: string) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
+    success = success || this.defaultCallback;
+    fail = fail || this.defaultCallback;
+    NativeTTLock.getAllValidPalmVeins(lockData, success, fail);
+  }
+
+  /**
+   * Get all valid QR codes
+   * @param lockData
+   * @param success
+   * @param fail
+   */
+  // static getAllValidQRCodes(lockData: string, success: null | ((data: string) => void), fail: null | ((errorCode: LockErrorCode, description: string) => void)) {
+  //   success = success || this.defaultCallback;
+  //   fail = fail || this.defaultCallback;
+  //   NativeTTLock.getAllValidQRCodes(lockData, success, fail);
+  // }
 
 
   /**
@@ -1147,7 +1272,11 @@ export enum LockFunction {
   Wifi = 56,
   WifiStaticIP = 58,
   PasscodeKeyNumber = 60,
-  AutoSetUnlockDirection = 81
+  AutoSetUnlockDirection = 81,
+  WorkingTimes = 98,
+  WifiFirmwareVersion = 104,
+  LockWorkingTime = 107,
+  MotorDriveBoardFirmwareVersion = 122
 }
 
 export enum LockRecordType {
@@ -1190,6 +1319,12 @@ export enum LockUnlockDirection {
 export enum LockPassageMode {
   Weekly = 0,
   Monthly = 1
+}
+
+export enum LockWorkingMode {
+  ALL_DAY_WORK = 1,
+  ALL_DAY_NOT_WORK = 2,
+  CUSTOM = 3
 }
 
 export enum LockControlType {
@@ -1514,4 +1649,16 @@ export interface CycleDateParam {
   weekDay: number,
   startTime: number,
   endTime: number
+}
+
+/**
+ * One working time period. startTime/endTime are minutes of day, same as CycleDateParam.
+ */
+export interface WorkingTimesConfig {
+  /** Minutes from 0 o'clock. */
+  startTime: number,
+  /** Minutes from 0 o'clock. */
+  endTime: number,
+  /** Valid days, 1~7 means Monday ~ Sunday. */
+  weekDays: number[]
 }

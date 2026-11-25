@@ -93,7 +93,15 @@ import com.ttlock.bl.sdk.callback.GetRemoteUnlockStateCallback;
 import com.ttlock.bl.sdk.callback.GetUnlockDirectionCallback;
 import com.ttlock.bl.sdk.callback.GetWifiInfoCallback;
 import com.ttlock.bl.sdk.callback.GetWifiPowerSavingTimesCallback;
+import com.ttlock.bl.sdk.callback.GetWifiFirmwareVersionCallback;
+import com.ttlock.bl.sdk.callback.GetMotorDriveBoardFirmwareVersionCallback;
 import com.ttlock.bl.sdk.callback.InitLockCallback;
+import com.ttlock.bl.sdk.callback.GetAllFacesCallback;
+import com.ttlock.bl.sdk.callback.GetAllPalmVeinsCallback;
+import com.ttlock.bl.sdk.callback.GetAllValidFingerprintCallback;
+import com.ttlock.bl.sdk.callback.GetAllValidICCardCallback;
+import com.ttlock.bl.sdk.callback.GetAllValidPasscodeCallback;
+//import com.ttlock.bl.sdk.callback.GetAllValidQRCodesCallback;
 import com.ttlock.bl.sdk.callback.ModifyAdminPasscodeCallback;
 import com.ttlock.bl.sdk.callback.ModifyFacePeriodCallback;
 import com.ttlock.bl.sdk.callback.ModifyFingerprintPeriodCallback;
@@ -113,9 +121,11 @@ import com.ttlock.bl.sdk.callback.SetLiftWorkModeCallback;
 import com.ttlock.bl.sdk.callback.SetLockConfigCallback;
 import com.ttlock.bl.sdk.callback.SetLockSoundWithSoundVolumeCallback;
 import com.ttlock.bl.sdk.callback.SetLockTimeCallback;
+import com.ttlock.bl.sdk.callback.SetLockWorkingTimeCallback;
 import com.ttlock.bl.sdk.callback.SetPassageModeCallback;
 import com.ttlock.bl.sdk.callback.SetRemoteUnlockSwitchCallback;
 import com.ttlock.bl.sdk.callback.SetUnlockDirectionCallback;
+import com.ttlock.bl.sdk.callback.SetWorkingModeCallback;
 // power saver & unauthorized attempt alert callbacks
 import com.ttlock.bl.sdk.callback.GetUnauthorizedAttemptAlertCallback;
 import com.ttlock.bl.sdk.callback.SetPowerSaverControlableLockCallback;
@@ -143,6 +153,7 @@ import com.ttlock.bl.sdk.entity.TTLockConfigType;
 import com.ttlock.bl.sdk.entity.UnlockDirection;
 import com.ttlock.bl.sdk.entity.ValidityInfo;
 import com.ttlock.bl.sdk.entity.WifiLockInfo;
+import com.ttlock.bl.sdk.entity.WorkingTimesConfig;
 // power saver & unauthorized attempt alert entities
 import com.ttlock.bl.sdk.entity.PowerSaverWorkMode;
 import com.ttlock.bl.sdk.entity.UnauthorizedAttemptAlertData;
@@ -761,6 +772,11 @@ public class TtlockModule extends NativeTtlockSpec {
     @ReactMethod
     public void stopScan() {
         TTLockClient.getDefault().stopScanLock();
+    }
+
+    @ReactMethod
+    public void cancelOperationsWithLockMac(String lockMac) {
+        TTLockClient.getDefault().disconnect();
     }
 
     @ReactMethod
@@ -1526,36 +1542,36 @@ public class TtlockModule extends NativeTtlockSpec {
     }
 
     @ReactMethod
-    public void addPassageMode(ReadableMap type, ReadableArray weekly, ReadableArray monthly, double startDate, double endDate, String lockData, Callback successCallback, Callback fail) {
-//      PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
-//        if (success) {
-//          PassageModeConfig passageModeConfig = new PassageModeConfig();
-//          passageModeConfig.setModeType(((int) type) == 0 ? PassageModeType.Weekly : PassageModeType.Monthly);
-//          if (passageModeConfig.getModeType() == PassageModeType.Weekly) {
-//            passageModeConfig.setRepeatWeekOrDays(Utils.readableArray2IntJson(weekly));
-//          } else {
-//            passageModeConfig.setRepeatWeekOrDays(Utils.readableArray2IntJson(monthly));
-//          }
-//          passageModeConfig.setStartDate((int) startDate);
-//          passageModeConfig.setEndDate((int) endDate);
-//
-//          LogUtil.d("weekdays:" + passageModeConfig.getRepeatWeekOrDays());
-//
-//          TTLockClient.getDefault().setPassageMode(passageModeConfig, lockData, new SetPassageModeCallback() {
-//            @Override
-//            public void onSetPassageModeSuccess() {
-//              successCallback.invoke();
-//            }
-//
-//            @Override
-//            public void onFail(LockError error) {
-//              lockErrorCallback(error, fail);
-//            }
-//          });
-//        } else {
-//          noPermissionCallback(fail);
-//        }
-//      });
+    public void addPassageMode(double type, ReadableArray weekly, ReadableArray monthly, double startDate, double endDate, String lockData, Callback successCallback, Callback fail) {
+      PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+        if (success) {
+          PassageModeConfig passageModeConfig = new PassageModeConfig();
+          passageModeConfig.setModeType(((int) type) == 0 ? PassageModeType.Weekly : PassageModeType.Monthly);
+          if (passageModeConfig.getModeType() == PassageModeType.Weekly) {
+            passageModeConfig.setRepeatWeekOrDays(Utils.readableArray2IntJson(weekly));
+          } else {
+            passageModeConfig.setRepeatWeekOrDays(Utils.readableArray2IntJson(monthly));
+          }
+          passageModeConfig.setStartDate((int) startDate);
+          passageModeConfig.setEndDate((int) endDate);
+
+          LogUtil.d("weekdays:" + passageModeConfig.getRepeatWeekOrDays());
+
+          TTLockClient.getDefault().setPassageMode(passageModeConfig, lockData, new SetPassageModeCallback() {
+            @Override
+            public void onSetPassageModeSuccess() {
+              successCallback.invoke();
+            }
+
+            @Override
+            public void onFail(LockError error) {
+              lockErrorCallback(error, fail);
+            }
+          });
+        } else {
+          noPermissionCallback(fail);
+        }
+      });
     }
 
     @ReactMethod
@@ -2601,6 +2617,48 @@ public class TtlockModule extends NativeTtlockSpec {
     });
   }
 
+  @ReactMethod
+  public void getWifiFirmwareVersion(String lockData, Callback successCallback, Callback fail) {
+    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+      if (success) {
+        TTLockClient.getDefault().getWifiFirmwareVersion(lockData, new GetWifiFirmwareVersionCallback() {
+          @Override
+          public void onGetSuccess(String firmwareVersion) {
+            successCallback.invoke(firmwareVersion);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            lockErrorCallback(lockError, fail);
+          }
+        });
+      } else {
+        noPermissionCallback(fail);
+      }
+    });
+  }
+
+  @ReactMethod
+  public void getMotorDriveBoardFirmwareVersion(String lockData, Callback successCallback, Callback fail) {
+    PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+      if (success) {
+        TTLockClient.getDefault().getMotorDriveBoardFirmwareVersion(lockData, new GetMotorDriveBoardFirmwareVersionCallback() {
+          @Override
+          public void onGetSuccess(String firmwareVersion) {
+            successCallback.invoke(firmwareVersion);
+          }
+
+          @Override
+          public void onFail(LockError lockError) {
+            lockErrorCallback(lockError, fail);
+          }
+        });
+      } else {
+        noPermissionCallback(fail);
+      }
+    });
+  }
+
     @ReactMethod
     public void getBluetoothState(Callback callback) {
         boolean enable = TTLockClient.getDefault().isBLEEnabled(getCurrentActivity());
@@ -2613,6 +2671,179 @@ public class TtlockModule extends NativeTtlockSpec {
         boolean support = FeatureValueUtil.isSupportFeature(lockData, (int) function);
         callback.invoke(support);
     }
+
+    // 设置锁工作模式（依赖冻结/解冻与工作时间段指令，对应特征值 98）
+    // Set lock working mode (based on freeze/unfreeze and working time commands, feature 98).
+    @ReactMethod
+    public void setWorkingMode(double workingMode, ReadableArray cyclicConfigs, String lockData, Callback successCallback, Callback fail) {
+        PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+            if (success) {
+                List<WorkingTimesConfig> workingTimesConfigs = Utils.readableArray2WorkingTimesList(cyclicConfigs);
+                TTLockClient.getDefault().setWorkingMode((int) workingMode, workingTimesConfigs, lockData, new SetWorkingModeCallback() {
+                    @Override
+                    public void onSetSuccess() {
+                        successCallback.invoke();
+                    }
+
+                    @Override
+                    public void onFail(LockError lockError) {
+                        lockErrorCallback(lockError, fail);
+                    }
+                });
+            } else {
+                noPermissionCallback(fail);
+            }
+        });
+    }
+
+    // 设置锁允许工作时间段（0x91 指令，参数 ID 0x0005，对应特征值 107，时间单位为毫秒时间戳）
+    // Set the allowed working time period of the lock (0x91, param ID 0x0005, feature 107, millisecond timestamps).
+    @ReactMethod
+    public void setLockWorkingTime(double startDate, double endDate, String lockData, Callback successCallback, Callback fail) {
+        PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+            if (success) {
+                TTLockClient.getDefault().setLockWorkingTime((long) startDate, (long) endDate, lockData, new SetLockWorkingTimeCallback() {
+                    @Override
+                    public void onSetSuccess() {
+                        successCallback.invoke();
+                    }
+
+                    @Override
+                    public void onFail(LockError lockError) {
+                        lockErrorCallback(lockError, fail);
+                    }
+                });
+            } else {
+                noPermissionCallback(fail);
+            }
+        });
+    }
+
+    @ReactMethod
+    public void getAllValidPasscodes(String lockData, Callback successCallback, Callback fail) {
+        PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+            if (success) {
+                TTLockClient.getDefault().getAllValidPasscodes(lockData, new GetAllValidPasscodeCallback() {
+                    @Override
+                    public void onGetAllValidPasscodeSuccess(String passcodeStr) {
+                        successCallback.invoke(passcodeStr);
+                    }
+
+                    @Override
+                    public void onFail(LockError error) {
+                        lockErrorCallback(error, fail);
+                    }
+                });
+            } else {
+                noPermissionCallback(fail);
+            }
+        });
+    }
+
+    @ReactMethod
+    public void getAllValidCards(String lockData, Callback successCallback, Callback fail) {
+        PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+            if (success) {
+                TTLockClient.getDefault().getAllValidICCards(lockData, new GetAllValidICCardCallback() {
+                    @Override
+                    public void onGetAllValidICCardSuccess(String cardDataStr) {
+                        successCallback.invoke(cardDataStr);
+                    }
+
+                    @Override
+                    public void onFail(LockError error) {
+                        lockErrorCallback(error, fail);
+                    }
+                });
+            } else {
+                noPermissionCallback(fail);
+            }
+        });
+    }
+
+    @ReactMethod
+    public void getAllValidFingerprints(String lockData, Callback successCallback, Callback fail) {
+        PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+            if (success) {
+                TTLockClient.getDefault().getAllValidFingerprints(lockData, new GetAllValidFingerprintCallback() {
+                    @Override
+                    public void onGetAllFingerprintsSuccess(String fingerprintStr) {
+                        successCallback.invoke(fingerprintStr);
+                    }
+
+                    @Override
+                    public void onFail(LockError error) {
+                        lockErrorCallback(error, fail);
+                    }
+                });
+            } else {
+                noPermissionCallback(fail);
+            }
+        });
+    }
+
+    @ReactMethod
+    public void getAllValidFaces(String lockData, Callback successCallback, Callback fail) {
+        PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+            if (success) {
+                TTLockClient.getDefault().getAllValidFaces(lockData, new GetAllFacesCallback() {
+                    @Override
+                    public void onGetAllFaces(String facesStr) {
+                        successCallback.invoke(facesStr);
+                    }
+
+                    @Override
+                    public void onFail(LockError error) {
+                        lockErrorCallback(error, fail);
+                    }
+                });
+            } else {
+                noPermissionCallback(fail);
+            }
+        });
+    }
+
+    @ReactMethod
+    public void getAllValidPalmVeins(String lockData, Callback successCallback, Callback fail) {
+        PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+            if (success) {
+                TTLockClient.getDefault().getAllValidPalmVeins(lockData, new GetAllPalmVeinsCallback() {
+                    @Override
+                    public void onGetAllPalmVeins(String palmVeinsStr) {
+                        successCallback.invoke(palmVeinsStr);
+                    }
+
+                    @Override
+                    public void onFail(LockError error) {
+                        lockErrorCallback(error, fail);
+                    }
+                });
+            } else {
+                noPermissionCallback(fail);
+            }
+        });
+    }
+
+//    @ReactMethod
+//    public void getAllValidQRCodes(String lockData, Callback successCallback, Callback fail) {
+//        PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+//            if (success) {
+//                TTLockClient.getDefault().getAllValidQRCodes(lockData, new GetAllValidQRCodesCallback() {
+//                    @Override
+//                    public void onGetAllValidQRCodesSuccess(String qrCodesStr) {
+//                        successCallback.invoke(qrCodesStr);
+//                    }
+//
+//                    @Override
+//                    public void onFail(LockError error) {
+//                        lockErrorCallback(error, fail);
+//                    }
+//                });
+//            } else {
+//                noPermissionCallback(fail);
+//            }
+//        });
+//    }
 
     private void lockErrorCallback(LockError lockError, Callback fail) {
         if (fail != null) {

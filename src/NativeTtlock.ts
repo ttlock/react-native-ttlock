@@ -7,6 +7,7 @@ interface Spec extends TurboModule {
   getBluetoothState(callback: (state: number) => void): void;
   startScan(): void;
   stopScan(): void;
+  cancelOperationsWithLockMac(lockMac: string): void;
 
 
   initLock(object: Object, success: ((lockData: string) => void), fail: ((errorCode: number, description: string) => void)) : void;
@@ -87,7 +88,7 @@ interface Spec extends TurboModule {
 
     setUnlockDirectionAutomatic(lockData: string, success: null | ((direction: number) => void), fail: null | ((errorCode: number, description: string) => void)) : void;
 
-    addPassageMode(mode: Object, weekDays: number[], monthDays: number[], startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) : void;
+    addPassageMode(mode: number, weekDays: number[], monthDays: number[], startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) : void;
 
 
     clearAllPassageModes(lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) : void;
@@ -131,8 +132,6 @@ interface Spec extends TurboModule {
 
     getWifiInfo(lockData: string, success: null | ((data: any[]) => void), fail: null | ((errorCode: number, description: string) => void)) : void;
 
-
-
     getWifiPowerSavingTime(lockData: string, success: ((timesJsonString: undefined | string) => void), fail: null | ((errorCode: number, description: string) => void)) : void;
 
 
@@ -173,7 +172,29 @@ interface Spec extends TurboModule {
     // Get unauthorized attempt alert config.
     getUnauthorizedAttemptAlert(lockData: string, success: null | ((alert: Object) => void), fail: null | ((errorCode: number, description: string) => void)) : void;
 
+    getWifiFirmwareVersion(lockData: string, success: null | ((firmwareVersion: string) => void), fail: null | ((errorCode: number, description: string) => void)) : void;
+
+    getMotorDriveBoardFirmwareVersion(lockData: string, success: null | ((firmwareVersion: string) => void), fail: null | ((errorCode: number, description: string) => void)) : void;
+
     supportFunction(lockFunction: number, lockData: string, callback: (isSupport: boolean) => void) : void;
+
+    // Set lock working mode: 1 all day work, 2 all day not work, 3 custom.
+    setWorkingMode(workingMode: number, cyclicConfigs: null | Object[], lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) : void;
+
+    // Set the allowed working time period of the lock (millisecond timestamps).
+    setLockWorkingTime(startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) : void;
+
+    getAllValidPasscodes(lockData: string, success: null | ((data: string) => void), fail: null | ((errorCode: number, description: string) => void)) : void;
+
+    getAllValidCards(lockData: string, success: null | ((data: string) => void), fail: null | ((errorCode: number, description: string) => void)) : void;
+
+    getAllValidFingerprints(lockData: string, success: null | ((data: string) => void), fail: null | ((errorCode: number, description: string) => void)) : void;
+
+    getAllValidFaces(lockData: string, success: null | ((data: string) => void), fail: null | ((errorCode: number, description: string) => void)) : void;
+
+    getAllValidPalmVeins(lockData: string, success: null | ((data: string) => void), fail: null | ((errorCode: number, description: string) => void)) : void;
+
+   //  getAllValidQRCodes(lockData: string, success: null | ((data: string) => void), fail: null | ((errorCode: number, description: string) => void)) : void;
 
 
 
