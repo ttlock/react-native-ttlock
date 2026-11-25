@@ -178,6 +178,12 @@ interface Spec extends TurboModule {
 
     supportFunction(lockFunction: number, lockData: string, callback: (isSupport: boolean) => void) : void;
 
+    // Set lock working mode: 1 all day work, 2 all day not work, 3 custom.
+    setWorkingMode(workingMode: number, cyclicConfigs: null | Object[], lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) : void;
+
+    // Set the allowed working time period of the lock (millisecond timestamps).
+    setLockWorkingTime(startDate: number, endDate: number, lockData: string, success: null | (() => void), fail: null | ((errorCode: number, description: string) => void)) : void;
+
     getAllValidPasscodes(lockData: string, success: null | ((data: string) => void), fail: null | ((errorCode: number, description: string) => void)) : void;
 
     getAllValidCards(lockData: string, success: null | ((data: string) => void), fail: null | ((errorCode: number, description: string) => void)) : void;

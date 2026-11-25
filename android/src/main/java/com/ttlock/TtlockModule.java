@@ -121,9 +121,11 @@ import com.ttlock.bl.sdk.callback.SetLiftWorkModeCallback;
 import com.ttlock.bl.sdk.callback.SetLockConfigCallback;
 import com.ttlock.bl.sdk.callback.SetLockSoundWithSoundVolumeCallback;
 import com.ttlock.bl.sdk.callback.SetLockTimeCallback;
+import com.ttlock.bl.sdk.callback.SetLockWorkingTimeCallback;
 import com.ttlock.bl.sdk.callback.SetPassageModeCallback;
 import com.ttlock.bl.sdk.callback.SetRemoteUnlockSwitchCallback;
 import com.ttlock.bl.sdk.callback.SetUnlockDirectionCallback;
+import com.ttlock.bl.sdk.callback.SetWorkingModeCallback;
 // power saver & unauthorized attempt alert callbacks
 import com.ttlock.bl.sdk.callback.GetUnauthorizedAttemptAlertCallback;
 import com.ttlock.bl.sdk.callback.SetPowerSaverControlableLockCallback;
@@ -151,6 +153,7 @@ import com.ttlock.bl.sdk.entity.TTLockConfigType;
 import com.ttlock.bl.sdk.entity.UnlockDirection;
 import com.ttlock.bl.sdk.entity.ValidityInfo;
 import com.ttlock.bl.sdk.entity.WifiLockInfo;
+import com.ttlock.bl.sdk.entity.WorkingTimesConfig;
 // power saver & unauthorized attempt alert entities
 import com.ttlock.bl.sdk.entity.PowerSaverWorkMode;
 import com.ttlock.bl.sdk.entity.UnauthorizedAttemptAlertData;
@@ -2662,6 +2665,53 @@ public class TtlockModule extends NativeTtlockSpec {
     public void supportFunction(double function, String lockData, Callback callback) {
         boolean support = FeatureValueUtil.isSupportFeature(lockData, (int) function);
         callback.invoke(support);
+    }
+
+    // 设置锁工作模式（依赖冻结/解冻与工作时间段指令，对应特征值 98）
+    // Set lock working mode (based on freeze/unfreeze and working time commands, feature 98).
+    @ReactMethod
+    public void setWorkingMode(double workingMode, ReadableArray cyclicConfigs, String lockData, Callback successCallback, Callback fail) {
+        PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+            if (success) {
+                List<WorkingTimesConfig> workingTimesConfigs = Utils.readableArray2WorkingTimesList(cyclicConfigs);
+                TTLockClient.getDefault().setWorkingMode((int) workingMode, workingTimesConfigs, lockData, new SetWorkingModeCallback() {
+                    @Override
+                    public void onSetSuccess() {
+                        successCallback.invoke();
+                    }
+
+                    @Override
+                    public void onFail(LockError lockError) {
+                        lockErrorCallback(lockError, fail);
+                    }
+                });
+            } else {
+                noPermissionCallback(fail);
+            }
+        });
+    }
+
+    // 设置锁允许工作时间段（0x91 指令，参数 ID 0x0005，对应特征值 107，时间单位为毫秒时间戳）
+    // Set the allowed working time period of the lock (0x91, param ID 0x0005, feature 107, millisecond timestamps).
+    @ReactMethod
+    public void setLockWorkingTime(double startDate, double endDate, String lockData, Callback successCallback, Callback fail) {
+        PermissionUtils.doWithConnectPermission(getCurrentActivity(), success -> {
+            if (success) {
+                TTLockClient.getDefault().setLockWorkingTime((long) startDate, (long) endDate, lockData, new SetLockWorkingTimeCallback() {
+                    @Override
+                    public void onSetSuccess() {
+                        successCallback.invoke();
+                    }
+
+                    @Override
+                    public void onFail(LockError lockError) {
+                        lockErrorCallback(lockError, fail);
+                    }
+                });
+            } else {
+                noPermissionCallback(fail);
+            }
+        });
     }
 
     @ReactMethod

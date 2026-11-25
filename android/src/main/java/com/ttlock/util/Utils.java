@@ -4,6 +4,7 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.reactnativettlock.model.TTLockFieldConstant;
 import com.ttlock.bl.sdk.entity.CyclicConfig;
+import com.ttlock.bl.sdk.entity.WorkingTimesConfig;
 import com.ttlock.bl.sdk.util.GsonUtil;
 
 import java.util.ArrayList;
@@ -49,5 +50,24 @@ public class Utils {
             }
         }
         return cyclicConfigs;
+    }
+
+    // 锁工作模式的时间段配置（weekDays 数组）/ Working times config for setWorkingMode (weekDays array).
+    public static List<WorkingTimesConfig> readableArray2WorkingTimesList(ReadableArray readableArray) {
+        List<WorkingTimesConfig> workingTimesConfigs = new ArrayList<>();
+        if (readableArray != null) {
+            for (int i=0;i<readableArray.size();i++) {
+                ReadableMap map = readableArray.getMap(i);
+                WorkingTimesConfig workingTimesConfig = new WorkingTimesConfig();
+                workingTimesConfig.setStartTime(map.getInt(TTLockFieldConstant.START_TIME));
+                workingTimesConfig.setEndTime(map.getInt(TTLockFieldConstant.END_TIME));
+                ReadableArray weekDays = map.getArray(TTLockFieldConstant.WEEK_DAYS);
+                if (weekDays != null) {
+                    workingTimesConfig.setWeekDays(readableArray2IntList(weekDays).toArray(new Integer[0]));
+                }
+                workingTimesConfigs.add(workingTimesConfig);
+            }
+        }
+        return workingTimesConfigs;
     }
 }
