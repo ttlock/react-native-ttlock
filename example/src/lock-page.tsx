@@ -500,7 +500,7 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
     }, failedCallback);
   }
   else if (lockOperation === "Set working mode - all day not work") {
-    Ttlock.setWorkingMode(LockWorkingMode.ALL_DAY_NOT_WORK, [], lockData, () => {
+    Ttlock.setWorkingMode(LockWorkingMode.ALL_DAY_NOT_WORK, null, lockData, () => {
       successCallback("set working mode ALL_DAY_NOT_WORK success");
     }, failedCallback);
   }
