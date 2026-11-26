@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { Ttlock, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockControlType, LockState, LockSoundVolume, LockUnlockDirection, type WifiLockServerInfo, type DeviceSystemModal, FaceState, FaceErrorCode, LockErrorCode, LiftWorkMode, PowerSaverWorkMode, UnlockMode } from 'react-native-ttlock';
+import { Ttlock, LockFunction, LockRecordType, LockConfigType, LockPassageMode, LockWorkingMode, LockControlType, LockState, LockSoundVolume, LockUnlockDirection, type WifiLockServerInfo, type DeviceSystemModal, FaceState, FaceErrorCode, LockErrorCode, LiftWorkMode, PowerSaverWorkMode, UnlockMode } from 'react-native-ttlock';
 import * as Toast from './toast-page';
 
 const getLockSupportOperationList = (lockData: string) => {
@@ -103,6 +103,11 @@ const getLockSupportOperationList = (lockData: string) => {
 
     { lockOperation: "Wifi lock get wifi firmware version", lockFunctionValue: LockFunction.WifiFirmwareVersion },
     { lockOperation: "Get motor drive board firmware version", lockFunctionValue: LockFunction.MotorDriveBoardFirmwareVersion },
+
+    { lockOperation: "Set working mode - all day work", lockFunctionValue: LockFunction.WorkingTimes },
+    { lockOperation: "Set working mode - all day not work", lockFunctionValue: LockFunction.WorkingTimes },
+    { lockOperation: "Set working mode - custom Mon-Fri 08:00-18:00", lockFunctionValue: LockFunction.WorkingTimes },
+    { lockOperation: "Set lock working time", lockFunctionValue: LockFunction.LockWorkingTime },
 
 //     { lockOperation: "Lock upgrade", lockFuctionValue: null }
   ]
@@ -488,6 +493,34 @@ const operationClick = (lockOperation: string, lockData: string, lockMac: string
       successCallback(text);
     }, failedCallback);
 
+  }
+  else if (lockOperation === "Set working mode - all day work") {
+    Ttlock.setWorkingMode(LockWorkingMode.ALL_DAY_WORK, null, lockData, () => {
+      successCallback("set working mode ALL_DAY_WORK success");
+    }, failedCallback);
+  }
+  else if (lockOperation === "Set working mode - all day not work") {
+    Ttlock.setWorkingMode(LockWorkingMode.ALL_DAY_NOT_WORK, [], lockData, () => {
+      successCallback("set working mode ALL_DAY_NOT_WORK success");
+    }, failedCallback);
+  }
+  else if (lockOperation === "Set working mode - custom Mon-Fri 08:00-18:00") {
+    // minutes from 0 o'clock; weekDays 1~7 = Mon~Sun
+    Ttlock.setWorkingMode(LockWorkingMode.CUSTOM, [{
+      startTime: 8 * 60,
+      endTime: 18 * 60,
+      weekDays: [1, 2, 3, 4, 5]
+    }], lockData, () => {
+      successCallback("set working mode CUSTOM success");
+    }, failedCallback);
+  }
+  else if (lockOperation === "Set lock working time") {
+    // millisecond timestamps: now ~ 30 days later
+    let startDate = new Date().getTime();
+    let endDate = startDate + 30 * 24 * 60 * 60 * 1000;
+    Ttlock.setLockWorkingTime(startDate, endDate, lockData, () => {
+      successCallback("set lock working time success");
+    }, failedCallback);
   }
   else if (
     lockOperation === "Init remote key"

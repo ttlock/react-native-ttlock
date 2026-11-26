@@ -353,6 +353,42 @@ RCT_EXPORT_METHOD(getAllValidFingerprints:(NSString *)lockData success:(RCTRespo
   }];
 }
 
+RCT_EXPORT_METHOD(getAllValidPasscodes:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    [TTLock getAllValidPasscodesWithLockData:lockData success:^(NSString *passcodes) {
+        [Ttlock reseponseSuccess:passcodes success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+    }];
+}
+
+RCT_EXPORT_METHOD(getAllValidCards:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    [TTLock getAllValidICCardsWithLockData:lockData success:^(NSString *allICCardsJsonString) {
+        [Ttlock reseponseSuccess:allICCardsJsonString success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+    }];
+}
+
+RCT_EXPORT_METHOD(getAllValidFaces:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    [TTLock getAllValidFacesWithLockData:lockData success:^(NSString *allFacesJsonString) {
+        [Ttlock reseponseSuccess:allFacesJsonString success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+    }];
+}
+
+RCT_EXPORT_METHOD(getAllValidPalmVeins:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    [TTLock getAllValidPalmVeinsWithLockData:lockData success:^(NSString *allPalmVeinsJsonString) {
+        [Ttlock reseponseSuccess:allPalmVeinsJsonString success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+    }];
+}
+
 RCT_EXPORT_METHOD(clearAllFingerprints:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
 {
     
@@ -844,6 +880,45 @@ RCT_EXPORT_METHOD(getMotorDriveBoardFirmwareVersion:(NSString *) lockData succes
     }];
 }
 
+RCT_EXPORT_METHOD(setWorkingMode:(int)workingMode cyclicConfigs:(NSArray *)cyclicConfigs lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    // SDK may invoke failure more than once when checking LockFreeze/WorkingMode features;
+    // TurboModule callbacks can only be called once.
+    __block BOOL callbackInvoked = NO;
+    NSArray <TTWorkingModeTimeModel *> *models = [Ttlock workingModeTimeModelsFromArray:cyclicConfigs];
+    [TTLock setWorkingMode:workingMode cyclicConfig:models lockData:lockData success:^{
+        if (callbackInvoked) {
+            return;
+        }
+        callbackInvoked = YES;
+        [Ttlock reseponseSuccess:nil success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        if (callbackInvoked) {
+            return;
+        }
+        callbackInvoked = YES;
+        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+    }];
+}
+
+RCT_EXPORT_METHOD(setLockWorkingTime:(nonnull NSNumber *)startDate endDate:(nonnull NSNumber *)endDate lockData:(NSString *)lockData success:(RCTResponseSenderBlock)success fail:(RCTResponseSenderBlock)fail)
+{
+    __block BOOL callbackInvoked = NO;
+    [TTLock setLockWorkingTimeWithStartDate:startDate.longLongValue endDate:endDate.longLongValue lockData:lockData success:^{
+        if (callbackInvoked) {
+            return;
+        }
+        callbackInvoked = YES;
+        [Ttlock reseponseSuccess:nil success:success];
+    } failure:^(TTError errorCode, NSString *errorMsg) {
+        if (callbackInvoked) {
+            return;
+        }
+        callbackInvoked = YES;
+        [Ttlock responseFail:LOCK code:errorCode errorMessage:errorMsg fail:fail];
+    }];
+}
+
 
 RCT_EXPORT_METHOD(supportFunction:(int)fuction lockData:(NSString *)lockData callback:(RCTResponseSenderBlock)callback)
 {
@@ -1136,6 +1211,39 @@ RCT_EXPORT_METHOD(initWirelessKeypad:(NSString *)mac lockMac:(NSString *) lockMa
     }
     free(properties);
     return resultDict;
+}
+
++ (NSArray <TTWorkingModeTimeModel *> *)workingModeTimeModelsFromArray:(NSArray *)cyclicConfigs {
+    NSMutableArray <TTWorkingModeTimeModel *> *models = [NSMutableArray array];
+    if (![cyclicConfigs isKindOfClass:[NSArray class]]) {
+        return models;
+    }
+    for (id item in cyclicConfigs) {
+        if (![item isKindOfClass:[NSDictionary class]]) {
+            continue;
+        }
+        NSDictionary *dict = (NSDictionary *)item;
+        TTWorkingModeTimeModel *model = [[TTWorkingModeTimeModel alloc] init];
+        model.startTime = [dict[@"startTime"] intValue];
+        model.endTime = [dict[@"endTime"] intValue];
+        // 1-yes, 2-no. JS/Android have no isAllDay; 0~0 or 0~1440 means all day for selected weekDays.
+        if (dict[@"isAllDay"] != nil) {
+            model.isAllDay = [dict[@"isAllDay"] intValue];
+        } else if (model.startTime == 0 && (model.endTime == 0 || model.endTime >= 24 * 60)) {
+            model.isAllDay = 1;
+            model.endTime = 0;
+        } else {
+            model.isAllDay = 2;
+        }
+        id weekDays = dict[@"weekDays"];
+        if ([weekDays isKindOfClass:[NSArray class]]) {
+            model.weekDays = weekDays;
+        } else {
+            model.weekDays = @[];
+        }
+        [models addObject:model];
+    }
+    return models;
 }
 
 

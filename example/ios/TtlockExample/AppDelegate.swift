@@ -6,6 +6,7 @@ import ReactAppDependencyProvider
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
   var window: UIWindow?
+  var launchOptions: [UIApplication.LaunchOptionsKey: Any]?
 
   var reactNativeDelegate: ReactNativeDelegate?
   var reactNativeFactory: RCTReactNativeFactory?
@@ -14,6 +15,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
   ) -> Bool {
+    self.launchOptions = launchOptions
+
     let delegate = ReactNativeDelegate()
     let factory = RCTReactNativeFactory(delegate: delegate)
     delegate.dependencyProvider = RCTAppDependencyProvider()
@@ -21,14 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     reactNativeDelegate = delegate
     reactNativeFactory = factory
 
-    window = UIWindow(frame: UIScreen.main.bounds)
-
-    factory.startReactNative(
-      withModuleName: "TtlockExample",
-      in: window,
-      launchOptions: launchOptions
-    )
-
+    // Window / RN bootstrap happens in SceneDelegate (UIScene lifecycle).
     return true
   }
 }
